@@ -74,7 +74,6 @@
             this.loading = true;
             this.$store.dispatch('Login', this.loginForm).then(() => {
               this.loading = false;
-              alert('我成功登陆')
               this.$router.push({ path: '/' });
                 // this.showDialog = true;
             }).catch(() => {

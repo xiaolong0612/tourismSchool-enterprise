@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-default/index.css'
+import RegionPicker from 'region-picker'
 import App from './App'
 import router from './router'
 import store from './store'
@@ -14,6 +15,7 @@ import '@/mock/index.js'  // 该项目所有请求使用mockjs模拟
 // register globally
 Vue.component('icon-svg', IconSvg)
 Vue.use(ElementUI)
+Vue.use(RegionPicker)
 
 // register global utility filters.
 Object.keys(filters).forEach(key => {

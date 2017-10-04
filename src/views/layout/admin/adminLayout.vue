@@ -12,8 +12,9 @@
 
 <script>
     import { Navbar, Sidebar, AppMain } from '@/views/layout';
+
     export default {
-      name: 'layout',
+      name: 'ladminayout',
       components: {
         Navbar,
         Sidebar,
