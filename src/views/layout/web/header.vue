@@ -7,7 +7,7 @@
 			</div>
 			<div class="navbar-collapse">
 				<el-menu :default-active="activeIndex" class="pull-right" mode="horizontal" @select="handleSelect">
-				  <el-menu-item index="0">切换企业版</el-menu-item>
+				  <el-menu-item index="0" :open="ToggleHeader">切换企业版</el-menu-item>
 				  <el-menu-item :router="true" :index="item.link" v-for="item in link_list" :key="item.name" v-if="item.children == undefined">
 				  	{{item.name}}
 				  	<router-link :to='item.link'>	</router-link>
@@ -52,7 +52,13 @@
 	</header>
 </template>
 <script>
+  import { mapGetters } from 'vuex';
 	export default {
+		computed: {
+	    ...mapGetters([
+	      'header'
+	    ])
+	  },
 		data() {
 			return{
 				link_list: [
@@ -88,6 +94,10 @@
 		  }
 		},
 		methods: {
+			ToggleHeader() {
+				console.log(12312)
+        this.$store.dispatch('ToggleHeader')
+      },
 			handleSelect(){
 
 			}

@@ -29,6 +29,17 @@ const user_resume_list = _import('web/user/resume/list');
 const user_resume_details = _import('web/user/resume/details');
 /* 收藏夹 */
 const user_collect = _import('web/user/collect/index');
+
+/***************
+ *   企业信息   *
+ ***************/
+/* 招聘列表 */
+const com_recruit_list = _import('web/com/recruit/list');
+/* 招聘详情 */
+const com_recruit_details = _import('web/com/recruit/details');
+
+
+
 /* dashboard */
 const dashboard = _import('dashboard/index');
 
