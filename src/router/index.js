@@ -33,6 +33,8 @@ const user_collect = _import('web/user/collect/index');
 /***************
  *   企业信息   *
  ***************/
+/* 发布招聘 */
+const com_recruit_release = _import('web/com/recruit/release');
 /* 招聘列表 */
 const com_recruit_list = _import('web/com/recruit/list');
 /* 招聘详情 */
@@ -49,6 +51,8 @@ const Err404 = _import('404');
 /* demo page */
 const Form = _import('page/form');
 const Table = _import('table/index');
+
+const form_new_resume = _import('form/new-resume');
 
 
 
@@ -115,12 +119,32 @@ export const constantRouterMap = [
     ]
   },
   {
+    path: '/com',
+    component: webLayout,
+    name: '企业',
+    hidden: true,
+    children: [
+      {
+        path: 'release',
+        component: com_recruit_release,
+        name: '发布招聘'
+      }
+    ]
+  },
+  {
     path: '/dashboard',
     component: adminLayout,
     redirect: '/dashboard/index',
     name: 'Home',
     hidden: true,
     children: [{ path: 'dashboard/index', component: dashboard }]
+  },
+  {
+    path: '/form',
+    component: webLayout,
+    name: 'Home',
+    hidden: true,
+    children: [{ path: 'form-new-resume', component: form_new_resume }]
   }
 ]
 

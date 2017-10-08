@@ -13,20 +13,16 @@ const app = {
     TOGGLE_SIDEBAR: state => {
       if (state.sidebar.opened) {
         Cookies.set('sidebarStatus', 1);
-        console.log(1)
       } else {
         Cookies.set('sidebarStatus', 0);
-        console.log(2)
       }
       state.sidebar.opened = !state.sidebar.opened;
     },
     TOGGLE_HEADER: state => {
       if (state.header.type) {
         Cookies.set('headerStatus', 1); // 企业
-        console.log(1);
       } else {
         Cookies.set('headerStatus', 0); // 学生
-        console.log(0);
       }
 
       state.header.type = !state.header.type;

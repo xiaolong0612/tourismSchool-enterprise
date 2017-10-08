@@ -6,7 +6,7 @@
 				<router-link to="index" class="logo">旅游校企</router-link>
 			</div>
 			<div class="navbar-collapse">
-				<el-menu :default-active="activeIndex" class="pull-right" mode="horizontal" @select="handleSelect">
+				<!-- <el-menu :default-active="activeIndex" class="pull-right" mode="horizontal" @select="handleSelect">
 				  <el-menu-item index="0" :open="ToggleHeader">切换企业版</el-menu-item>
 				  <el-menu-item :router="true" :index="item.link" v-for="item in link_list" :key="item.name" v-if="item.children == undefined">
 				  	{{item.name}}
@@ -24,29 +24,39 @@
 				    </el-menu-item>
 				  </el-submenu>
 				  <el-menu-item index="5">登陆／登出</el-menu-item>
-				</el-menu>
-				<!-- <ul class="pull-right navbar-nav">
-					<li>
-						<router-link to='index'>切换企业版</router-link>
+				</el-menu> -->
+				<ul class="pull-right navbar-nav">
+					<li @click="ToggleHeader" v-if="header.type">
+							切换企业版
 					</li>
-					<li v-for="item in link_list">
-						<router-link :to='item.link'>item.name</router-link>
+					<li @click="ToggleHeader" v-else>
+							切换学生版
+					</li>
+					<li v-for="item in link_list" :key="item.name" :class="{ 'active': item.active, 'border': item.name == '发布招聘'}">
+						<router-link :to='item.link'  v-if="item.children == undefined">
+							{{item.name}}
+						</router-link>
+
+						<el-dropdown v-if="item.children != undefined" @command="handleCommand">
+						  <span class="el-dropdown-link">
+						  	<router-link :to="item.link">
+						    {{item.name}}
+						   	</router-link>
+						    <i class="el-icon-caret-bottom el-icon--right"></i>
+						  </span>
+						  <el-dropdown-menu slot="dropdown">
+						    <el-dropdown-item v-for="children in item.children" :key="item.name" :command="children.link">
+						    	{{children.name}}
+						    </el-dropdown-item>
+						  </el-dropdown-menu>
+						</el-dropdown>
 					</li>
 					<li>
-						<router-link to='/resume/details'>
-							<el-badge is-dot class="item">我的简历</el-badge>
+						<router-link to='/'>
+							登陆／登出
 						</router-link>
 					</li>
-					<li>
-						<router-link to='index'>投递箱</router-link>
-					</li>
-					<li>
-						<router-link to='index'>收藏夹</router-link>
-					</li>
-					<li>
-						<router-link to='index'>登陆／登出</router-link>
-					</li>
-				</ul> -->
+				</ul>
 			</div>
 		</div>
 	</header>
@@ -61,10 +71,34 @@
 	  },
 		data() {
 			return{
-				link_list: [
+				com_header: [
+					{
+						name: '发布招聘',
+						link: '/com/release'
+					},{
+						name: '招聘列表',
+						link: '/user/resume/list',
+						children: [
+							{
+								name: '导游',
+								link: '/user/resume/details'
+							},{
+								name: '会计',
+								link: '/user/resume/details'
+							}
+						]
+					},{
+						name: '收件箱',
+						link: '/user/delivery'
+					},{
+						name: '公司信息',
+						link: '/index'
+					}
+				],
+				user_header: [
 					{
 						name: '首页',
-						link: '/'
+						link: '/index'
 					},{
 						name: '我的简历',
 						link: '/user/resume/list',
@@ -85,18 +119,72 @@
 						link: '/user/collect/list'
 					}
 				],
+				link_list: [],
 				activeIndex: '1'
 			}
 		},
 		watch: {
   		'$route' (to, from) {
-  			// console.log(to, from);
+  			this.active_link(to.path);
 		  }
 		},
+    mounted() {
+    	this.set_active_link();
+    	this.active_link(this.$route.path);
+    	this.setHeader();
+    },
 		methods: {
+			set_active_link(){
+				for(let i in this.link_list){
+					if(typeof this.link_list[i].children == 'undefined'){
+						this.$set(this.link_list[i], 'active', false);
+					
+					}else{
+						for(let c in this.link_list[i].children){
+							this.$set(this.link_list[i].children[c], 'active', false);
+						}
+					}
+				}
+			},
+			active_link(link){
+				for(let i in this.link_list){
+					if(typeof this.link_list[i].children == 'undefined'){
+						if(this.link_list[i].link == link){
+							this.link_list[i].active = true;
+						}else{
+							this.link_list[i].active = false
+						}
+					
+					}else{
+						if(this.link_list[i].link == link){
+							this.link_list[i].active = true;
+						}else{
+							for(let c in this.link_list[i].children){
+								if(this.link_list[i].children[c].link == link){
+									this.link_list[i].active = true;
+									// this.link_list[i].children[c].active = true;
+								}else{
+									this.link_list[i].active = false;
+									// this.link_list[i].children[c].active = false;
+								}
+							}
+						}
+					}
+				}
+			},
+			handleCommand(link){
+				this.$router.push({path: link})
+			},
 			ToggleHeader() {
-				console.log(12312)
-        this.$store.dispatch('ToggleHeader')
+        this.$store.dispatch('ToggleHeader');
+        this.setHeader();
+      },
+      setHeader(){
+        if(!this.header.type){
+        	this.link_list = this.com_header
+        }else{
+        	this.link_list = this.user_header
+        }
       },
 			handleSelect(){
 
@@ -133,42 +221,55 @@
 	    height: 100%;
 	    color: #000000;
 		}
-		.navbar-collapse > .el-menu{
-			background-color: transparent;
-			>.el-menu-item, .el-submenu__title{
-				line-height: 65px;
-				height: 65px;
-				position: relative;
+		// .navbar-collapse > .el-menu{
+		// 	background-color: transparent;
+		// 	>.el-menu-item, .el-submenu__title{
+		// 		line-height: 65px;
+		// 		height: 65px;
+		// 		position: relative;
 				
-			}
-			.el-submenu .el-menu-item{
-				min-width: 100%;
-			}
-			.el-menu-item, .el-submenu__title{
-				a{
-					position: absolute;
-					top: 0;
-					left: 0;
-					right: 0;
-					bottom: 0;
-				}
-			}
-		}
+		// 	}
+		// 	.el-submenu .el-menu-item{
+		// 		min-width: 100%;
+		// 	}
+		// 	.el-menu-item, .el-submenu__title{
+		// 		a{
+		// 			position: absolute;
+		// 			top: 0;
+		// 			left: 0;
+		// 			right: 0;
+		// 			bottom: 0;
+		// 		}
+		// 	}
+		// }
 		.navbar-nav{
 			li{
 				float: left;
+				line-height: 25px;
+				margin: 20px 15px;
+				font-size: 13px;
+				&.border{
+					border: 1px solid #20a0ff;
+					margin: 19px 15px;
+					padding: 0 12px;
+					border-radius: 50px;
+					a{
+						color: #20a0ff;
+					}
+				}
+				&.active{
+					a{
+						color: #20a0ff
+					}
+				}
 				a{
 			    text-transform: uppercase;
 			    font-weight: 500;
-			    height: 100%;
-			    padding: 22px 15px;
 			    font-size: 13px;
 			    color: #000000;
 			    border-bottom: solid 1px transparent;
-			    background-color: transparent !important;
-			    display: block;
 			    &.active, &:hover{
-			    	color: #457aff;
+			    	color: #20a0ff;
 			    }
 			    .el-badge{
 			    	vertical-align: top;

@@ -30,7 +30,7 @@
 	          			</div>
 	          		</div>
 	          		<div class="edit">
-	          			<el-button class="pull-right" size="small" type="primary">编辑</el-button>
+	          			<el-button class="pull-right" size="mini" type="primary">编辑</el-button>
 	          			<span>最后编辑于:</span>
 	          			<font>{{item.last_edit_time}}</font>
 	          		</div>
@@ -218,11 +218,11 @@
 				padding: 5px 7px;
 				>span{
 					color: #999;
-					font-size: 14px;
+					font-size: 13px;
 				}
 				>font{
 					color: #555;
-					font-size: 14px;
+					font-size: 13px;
 				}
 			}
 		}

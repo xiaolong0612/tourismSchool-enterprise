@@ -17,7 +17,7 @@
 
 						</div>
 						<div class="label mt5">
-		  				<el-tag class="mr5" type="gray" v-for="lable in item.lable" :key="lable">{{lable}}</el-tag>
+		  				<el-tag size="small" class="mr5" type="gray" v-for="lable in item.lable" :key="lable">{{lable}}</el-tag>
 						</div>
 		  		</div>
 		  		<div class="con-info">

@@ -30,7 +30,8 @@ npm run build --report
 │   ├── utils                  // 全局公用方法
 │   ├── view                   // view
 │   ├── App.vue                // 入口页面
-│   └── main.js                // 入口 加载组件 初始化等
+│   ├── main.js                // 入口 加载组件 初始化等
+│   └── permission.js          // 动态生成路由表 权限判断
 ├── static                     // 第三方不打包资源
 │   └── Tinymce                // 富文本
 ├── .babelrc                   // babel-loader 配置

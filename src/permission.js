@@ -3,6 +3,7 @@ import store from './store'
 import NProgress from 'nprogress' // Progress 进度条
 import 'nprogress/nprogress.css'// Progress 进度条样式
 import { getToken } from '@/utils/auth' // 验权
+import { constantRouterMap } from '@/router/index';
 
 // permissiom judge
 function hasPermission(roles, permissionRoles) {
@@ -11,8 +12,22 @@ function hasPermission(roles, permissionRoles) {
   return roles.some(role => permissionRoles.indexOf(role) >= 0)
 }
 
+function getWhiteList(){
+  let list = [];
+  for(let i in constantRouterMap){
+    if(typeof constantRouterMap[i].redirect == 'undefined'){
+      for(let c in constantRouterMap[i].children){
+        list.push(constantRouterMap[i].path+'/'+constantRouterMap[i].children[c].path);
+      }
+    }else{
+      list.push(constantRouterMap[i].path);
+      list.push(constantRouterMap[i].redirect);
+    }
+  }
+}
+
 // register global progress.
-const whiteList = ['/', '/index', '/login', '/authredirect', '/reset', '/sendpwd', '/dashboard/index', '/resume/details']// 不重定向白名单
+const whiteList = getWhiteList(); // 不重定向白名单
 router.beforeEach((to, from, next) => {
   NProgress.start() // 开启Progress
   if (getToken()) { // 判断是否有token
