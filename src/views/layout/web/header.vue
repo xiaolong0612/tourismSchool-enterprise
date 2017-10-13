@@ -74,22 +74,31 @@
 				com_header: [
 					{
 						name: '发布招聘',
-						link: '/com/release'
+						link: '/com/recruit/release'
 					},{
 						name: '招聘列表',
-						link: '/user/resume/list',
+						link: '/com/recruit/list',
 						children: [
 							{
 								name: '导游',
-								link: '/user/resume/details'
+								link: '/com/recruit/list'
 							},{
 								name: '会计',
-								link: '/user/resume/details'
+								link: '/com/recruit/list'
 							}
 						]
 					},{
 						name: '收件箱',
-						link: '/user/delivery'
+						link: '/com/inbox/list',
+						children: [
+							{
+								name: '导游',
+								link: '/com/inbox/list'
+							},{
+								name: '会计',
+								link: '/com/inbox/list'
+							}
+						]
 					},{
 						name: '公司信息',
 						link: '/index'
@@ -105,10 +114,10 @@
 						children: [
 							{
 								name: '导游',
-								link: '/user/resume/details'
+								link: '/user/resume/list'
 							},{
 								name: '会计',
-								link: '/user/resume/details'
+								link: '/user/resume/list'
 							}
 						]
 					},{

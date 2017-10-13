@@ -3,7 +3,7 @@
 		<div class="breadcrumb-wrap container pt95">
 			<el-breadcrumb separator="/">
 				  <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-				  <el-breadcrumb-item>简历列表</el-breadcrumb-item>
+				  <el-breadcrumb-item>收件箱</el-breadcrumb-item>
 				</el-breadcrumb>
 		</div>
 		<div class="container pt20 resume_type_list_wrap pb50">
@@ -19,11 +19,10 @@
 	          			<div class="info">
 	          				<h2>
 	          					<router-link to="/">
-											{{item.recruit}}
-											<span>({{item.salary}})</span>
+											{{item.name}}[{{item.recruit}}]
 	          					</router-link>
 	          				</h2>
-	          				<font class="state">{{item.state}}</font>
+	          				<font class="state">{{item.state}} / 1年</font>
 		          			<p>
 		          				{{item.address}} / 
 		          				{{item.edu}}
@@ -32,10 +31,10 @@
 	          		</div>
 	          		<div class="edit">
 	          			<router-link to="/user/resume/details">
-		          			<el-button class="pull-right" size="mini" type="primary">编辑</el-button>
+		          			<el-button class="pull-right" size="mini" type="primary">查看</el-button>
 		          		</router-link>
 		          		
-	          			<span>最后编辑于:</span>
+	          			<span>收件时间:</span>
 	          			<font>{{item.last_edit_time}}</font>
 	          		</div>
 	          	</div> 

@@ -27,8 +27,9 @@ const userMap = {
 
 export default {
   login: config => {
-    const { account } = JSON.parse(config.body);
-    return userMap[account.split('@')[0]];
+    console.log(config)
+    const { account } = config.body.account;
+    return userMap.admin;
   },
   getInfo: config => {
     const { token } = param2Obj(config.url);

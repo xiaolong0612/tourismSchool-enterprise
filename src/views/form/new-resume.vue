@@ -21,27 +21,38 @@
       return {
         form: {
           studentId: 1,
-          jobIntent: '',
-          certificate: '',
-          selfIntro: '',
-          skillDescript: '',
-          pic: '',
-          labelName: '',
-          working: '',
-          expectAddress: '',
-          expectIncome: '',
-          expectJob: '',
-          workList: [
-          	{
-          		companyName: '',
-          		beginDate: '',
-          		endDate: '',
-          		workJob: '',
-          		workContent: '',
-          		schoolName: '',
-          		major: '',
-          		qualificate: '',
-          		graduateYear: ''
+          jobIntent: '1',
+          certificate: '1',
+          selfIntro: '1',
+          skillDescript: '1',
+          pic: '1',
+          labelName: '1',
+          working: '1',
+          expectAddress: '1',
+          expectIncome: '1',
+          expectJob: '1',
+          work: [
+            {
+              companyName: '1',
+              beginDate: '1',
+              endDate: '1',
+              workJob: '1',
+              workContent: '1',
+            },
+            {
+              companyName: '1',
+              beginDate: '1',
+              endDate: '1',
+              workJob: '1',
+              workContent: '1',
+            }
+          ],
+          edu:[
+            {
+              schoolName: '1',
+          		major: '1',
+          		qualificate: '1',
+          		graduateYear: '1'
           	}
           ]
         }
@@ -49,8 +60,25 @@
     },
     methods: {
       onSubmit() {
-        saveResume(this.form).then(res => {
-        	console.log(res)
+        let query = JSON.parse(JSON.stringify(this.form));
+        // for(let i in query.workList){
+        //   query.workList[i] = JSON.stringify(query.workList[i])
+        // }
+        // for(let i in query.eduList){
+        //   query.eduList[i] = JSON.stringify(query.eduList[i]);
+        // }
+        query.work = JSON.stringify(query.work);
+        query.edu = JSON.stringify(query.edu);
+        // query.work = '1';
+        // query.edu = '1';
+        console.log(query)
+        saveResume(query).then(res => {
+          if(res.data.code == 1){
+            this.$message({
+              message: '简历新增成功',
+              type: 'success'
+            });
+          }
         })
       }
     }

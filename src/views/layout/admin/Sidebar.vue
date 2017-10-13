@@ -1,5 +1,7 @@
 <template>
-    <el-menu mode="vertical" theme="dark" :default-active="$route.path">
+    <el-menu mode="vertical" theme="dark" :default-active="$route.path" background-color="#545c64"
+  text-color="#fff"
+  active-text-color="#ffd04b">
         <sidebar-item :routes='permission_routers'></sidebar-item>
     </el-menu>
 </template>

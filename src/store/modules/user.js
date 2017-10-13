@@ -55,6 +55,7 @@ const user = {
       const account = userInfo.account.trim();
       return new Promise((resolve, reject) => {
         login(account, userInfo.password).then(response => {
+          console.log(response)
           const data = response.data;
           setToken(response.data.token);
           commit('SET_TOKEN', data.token);

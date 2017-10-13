@@ -19,6 +19,12 @@ const search_index = _import('web/search/index');
 const recruit_details = _import('web/recruit/details');
 
 /***************
+ *    admin    *
+ ***************/
+const admin_student_list = _import('admin/student/index');
+const admin_com_list = _import('admin/com/index');
+
+/***************
  *   用户信息   *
  ***************/
 /* 投递箱 */
@@ -39,6 +45,9 @@ const com_recruit_release = _import('web/com/recruit/release');
 const com_recruit_list = _import('web/com/recruit/list');
 /* 招聘详情 */
 const com_recruit_details = _import('web/com/recruit/details');
+/* 收件箱 */
+const com_inbox_list = _import('web/com/inbox/list');
+
 
 
 
@@ -125,10 +134,25 @@ export const constantRouterMap = [
     hidden: true,
     children: [
       {
-        path: 'release',
+        path: 'recruit/release',
         component: com_recruit_release,
         name: '发布招聘'
-      }
+      },
+      {
+        path: 'recruit/list',
+        component: com_recruit_list,
+        name: '招聘列表'
+      },
+      {
+        path: 'recruit/list/details',
+        component: com_recruit_details,
+        name: '招聘详情'
+      },
+      {
+        path: 'inbox/list',
+        component: com_inbox_list,
+        name: '收件箱'
+      },
     ]
   },
   {
@@ -161,17 +185,36 @@ export const asyncRouterMap = [
     redirect: 'noredirect',
     name: 'Example',
     icon: 'zujian',
+    hidden: true,
     children: [
       { path: 'index', component: Form, name: 'Form', icon: 'zonghe' }
     ]
   },
-
+  {
+    path: '/student',
+    component: adminLayout,
+    redirect: '/student/list',
+    name: '学生',
+    icon: 'tubiaoleixingzhengchang',
+    noDropdown: true,
+    children: [{ path: 'index', component: admin_student_list, name: '学生列表', meta: { role: ['admin'] } }]
+  },
+  {
+    path: '/com',
+    component: adminLayout,
+    redirect: '/com/list',
+    name: '企业',
+    icon: 'tubiaoleixingzhengchang',
+    noDropdown: true,
+    children: [{ path: 'index', component: admin_com_list, name: '企业列表', meta: { role: ['admin'] } }]
+  },
   {
     path: '/table',
     component: adminLayout,
     redirect: '/table/index',
     name: 'Table',
     icon: 'tubiaoleixingzhengchang',
+    hidden: true,
     noDropdown: true,
     children: [{ path: 'index', component: Table, name: 'Table', meta: { role: ['admin'] } }]
   },

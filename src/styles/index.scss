@@ -73,6 +73,9 @@ p {font-size: 14px;}
 .pull-left{float: left;}
 .pull-right{float: right;}
 
+.t-center{text-align: center;}
+.t-left{text-align: left;}
+.t-right{text-align: right}
 .bg-gray{
   background-color:#f0f2f6;
 }
@@ -88,6 +91,12 @@ p {font-size: 14px;}
 .fade-enter,
 .fade-leave-active {
   opacity: 0;
+}
+
+.el-form{
+  .el-select{
+    width: 100%;
+  }
 }
 
 //main-container全局样式

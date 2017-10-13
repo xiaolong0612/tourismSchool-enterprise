@@ -2,22 +2,23 @@ import axios from 'axios'
 import { Message } from 'element-ui';
 import store from '../store';
 import { getToken } from '@/utils/auth';
-import qs from 'qs';
+const qs = require('qs')
 
 // 创建axios实例
 const service = axios.create({
   baseURL: process.env.BASE_API, // api的base_url
   timeout: 5000,                // 请求超时时间
-  // transformRequest: [function (data) {
-  //   // 对 data 进行任意转换处理
-  //   return qs.stringify(data);
-  // }]
+  headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+  transformRequest: [function (data) {
+    // data = qs.stringify(data)
+    return data;
+  }]
 });
-service.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+// service.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 // service.defaults.withCredentials=true;
 // request拦截器
 service.interceptors.request.use(config => {
-  // config.headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'
+  // config.headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';
   config.emulateJSON = true;
   return config;
 }, error => {

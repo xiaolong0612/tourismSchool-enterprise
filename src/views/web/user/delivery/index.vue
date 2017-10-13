@@ -86,7 +86,7 @@
 						  		</div>
 						  		<div class="resume clearfix">
 
-						  			<el-popover placement="right-end" title="标题" trigger="click">
+						  			<el-popover placement="right-end" title="标题" trigger="click" width="540">
 						        <div class="contact_info">
 						        	<el-alert
 										    title="提示:  你的简历已经通过初筛，企业可能会在近期与你沟通，请保持联系方式畅通"
@@ -151,7 +151,7 @@
 						  			</router-link>
 						  		</div>
 						  		<div class="resume clearfix">
-						  			<el-popover placement="left-end" title="标题" trigger="click">
+						  			<el-popover placement="left-end" title="标题" trigger="click" width="540">
 
 											<div class="contact_info">
 							        	<el-alert
