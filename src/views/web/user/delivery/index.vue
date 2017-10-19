@@ -7,277 +7,251 @@
 			</el-breadcrumb>
 		</div>
 		<div class="container pt30 pb100 delivery_list">
-			<el-tabs type="border-card">
-			  <el-tab-pane label="全部">
-			  	<el-row :gutter="20">
-					  <el-col :span="12" v-for='item in list' :key="item.recruit">
-					  	<div class="box mb15">
-					  		<div class="box_top">
-						  		<h2 class="position_name">
-						  			<router-link to="/">
-						  				{{item.recruit}}
-						  				<span>{{item.salary}}</span>
-						  			</router-link>
-						  		</h2>
-						  		<div class="com_info">
-						  			<router-link to="/">
-							  			{{item.company.name}}
-							  			<font>[{{item.address}}]</font>
-						  			</router-link>
-						  		</div>
-						  		<div class="resume clearfix">
-						  			<el-button class="pull-right ml5" size="small" type="text">等待通知</el-button>
-						  			<span class="pull-right">{{item.time}}</span>
-						  			<span>使用简历:</span>
-						  			<font>简历一</font>
-						  		</div>
+			<el-tabs type="border-card" v-model="active_list.tabs" @tab-click="getList">
+			  <el-tab-pane
+			  	v-for="tab in tabList"
+			  	:key="tab.name"
+			    :label="tab.title"
+			    :name="tab.name">
+			    <div v-loading="loading">
+				  	<el-row :gutter="20">
+						  <el-col :span="12" v-for='item in list' :key="item.deliveryTime">
+						  	<div class="box mb15">
+						  		<div class="box_top">
+							  		<h2 class="position_name">
+							  			<router-link :to="'/com/recruit/list/details/'+item.jobId">
+							  				{{item.jobId}}
+							  				<span>15k-30k</span>
+							  			</router-link>
+							  		</h2>
+							  		<div class="com_info">
+							  			<router-link to="/">
+								  			{{item.companyName}}
+								  			<font>[厦门市]</font>
+							  			</router-link>
+							  		</div>
+							  		<div class="resume clearfix">
+							  			<el-popover
+											  placement="left-end"
+											  width="540"
+											  trigger="click">
+								        <div class="contact_info">
+								        	<el-alert
+								        		v-if="typeof item.stateStr.alert != undefined"
+												    :title="item.stateStr.alert_text"
+												    :type="item.stateStr.alert"
+												    class="mt10"
+												    :class="{'mb10': item.stateStr.type == 'danger'}"
+												    :closable="false">
+												  </el-alert>
+								          <el-form
+								          	v-if="item.stateStr.type != 'danger'"
+								          	label-position="left"
+								          	inline
+								          	class="demo-table-expand">
+								          	<el-row>
+								          		<el-col :span="10">
+											          <el-form-item label="联系人">
+											            <span>xiaolongjun</span>
+											          </el-form-item>
+											        </el-col>
+								          		<el-col :span="10">
+											          <el-form-item label="面试时间">
+											            <span>4／12 16:00</span>
+											          </el-form-item>
+											        </el-col>
+								          		<el-col :span="10">
+											          <el-form-item label="联系电话">
+											            <span>18678787979</span>
+											          </el-form-item>
+											        </el-col>
+								          		<el-col :span="14">
+											          <el-form-item label="联系邮箱">
+											            <span>1057520381@qq.com</span>
+											          </el-form-item>
+											        </el-col>
+											      </el-row>
+									        </el-form>
+
+								          <el-form
+								          	v-if="item.state != 0 || item.state != 1"
+								          	label-position="left"
+								          	inline
+								          	class="demo-table-expand"
+								          	label-width="70px">
+								          	<el-row>
+								          		<el-col :span="24" class="mb10">
+											          <el-form-item label="评分">
+											            <el-rate
+																    v-model="item.score"
+																    show-text
+																    :colors="['#99A9BF', '#F7BA2A', '#FF9900']"
+																    style="padding: 8px 0">
+																  </el-rate>
+											          </el-form-item>
+											        </el-col>
+								          		<el-col :span="24" class="mb10">
+											          <el-form-item label="评价内容">
+											            <el-input type="textarea" v-model="item.evaluate_content"></el-input>
+											          </el-form-item>
+											        </el-col>
+											        <el-form-item label="   " class="mb15">
+										            <el-button
+										            	class="ml5"
+										            	size="mini" 
+										            	type="primary"
+										            	@click="submitEvaluate(item)">提交</el-button>
+										          </el-form-item>
+											      </el-row>
+									        </el-form>
+
+								        </div>
+
+									  		<el-button  slot="reference" v-if="item.state != 0" class="pull-right ml5" size="mini" :type="item.stateStr.type">{{item.stateStr.text}}</el-button>
+									    </el-popover>
+											
+											<el-tooltip v-if="item.state == 0" effect="dark" content="等待企业反馈" placement="top-start">
+							  				<el-button class="pull-right ml5" size="mini" :type="item.stateStr.type">{{item.stateStr.text}}</el-button>
+											</el-tooltip>
+							  			<span class="pull-right">{{item.deliveryTime}}</span>
+							  			<span>使用简历:</span>
+							  			<font>简历一</font>
+							  		</div>
+							  	</div>
 						  	</div>
-					  	</div>
-					  </el-col>
-					</el-row>
-
-			  </el-tab-pane>
-			  <el-tab-pane label="投递成功">
-
-			  	<el-row :gutter="20">
-					  <el-col :span="12" v-for='item in list' :key="item.recruit">
-					  	<div class="box mb15">
-					  		<div class="box_top">
-						  		<h2 class="position_name">
-						  			<router-link to="/">
-						  				{{item.recruit}}
-						  				<span>{{item.salary}}</span>
-						  			</router-link>
-						  		</h2>
-						  		<div class="com_info">
-						  			<router-link to="/">
-							  			{{item.company.name}}
-							  			<font>[{{item.address}}]</font>
-						  			</router-link>
-						  		</div>
-						  		<div class="resume clearfix">
-						  			<el-button class="pull-right ml5" size="small" type="text">等待通知</el-button>
-						  			<span class="pull-right">{{item.time}}</span>
-						  			<span>使用简历:</span>
-						  			<font>简历一</font>
-						  		</div>
-						  	</div>
-					  	</div>
-					  </el-col>
-					</el-row>
-
-			  </el-tab-pane>
-			  <el-tab-pane label="邀请面试">
-			  	<el-row :gutter="20">
-					  <el-col :span="12" v-for='item in list' :key="item.recruit">
-					  	<div class="box mb15">
-					  		<div class="box_top">
-						  		<h2 class="position_name">
-						  			<router-link to="/">
-						  				{{item.recruit}}
-						  				<span>{{item.salary}}</span>
-						  			</router-link>
-						  		</h2>
-						  		<div class="com_info">
-						  			<router-link to="/">
-							  			{{item.company.name}}
-							  			<font>[{{item.address}}]</font>
-						  			</router-link>
-						  		</div>
-						  		<div class="resume clearfix">
-
-						  			<el-popover placement="right-end" title="标题" trigger="click" width="540">
-						        <div class="contact_info">
-						        	<el-alert
-										    title="提示:  你的简历已经通过初筛，企业可能会在近期与你沟通，请保持联系方式畅通"
-										    type="info"
-										    class="mt10"
-										    :closable="false">
-										  </el-alert>
-						          <el-form label-position="left" inline class="demo-table-expand">
-						          	<el-row>
-						          		<el-col :span="10">
-									          <el-form-item label="联系人">
-									            <span>xiaolongjun</span>
-									          </el-form-item>
-									        </el-col>
-						          		<el-col :span="10">
-									          <el-form-item label="面试时间">
-									            <span>4／12 16:00</span>
-									          </el-form-item>
-									        </el-col>
-						          		<el-col :span="10">
-									          <el-form-item label="联系电话">
-									            <span>18678787979</span>
-									          </el-form-item>
-									        </el-col>
-						          		<el-col :span="14">
-									          <el-form-item label="联系邮箱">
-									            <span>1057520381@qq.com</span>
-									          </el-form-item>
-									        </el-col>
-									      </el-row>
-							        </el-form>
-						        </div>
-						      </transition>
-
-						  		<el-button class="pull-right ml5" size="small" type="text" slot="reference" @click="item.collapse = !item.collapse">{{item.state}}</el-button>
-						    </el-popover>
-
-						  			<span class="pull-right">{{item.time}}</span>
-						  			<span>使用简历:</span>
-						  			<font>简历一</font>
-						  		</div>
-						  	</div>
-					  	</div>
-					  </el-col>
-					</el-row>
-			  </el-tab-pane>
-			  <el-tab-pane label="面试结果">
-			  	<el-row :gutter="20">
-					  <el-col :span="12" v-for='item in list' :key="item.recruit">
-					  	<div class="box mb15">
-					  		<div class="box_top">
-						  		<h2 class="position_name">
-						  			<router-link to="/">
-						  				{{item.recruit}}
-						  				<span>{{item.salary}}</span>
-						  			</router-link>
-						  		</h2>
-						  		<div class="com_info">
-						  			<router-link to="/">
-							  			{{item.company.name}}
-							  			<font>[{{item.address}}]</font>
-						  			</router-link>
-						  		</div>
-						  		<div class="resume clearfix">
-						  			<el-popover placement="left-end" title="标题" trigger="click" width="540">
-
-											<div class="contact_info">
-							        	<el-alert
-											    :title="item.alert_text"
-											    :type="gerAlertType(item.state)"
-											    class="mt10"
-											    :closable="false">
-											  </el-alert>
-											  <div style="height: 10px;"></div>
-							        </div>
-
-						  				<el-button class="pull-right ml5" size="small" type="text" slot="reference" @click="item.collapse = !item.collapse">不合适</el-button>
-						  			</el-popover>
-						  			<span class="pull-right">{{item.time}}</span>
-						  			<span>使用简历:</span>
-						  			<font>简历一</font>
-						  		</div>
-						  	</div>
-					  		<transition name="el-zoom-in-top" v-if="item.state != '等待通知'">
-					        
-					      </transition>
-					  	</div>
-					  </el-col>
-					</el-row>
+						  </el-col>
+						</el-row>
+						<el-pagination
+	            @current-change="handleCurrentChange"
+	            :current-page.sync="listQuery.pageNo"
+	            :page-size="listQuery.pageSize"
+	            layout="total, prev, pager, next"
+	            :total="total">
+	          </el-pagination>
+	        </div>
 			  </el-tab-pane>
 			</el-tabs>
 		</div>
+		<div style="height:100px;"></div>
 	</div>
 </template>
 <script>
+	import { mapGetters } from 'vuex';
+  import { deliveryList, editEvaluate } from '@/api/student/delivery';
+  import { parseTime } from '@/utils/index';
 	export default {
-		name: '',
+		computed: {
+	    ...mapGetters([
+	      'id'
+	    ])
+	  },
 		data() {
 			return {
 				active_list: {
-					search_result: 'result'
+					tabs: '5'
 				},
-				list: [
-					{
-      			recruit: '导游',
-      			time: '9-12 12:00',
-      			salary: '15k-30k',
-      			exp: '1-3年',
-      			edu: '本科',
-      			address: '厦门',
-      			state: '等待通知',
-      			lable: ['旅游', '业界龙头', '氛围好'],
-      			company: {
-      				name: '微众教育',
-      				logo: '//static.lagou.com/thumbnail_100x100/i/image/M00/1A/D8/CgpFT1kIdEGANCt3AACNzh_LYrw828.jpg',
-      				industry: '经营多年经营多年经营多年经营多年经营多年经营多年经营多年经营多年经营多年'
-      			}
-      		},
-					{
-      			recruit: '导游',
-      			time: '9-12 12:00',
-      			salary: '15k-30k',
-      			exp: '1-3年',
-      			edu: '本科',
-      			address: '厦门',
-      			state: '合适',
-      			lable: ['旅游', '业界龙头', '氛围好'],
-      			alert_text: '期待您融入我们这个大家庭',
-      			company: {
-      				name: '微众教育',
-      				logo: '//static.lagou.com/thumbnail_100x100/i/image/M00/1A/D8/CgpFT1kIdEGANCt3AACNzh_LYrw828.jpg',
-      				industry: '经营多年经营多年经营多年经营多年经营多年经营多年经营多年经营多年经营多年'
-      			}
-      		},
-					{
-      			recruit: '导游',
-      			time: '9-12 12:00',
-      			salary: '15k-30k',
-      			exp: '1-3年',
-      			edu: '本科',
-      			address: '厦门',
-      			state: '不合适',
-      			lable: ['旅游', '业界龙头', '氛围好'],
-      			alert_text: '非常荣幸收到您的简历，经过我们评估，认为您与该职位不太合适，无法进入面试阶段。建议参考STAR法则对简历进行修改，并突出您在专业知识方面的优势。相信更好的机会一定还在翘首期盼着您，赶快调整心态，做好充足的准备重新出发吧！',
-      			company: {
-      				name: '微众教育',
-      				logo: '//static.lagou.com/thumbnail_100x100/i/image/M00/1A/D8/CgpFT1kIdEGANCt3AACNzh_LYrw828.jpg',
-      				industry: '经营多年经营多年经营多年经营多年经营多年经营多年经营多年经营多年经营多年'
-      			}
-      		},
-					{
-      			recruit: '导游',
-      			time: '9-12 12:00',
-      			salary: '15k-30k',
-      			exp: '1-3年',
-      			edu: '本科',
-      			address: '厦门',
-      			state: '待面试',
-      			lable: ['旅游', '业界龙头', '氛围好'],
-      			alert_text: '期待您融入我们这个大家庭',
-      			company: {
-      				name: '微众教育',
-      				logo: '//static.lagou.com/thumbnail_100x100/i/image/M00/1A/D8/CgpFT1kIdEGANCt3AACNzh_LYrw828.jpg',
-      				industry: '经营多年经营多年经营多年经营多年经营多年经营多年经营多年经营多年经营多年'
-      			}
-      		},
-				]
+				tabList: [{
+          title: '全部',
+          name: '5',
+        }, {
+          title: '投递成功',
+          name: '0',
+        }, {
+          title: '待面试',
+          name: '1',
+        }, {
+          title: '不通过',
+          name: '2',
+        }, {
+          title: '合适',
+          name: '3',
+        }],
+				listQuery: {
+					pageNo: 1,
+					pageSize: 10,
+					studentId: '',
+					state: "",
+				},
+				total: 0,
+				loading: false,
+				list: []
 			}
 		},
 		mounted() {
-			this.getList();
+			this.getList(this.active_list.tabs);
 		},
 		methods: {
-			getList() {
-				for(let i=0; i<this.list.length; i++){
-	  			this.$set(this.list[i], 'collapse', true);
-	  		}
+			getList(val) {
+				this.loading = true;
+				val = val.name;
+				val = val > 3 ? '' : val;
+				this.listQuery.state = val;
+				this.listQuery.studentId = this.id;
+				deliveryList(this.listQuery).then(res => {
+					if (typeof res == 'undefined') return;
+					for(let i=0; i<res.list.length; i++){
+		  			this.$set(res.list[i], 'stateStr', this.gerAlertType(res.list[i].state));
+		  			this.$set(res.list[i], 'evaluate_content', '');
+		  			this.$set(res.list[i], 'score', 0);
+		  		}
+
+					this.list = res.list;
+					this.total = res.total;
+					this.loading = false;
+				})
 			},
 			gerAlertType(type) {
 				switch (type) {
-					case '待面试':
-						return 'info';
+					case 0:
+						return {
+							type: 'text',
+							text: '等待通知'
+						}
 						break;
-					case '不合适':
-						return 'error';
+					case 1:
+						return {
+							type: 'primary',
+							text: '待参加面试',
+							alert:'success',
+							alert_text: '提示:  你的简历已经通过初筛，企业可能会在近期与你沟通，请保持联系方式畅通'
+						}
 						break;
-					case '合适':
-						return 'success';
+					case 2:
+						return {
+							type: 'danger',
+							text: '不合适',
+							alert: 'warning',
+							alert_text: '非常荣幸收到您的简历，经过我们评估，认为您与该职位不太合适，无法进入面试阶段'
+						}
+						break;
+					case 3:
+						return {
+							type: 'success',
+							text: '通过',
+							alert:'success',
+							alert_text: '即将开始工作，请做好工作前的准备'
+						}
 						break;
 				}
-			}
+			},
+			handleCurrentChange(val) {
+        this.listQuery.pageNo = val;
+        this.getList(this.active_list.tabs);
+      },
+      submitEvaluate(item){
+      	let data = {
+      		evaluatetime: parseTime(new Date, '{y}-{m}-{d} {h}:{i}:{s}'),
+      		jobId: parseInt(item.jobId),
+      		student_id: this.id,
+      		score: item.score,
+      		evaluate_content: item.evaluate_content
+      	}
+      	editEvaluate(data).then(res => {
+      		if(res.success) this.$message.success('评价成功');
+      		else this.$message.error('评价失败，请刷新重试！！！');
+      		this.getList(this.active_list.tabs);
+      	})
+      }
 		}
 	}
 </script>
@@ -313,7 +287,7 @@
 					margin: 5px 0;
 					color: #999;
 					font-size: 14px;
-					line-height: 26px;
+					line-height: 30px;
 					font{
 						color: #555;
 					}

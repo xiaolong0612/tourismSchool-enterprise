@@ -41,4 +41,46 @@ export function saveResume(data) {
   });
 }
 
+export function updateResume(data) {
+  return fetch({
+    url: '/admin/resume/mod-resume',
+    method: 'post',
+    data
+  });
+}
+
+export function delResume(data) {
+  return fetch({
+    url: '/admin/resume/del-resume',
+    method: 'post',
+    data
+  });
+}
+
+export function detailResume(data) {
+  return fetch({
+    url: '/admin/resume/detail-resume',
+    method: 'post',
+    data
+  });
+}
+
+export function searchResume(data) {
+  return fetch({
+    url: '/admin/resume/get-studnet-resume',
+    method: 'post',
+    data
+  });
+}
+
+// 获取单个简历内容
+export function getResumeDetails(data) {
+  return fetch({
+    url: '/ admin/resume/get-resume',
+    method: 'post',
+    data
+  });
+}
+
+
 

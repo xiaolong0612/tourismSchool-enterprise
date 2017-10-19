@@ -1,16 +1,16 @@
 <template>
 	<div class="container">
 		<div class="section_title">
-			<h4>{{list.title}}</h4>
+			<h4>我的经验</h4>
 			<div></div>
-			<p>{{list.label}}</p>
+			<p>以前的工作有助于经验的收集</p>
 		</div>
-		<el-row v-for="item in list.list" :key="item.name" class="section-list">
+		<el-row v-for="item in list" :key="item.workJob" class="section-list">
       <el-col :offset="2" :sm="20">
       	<div class="item">
-	      	<h5>{{item.name}}</h5>
-	      	<span>{{item.time}}</span>
-	      	<p>{{item.exp}}</p>
+	      	<h5>{{item.workJob}}</h5>
+	      	<span>{{item.endDate}}</span>
+	      	<p>{{item.workContent}}</p>
 	      </div>
 			</el-col>
 		</el-row>
@@ -22,14 +22,22 @@
     name: 'item',
     props: {
       list: {
-        type: Object
+        type: Array
       }
     },
     created() {
       // console.log(this.list)
     },
+    mounted() {
+    	this.formatList();
+    },
     methods: {
       
+      formatList(){
+      	for(let index in this.list){
+      		this.list[index].endDate = this.list[index].endDate[0] + "/" +this.list[index].endDate[1]
+      	}
+      }
     }
   }
 

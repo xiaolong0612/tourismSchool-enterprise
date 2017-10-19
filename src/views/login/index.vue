@@ -3,7 +3,7 @@
     <el-form autoComplete="on" :model="loginForm" :rules="loginRules" ref="loginForm" label-position="left" label-width="0px"
       class="card-box login-form">
       <h3 class="title">系统登录</h3>
-      <el-form-item prop="account">
+      <el-form-item>
         <span class="svg-container"><icon-svg icon-class="jiedianyoujian"></icon-svg></span>
         <el-input name="account" type="text" v-model="loginForm.account" autoComplete="on" placeholder="账号"></el-input>
       </el-form-item>
@@ -13,36 +13,27 @@
           placeholder="密码"></el-input>
       </el-form-item>
       <el-form-item>
+        <el-radio v-model="radio" label="0">管理员</el-radio>
+        <el-radio v-model="radio" label="1">学校</el-radio>
+      </el-form-item>
+      <el-form-item>
         <el-button type="primary" style="width:100%;" :loading="loading" @click.native.prevent="handleLogin">
           登录
         </el-button>
       </el-form-item>
-      <div class='tips'>admin账号为:admin@wallstreetcn.com 密码随便填</div>
-      <div class='tips'>editor账号:editor@wallstreetcn.com 密码随便填</div>
     </el-form>
-
-    <el-dialog title="第三方验证" :visible.sync="showDialog">
-      邮箱登录成功,请选择第三方验证
-      <!-- <social-sign></social-sign> -->
-    </el-dialog>
 
   </div>
 </template>
 
 <script>
   import { isWscnEmail } from '@/utils/validate';
+import { getType, setType } from '@/utils/auth';
   // import socialSign from './socialsignin';
   export default {
     // components: { socialSign },
     name: 'login',
     data() {
-      const validateAccount = (rule, value, callback) => {
-        if (!isWscnEmail(value)) {
-          callback(new Error('请输入正确的合法邮箱'));
-        } else {
-          callback();
-        }
-      };
       const validatePass = (rule, value, callback) => {
         if (value.length < 6) {
           callback(new Error('密码不能小于6位'));
@@ -52,29 +43,41 @@
       };
       return {
         loginForm: {
-          account: 'admin@wallstreetcn.com',
-          password: '123456'
+          account: 'admin',
+          password: '123456',
+          type: '0'
         },
         loginRules: {
-          account: [
-                { required: true, trigger: 'blur', validator: validateAccount }
-          ],
           password: [
                 { required: true, trigger: 'blur', validator: validatePass }
           ]
         },
+        radio: 0,
         loading: false,
         showDialog: false
       }
     },
+    mounted(){
+      this.getType();
+    },
     methods: {
+      getType(){
+        this.radio = getType().length == 0 ? 0 : getType();
+      },
       handleLogin() {
         this.$refs.loginForm.validate(valid => {
           if (valid) {
             this.loading = true;
-            this.$store.dispatch('Login', this.loginForm).then(() => {
+            setType(this.radio);
+            this.loginForm.type = this.radio;
+            this.$store.dispatch('Login', this.loginForm).then(res => {
               this.loading = false;
-              this.$router.push({ path: '/' });
+              if(getType() == 0){
+                this.$router.push({ path: '/com/list' });
+              }else{
+                this.$router.push({ path: '/student/list' });
+              }
+              
                 // this.showDialog = true;
             }).catch(() => {
               this.loading = false;
@@ -123,6 +126,9 @@
   .login-container {
     @include relative;
     height: 100vh;
+
+    background-image: url(/static/banner/58219a45ecb1088c2f4cb1b24f8cc541.jpg);
+    background-size: cover;
     background-color: #2d3a4b;
     input:-webkit-autofill {
       -webkit-box-shadow: 0 0 0px 1000px #293444 inset !important;
@@ -141,10 +147,11 @@
       display: inline-block;
       height: 47px;
       width: 85%;
+      color: #fff;
     }
     .svg-container {
       padding: 6px 5px 6px 15px;
-      color: #889aa4;
+      color: #fff;
     }
     .title {
       font-size: 26px;
@@ -164,12 +171,22 @@
     }
     .el-form-item {
       border: 1px solid rgba(255, 255, 255, 0.1);
-      background: rgba(0, 0, 0, 0.1);
+      background: rgba(0, 0, 0, 0.3);
       border-radius: 5px;
       color: #454545;
     }
+    .el-form-item:nth-of-type(2){
+      margin-bottom: 0
+    }
+    .el-form-item:nth-of-type(3){
+      background-color: transparent;;
+      border: 0 solid;
+    }
     .forget-pwd {
       color: #fff;
+    }
+    .el-radio{
+      color:#fff;
     }
   }
 </style>

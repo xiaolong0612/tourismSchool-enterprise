@@ -1,76 +1,88 @@
 <template>
-	<header class="header">
-		<div class="container">
-			<div class="navber-header pull-left clearfix">
-				<el-button class="pull-right navbar-toggle" type="primary" icon="menu"></el-button>
-				<router-link to="index" class="logo">旅游校企</router-link>
-			</div>
-			<div class="navbar-collapse">
-				<!-- <el-menu :default-active="activeIndex" class="pull-right" mode="horizontal" @select="handleSelect">
-				  <el-menu-item index="0" :open="ToggleHeader">切换企业版</el-menu-item>
-				  <el-menu-item :router="true" :index="item.link" v-for="item in link_list" :key="item.name" v-if="item.children == undefined">
-				  	{{item.name}}
-				  	<router-link :to='item.link'>	</router-link>
-				  </el-menu-item>
+	<div>
+		<header class="header">
+			<div class="container">
+				<div class="navber-header pull-left clearfix">
+					<router-link to="index" class="logo">旅游校企</router-link>
+				</div>
+				<div class="navbar-collapse">
+					<ul class="pull-right navbar-nav">
+						<li @click="ToggleVal('3')" v-if="cut == 2">
+								切换企业版
+						</li>
+						<li @click="ToggleVal('2')" v-else>
+								切换学生版
+						</li>
+						<li v-for="item in link_list" :key="item.name" :class="{ 'active': item.active, 'border': item.name == '发布招聘'}" @click="active_link(item)">
+							<router-link :to='item.link'  v-if="item.children == undefined">
+								{{item.name}}
+							</router-link>
 
-				  <el-submenu :index="item.name" v-for="item in link_list" :key="item.name" v-if="item.children != undefined">
-				    <template slot="title">
-				    	{{item.name}}
-				    	<router-link :to='item.link'>	</router-link>
-				    </template>
-				    <el-menu-item :index="item.name+'-'+children.name" v-for="children in item.children" :key="item.name">
-				    	{{children.name}}
-				    	<router-link :to='children.link'></router-link>
-				    </el-menu-item>
-				  </el-submenu>
-				  <el-menu-item index="5">登陆／登出</el-menu-item>
-				</el-menu> -->
-				<ul class="pull-right navbar-nav">
-					<li @click="ToggleHeader" v-if="header.type">
-							切换企业版
-					</li>
-					<li @click="ToggleHeader" v-else>
-							切换学生版
-					</li>
-					<li v-for="item in link_list" :key="item.name" :class="{ 'active': item.active, 'border': item.name == '发布招聘'}">
-						<router-link :to='item.link'  v-if="item.children == undefined">
-							{{item.name}}
-						</router-link>
+							<el-dropdown v-if="item.children != undefined" @command="handleCommand">
+							  <span class="el-dropdown-link">
+							  	<router-link :to="item.link">
+							    {{item.name}}
+							   	</router-link>
+							    <i class="el-icon-caret-bottom el-icon--right"></i>
+							  </span>
+							  <el-dropdown-menu slot="dropdown">
+							    <el-dropdown-item v-for="children in item.children" :key="item.name" :command="children.link">
+							    	{{children.name}}
+							    </el-dropdown-item>
+							  </el-dropdown-menu>
+							</el-dropdown>
+						</li>
+						<li v-if="name.length == 0" @click="ToggleVal('too')">登陆</li>
+						
+						<li  v-else>
+							<el-popover
+							  placement="bottom"
+							  width="120">
+							  <p>确定要退出么？</p>
+							  <div style="text-align: right; margin: 0">
+							    <el-button type="primary" size="mini" @click="logout">确定</el-button>
+							  </div>
+								
+								<span  slot="reference">{{name}}</span>
 
-						<el-dropdown v-if="item.children != undefined" @command="handleCommand">
-						  <span class="el-dropdown-link">
-						  	<router-link :to="item.link">
-						    {{item.name}}
-						   	</router-link>
-						    <i class="el-icon-caret-bottom el-icon--right"></i>
-						  </span>
-						  <el-dropdown-menu slot="dropdown">
-						    <el-dropdown-item v-for="children in item.children" :key="item.name" :command="children.link">
-						    	{{children.name}}
-						    </el-dropdown-item>
-						  </el-dropdown-menu>
-						</el-dropdown>
-					</li>
-					<li>
-						<router-link to='/'>
-							登陆／登出
-						</router-link>
-					</li>
-				</ul>
+							</el-popover>
+						</li>
+					</ul>
+				</div>
 			</div>
-		</div>
-	</header>
+		</header>
+		<el-dialog title="登陆" :visible.sync="dialogLogin" width="500px">
+			<el-form :model="loginForm" status-icon label-width="100px">
+			  <el-form-item label="账号">
+			    <el-input type="text" v-model="loginForm.account" auto-complete="off"></el-input>
+			  </el-form-item>
+			  <el-form-item label="密码">
+			    <el-input type="password" v-model="loginForm.password" auto-complete="off"></el-input>
+			  </el-form-item>
+			  <el-form-item label="">
+			    <el-button type="primary" @click="submitLogin('loginForm')" :loading="loginLoading">提交</el-button>
+			    <el-button @click="dialogLogin = false">取消</el-button>
+			  </el-form-item>
+			</el-form>
+		</el-dialog>
+	</div>
 </template>
 <script>
   import { mapGetters } from 'vuex';
+import { getType, setType } from '@/utils/auth';
 	export default {
 		computed: {
 	    ...mapGetters([
-	      'header'
+	      'name',
+	      'account',
+	      'type'
 	    ])
 	  },
 		data() {
 			return{
+				dialogLogin: false,
+				loginLoading: false,
+				cut: '',
 				com_header: [
 					{
 						name: '发布招聘',
@@ -78,27 +90,9 @@
 					},{
 						name: '招聘列表',
 						link: '/com/recruit/list',
-						children: [
-							{
-								name: '导游',
-								link: '/com/recruit/list'
-							},{
-								name: '会计',
-								link: '/com/recruit/list'
-							}
-						]
 					},{
 						name: '收件箱',
 						link: '/com/inbox/list',
-						children: [
-							{
-								name: '导游',
-								link: '/com/inbox/list'
-							},{
-								name: '会计',
-								link: '/com/inbox/list'
-							}
-						]
 					},{
 						name: '公司信息',
 						link: '/index'
@@ -111,36 +105,39 @@
 					},{
 						name: '我的简历',
 						link: '/user/resume/list',
-						children: [
-							{
-								name: '导游',
-								link: '/user/resume/list'
-							},{
-								name: '会计',
-								link: '/user/resume/list'
-							}
-						]
 					},{
 						name: '投递箱',
 						link: '/user/delivery'
-					},{
-						name: '收藏夹',
-						link: '/user/collect/list'
 					}
 				],
 				link_list: [],
-				activeIndex: '1'
+				activeIndex: '1',
+				loginForm: {
+					account: '18805070157',
+					password: '123456',
+					type: 2,
+				}
 			}
 		},
 		watch: {
   		'$route' (to, from) {
   			this.active_link(to.path);
+		  },
+		  type(curVal,oldVal){
+		  	this.type = curVal;
+		  	this.setHeader();
 		  }
 		},
     mounted() {
-    	this.set_active_link();
-    	this.active_link(this.$route.path);
+    	if(getType() == ''){
+    		setType(2);
+    	}
+    	this.cut = getType()
     	this.setHeader();
+    	this.set_active_link();
+    	this.active_link(this.link_list[0]);
+
+    	this.isLogin();
     },
 		methods: {
 			set_active_link(){
@@ -155,49 +152,58 @@
 					}
 				}
 			},
-			active_link(link){
+			active_link(item){
 				for(let i in this.link_list){
-					if(typeof this.link_list[i].children == 'undefined'){
-						if(this.link_list[i].link == link){
-							this.link_list[i].active = true;
-						}else{
-							this.link_list[i].active = false
-						}
-					
-					}else{
-						if(this.link_list[i].link == link){
-							this.link_list[i].active = true;
-						}else{
-							for(let c in this.link_list[i].children){
-								if(this.link_list[i].children[c].link == link){
-									this.link_list[i].active = true;
-									// this.link_list[i].children[c].active = true;
-								}else{
-									this.link_list[i].active = false;
-									// this.link_list[i].children[c].active = false;
-								}
-							}
-						}
-					}
+					this.link_list[i].active = false;
 				}
+				item.active = true;
 			},
 			handleCommand(link){
 				this.$router.push({path: link})
 			},
-			ToggleHeader() {
-        this.$store.dispatch('ToggleHeader');
-        this.setHeader();
-      },
+			ToggleVal(val) {
+				this.dialogLogin = true;
+				val = val == 'too' ? getType() : val;
+				this.loginForm.type = val;      
+			},
       setHeader(){
-        if(!this.header.type){
-        	this.link_list = this.com_header
+        if(this.cut == 3){
+        	this.link_list = this.com_header;
+        	this.loginForm.type = 3;
         }else{
-        	this.link_list = this.user_header
+        	this.link_list = this.user_header;
+        	this.loginForm.type = 2;
         }
       },
 			handleSelect(){
 
-			}
+			},
+			isLogin(){
+				if(typeof this.account == 'undefined') return;
+				if(this.account.length > 0) this.loginIn = true;
+				else this.loginIn = false;
+			},
+			submitLogin(){
+				this.loginLoading = true;
+				this.$store.dispatch('Login', this.loginForm).then(() => {
+          this.loginLoading = false;
+          this.dialogLogin = false;
+          if(this.loginForm.type == 3){
+          	this.$router.push({ path: '/com/recruit/list' });
+          }else{
+          	this.$router.push({ path: '/' });
+          }
+          location.reload();
+          // window.location.reload();
+        }).catch(() => {
+          this.loginLoading = false;
+        });
+			},
+			logout() {
+        this.$store.dispatch('LogOut').then(() => {
+          location.reload();  // 为了重新实例化vue-router对象 避免bug
+        });
+      }
 		}
 	}
 </script>

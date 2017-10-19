@@ -1,14 +1,14 @@
 <template>
 	<div class="bg-gray">
 		<search-criteria/>
-		<div class="container pt40 pb40">
+		<div class="container pt40 pb40" v-if="list.is_new_list">
 			<el-tabs v-model="active_list.new_list">
 		    <el-tab-pane label="新闻列表" name="new">
 					<list-new :list="list.new_list"/>
 	      </el-tab-pane>
 		  </el-tabs>
 		</div>
-		<div class="container new-recruit">
+		<div class="container new-recruit" v-if="list.is_recruit_list">
 			<el-tabs v-model="active_list.recruit_list">
 		    <el-tab-pane label="最新招聘" name="recruit">
 	        <el-row :gutter="25" class="new_list">
@@ -19,12 +19,16 @@
 	      </el-tab-pane>
 		  </el-tabs>
 		</div>
+    <div style="height:150px;"></div>
 	</div>
 </template>
 <script>
 	import searchCriteria from '@/views/web/search/search-criteria';
 	import listNew from '@/views/web/new/list-new';
 	import searchListOne from '@/views/web/search/list-one';
+  import { getListNew } from '@/api/index/new';
+  import { searchJob } from '@/api/com/recruit';
+  import { parseTime } from '@/utils/index';
 	export default {
 		name: '',
 		components: {
@@ -39,122 +43,45 @@
         	recruit_list: 'recruit'
         },
         list: {
-        	new_list: [{
-            img: 'https://wpimg.wallstcn.com/a77d6251-a332-4178-94b5-4ff21ddd7041.jpg?imageView2/1/w/190/h/190',
-            title: '香港诞生新楼王！每平米超96万人民币 刷新亚洲最高纪录',
-            text: '香港一顶楼复式豪宅昨日以5.22亿港元售出，约合每平方英尺10.5万港元，刷新了亚洲复式豪宅的成交记录。今年以来，香港私人住宅价格指数累涨18%，连涨17个月，为1993年以来最长连涨。',
-            author: 'xiaolongjun',
-            time: '2017-09-30 12:00:00'
-          }, {
-            img: 'https://wpimg.wallstcn.com/d0/24/94/-1-2-.png?imageView2/1/w/190/h/190',
-            title: '福建出台调控新政：共有产权房建设年内启动，厦门租赁住房占新增住房不低于30%',
-            text: '近日，我省出台《关于进一步加强房地产市场调控的八条措施》，通过加强商品房预售监管、完善土地出让方式控制楼面地价上涨、年内启动一批共有产权住房建设并实现常态化供应、增加租赁住房供应、扩大公共租赁住房保障范围、三年基本完成棚户区改造、督促开发企业按照土地合同约定开竣工、严厉打击房地产市场违法违规行为等八条措施，以新的政策“组合拳”坚决遏制部分地方房价不合理上涨、过快上涨，让房子回归居住属性。',
-            author: 'xiaolongjun',
-            time: '2017-09-30 12:00:00'
-          }, {
-            img: 'https://wpimg.wallstcn.com/a77d6251-a332-4178-94b5-4ff21ddd7041.jpg?imageView2/1/w/190/h/190',
-            title: '香港诞生新楼王！每平米超96万人民币 刷新亚洲最高纪录',
-            text: '香港一顶楼复式豪宅昨日以5.22亿港元售出，约合每平方英尺10.5万港元，刷新了亚洲复式豪宅的成交记录。今年以来，香港私人住宅价格指数累涨18%，连涨17个月，为1993年以来最长连涨。',
-            author: 'xiaolongjun',
-            time: '2017-09-30 12:00:00'
-          }, {
-            img: 'https://wpimg.wallstcn.com/d0/24/94/-1-2-.png?imageView2/1/w/190/h/190',
-            title: '福建出台调控新政：共有产权房建设年内启动，厦门租赁住房占新增住房不低于30%',
-            text: '近日，我省出台《关于进一步加强房地产市场调控的八条措施》，通过加强商品房预售监管、完善土地出让方式控制楼面地价上涨、年内启动一批共有产权住房建设并实现常态化供应、增加租赁住房供应、扩大公共租赁住房保障范围、三年基本完成棚户区改造、督促开发企业按照土地合同约定开竣工、严厉打击房地产市场违法违规行为等八条措施，以新的政策“组合拳”坚决遏制部分地方房价不合理上涨、过快上涨，让房子回归居住属性。',
-            author: 'xiaolongjun',
-            time: '2017-09-30 12:00:00'
-          }],
-          recruit_list: [
-      		{
-      			recruit: '导游',
-      			time: '9-12 12:00',
-      			salary: '15k-30k',
-      			exp: '1-3年',
-      			edu: '本科',
-            address: '厦门',
-      			lable: ['旅游', '业界龙头', '氛围好'],
-      			company: {
-      				name: '微众教育',
-      				logo: '//static.lagou.com/thumbnail_100x100/i/image/M00/1A/D8/CgpFT1kIdEGANCt3AACNzh_LYrw828.jpg',
-      				industry: '经营多年经营多年经营多年经营多年经营多年经营多年经营多年经营多年经营多年'
-      			}
-      		},
-      		{
-      			recruit: '导游',
-      			time: '9-12 12:00',
-      			salary: '15k-30k',
-      			exp: '1-3年',
-      			edu: '本科',
-            address: '厦门',
-      			lable: ['旅游', '业界龙头', '氛围好'],
-      			company: {
-      				name: '微众教育',
-      				logo: '//static.lagou.com/thumbnail_100x100/i/image/M00/1A/D8/CgpFT1kIdEGANCt3AACNzh_LYrw828.jpg',
-      				industry: '经营多年经营多年经营多年经营多年经营多年经营多年经营多年经营多年经营多年'
-      			}
-      		},
-      		{
-      			recruit: '导游',
-      			time: '9-12 12:00',
-      			salary: '15k-30k',
-      			exp: '1-3年',
-      			edu: '本科',
-            address: '厦门',
-      			lable: ['旅游', '业界龙头', '氛围好'],
-      			company: {
-      				name: '微众教育',
-      				logo: '//static.lagou.com/thumbnail_100x100/i/image/M00/1A/D8/CgpFT1kIdEGANCt3AACNzh_LYrw828.jpg',
-      				industry: '经营多年经营多年经营多年经营多年经营多年经营多年经营多年经营多年经营多年'
-      			}
-      		},
-      		{
-      			recruit: '导游',
-      			time: '9-12 12:00',
-      			salary: '15k-30k',
-      			exp: '1-3年',
-      			edu: '本科',
-            address: '厦门',
-      			lable: ['旅游', '业界龙头', '氛围好'],
-      			company: {
-      				name: '微众教育',
-      				logo: '//static.lagou.com/thumbnail_100x100/i/image/M00/1A/D8/CgpFT1kIdEGANCt3AACNzh_LYrw828.jpg',
-      				industry: '经营多年经营多年经营多年经营多年经营多年经营多年经营多年经营多年经营多年'
-      			}
-      		},
-      		{
-      			recruit: '导游',
-      			time: '9-12 12:00',
-      			salary: '15k-30k',
-      			exp: '1-3年',
-      			edu: '本科',
-            address: '厦门',
-      			lable: ['旅游', '业界龙头', '氛围好'],
-      			company: {
-      				name: '微众教育',
-      				logo: '//static.lagou.com/thumbnail_100x100/i/image/M00/1A/D8/CgpFT1kIdEGANCt3AACNzh_LYrw828.jpg',
-      				industry: '经营多年经营多年经营多年经营多年经营多年经营多年经营多年经营多年经营多年'
-      			}
-      		},
-      		{
-      			recruit: '导游',
-      			time: '9-12 12:00',
-      			salary: '15k-30k',
-      			exp: '1-3年',
-      			edu: '本科',
-            address: '厦门',
-      			lable: ['旅游', '业界龙头', '氛围好'],
-      			company: {
-      				name: '微众教育',
-      				logo: '//static.lagou.com/thumbnail_100x100/i/image/M00/1A/D8/CgpFT1kIdEGANCt3AACNzh_LYrw828.jpg',
-      				industry: '经营多年经营多年经营多年经营多年经营多年经营多年经营多年经营多年经营多年'
-      			}
-      		},
-      	]
+        	new_list: [],
+          is_new_list: false,
+          recruit_list: [],
+          is_recruit_list: false
+        },
+        newQuery:{
+          pageNo: 1,
+          pageSize: 20,
+          title: '',
+        },
+        recruitQuery: {
+          pageNo: 1,
+          pageSize: 6,
+          workCity: '',
+          jobType: '',
+          jobName: '',
+          companyId: '',
+          beginDate: '',
+          endDate: ''
         }
 			}
 		},
+    mounted() {
+      this.getNewRecruit();
+      this.getListNew();
+    },
 		methods: {
-
+      getListNew() {
+        getListNew(this.newQuery).then(res => {
+          this.list.new_list = res.list;
+          this.list.is_new_list = true
+        })
+      },
+      getNewRecruit() {
+        searchJob(this.recruitQuery).then(res => {
+          this.list.recruit_list = res.list;
+          this.list.is_recruit_list = true;
+        })
+      }
 		}
 	}
 </script>

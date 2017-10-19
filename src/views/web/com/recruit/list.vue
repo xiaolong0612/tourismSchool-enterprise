@@ -69,7 +69,7 @@
 					      	<el-button v-if="scope.row.use" type="success" size="small" @click="handlerUse(scope)">启用</el-button>
 					      	<el-button v-if="!scope.row.use" type="warning" size="small" @click="handlerDisable(scope)">停用</el-button>
 
-					      	<el-button type="text" size="small" class="del" @click="handlerDel(scope)"><i class="el-icon-circle-close"></i></el-button>
+					      	<el-button type="text" size="small" class="del" @click="handlerDel(scope.row.id)"><i class="el-icon-circle-close"></i></el-button>
 					      </div>
 				      </template>
 				    </el-table-column>
@@ -104,8 +104,10 @@
 </template>
 
 <script>
+  import { searchJob, delJob } from '@/api/com/recruit';
   export default {
     data() {
+    	// 所有变量都存在这里，调用 this.变量名
       return {
       	active_list: {
         	resume_list: 'recruit',
@@ -159,10 +161,34 @@
           linkName: '王小虎',
           address: '上海市普陀区金沙江路 1516 弄',
           use: true
-        }]
+        }],
+
+        listQuery: {
+        	pageNo: 1,
+        	pageSize: 30,
+        	companyId: 1,
+        	workCity: '厦门市',
+        	jobType: 1,
+        	jobName: '工程师'
+        }
       }
     },
+    // 调用方法的函数，，方法必须以this.方法名的方式调用
+    mounted(){
+			this.getList();
+    },
+    // 写方法的地方
     methods: {
+    	getList(){
+    		// 调用接口,参数必须以 this.参数名 才能调用
+    		searchJob(this.listQuery).then(res => {
+    			console.log(res)
+    			this.tableData = res.list;
+    		})
+    	},
+    	delRecryit(id){
+    		
+    	},
     	handlerUse(scope){
     		scope.row.use = false;
     		this.$message({
@@ -178,10 +204,15 @@
         });
     	},
     	handlerDel(scope){
-    		this.$message({
-          message: '已删除',
-          type: 'success'
-        });
+    		let data = { id };
+    		delJob(data).then(res => {
+    			// 提示信息
+    			this.$message({
+	          message: '已删除',
+	          type: 'success'
+	        });
+    		})
+    		
     	}
     }
   }

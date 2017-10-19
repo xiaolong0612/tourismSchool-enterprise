@@ -3,7 +3,7 @@
 		<div class="form-wrap bg-gray p20">
 			<el-upload
 			  ref="upload"
-			  :action="gpath.action_student"
+			  :action="gpath.action_school"
 			  :file-list="fileList"
 			  :auto-upload="false"
 			  accept=".xlsx, .xls">
@@ -19,53 +19,47 @@
 		    style="width: 100%"
 		    max-height="700px">
 		    <el-table-column
-		      prop="stuNo"
-		      label="编号">
+		      prop="id"
+		      label="序号">
 		    </el-table-column>
 		    <el-table-column
 		      prop="name"
-		      label="姓名">
-		      <template scope="scope">
-		      	<span v-show="!scope.row.edit">{{scope.row.name}}</span>
-		      	<el-input v-show="scope.row.edit" size="small" v-model="scope.row.name"></el-input>
-		      </template>
+		      label="学校名称">
 		    </el-table-column>
 		    <el-table-column
 		      prop="account"
 		      label="账号">
 		    </el-table-column>
 		    <el-table-column
-		      prop="age"
-		      label="年龄">
-		      <template scope="scope">
-		      	<span v-show="!scope.row.edit">{{scope.row.age}}</span>
-		      	<el-input v-show="scope.row.edit" size="small" v-model="scope.row.age"></el-input>
+		      prop="location"
+		      label="位置">
+
+					<template scope="scope">
+		      	<span v-show="!scope.row.edit">{{scope.row.location}}</span>
+		      	<el-input v-show="scope.row.edit" size="small" v-model="scope.row.location"></el-input>
+		      </template>
+
+		    </el-table-column>
+		    <el-table-column
+		      prop="totalStudent"
+		      label="学生总数">
+					<template scope="scope">
+		      	<span v-show="!scope.row.edit">{{scope.row.totalStudent}}</span>
+		      	<el-input v-show="scope.row.edit" size="small" v-model="scope.row.totalStudent"></el-input>
 		      </template>
 		    </el-table-column>
+
 		    <el-table-column
-		      prop="schoolName"
-		      label="学校">
-		    </el-table-column>
-		    <el-table-column
-		      prop="linkPhone"
-		      label="联系电话">
-		      <template scope="scope">
-		      	<span v-show="!scope.row.edit">{{scope.row.linkPhone}}</span>
-		      	<el-input v-show="scope.row.edit" size="small" v-model="scope.row.linkPhone"></el-input>
+		      prop="introduce"
+		      label="简介">
+				
+					<template scope="scope">
+		      	<span v-show="!scope.row.edit">{{scope.row.introduce}}</span>
+		      	<el-input v-show="scope.row.edit" size="small" v-model="scope.row.introduce"></el-input>
 		      </template>
+
 		    </el-table-column>
-		    <el-table-column
-		      prop="email"
-		      label="邮箱">
-		      <template scope="scope">
-		      	<span v-show="!scope.row.edit">{{scope.row.email}}</span>
-		      	<el-input v-show="scope.row.edit" size="small" v-model="scope.row.email"></el-input>
-		      </template>
-		    </el-table-column>
-		    <el-table-column
-		      prop="sexStr"
-		      label="性别">
-		    </el-table-column>
+
 		    <el-table-column
 		      label="操作"
 		      width="150px">
@@ -78,7 +72,7 @@
 								  width="160">
 								  <p>确定删除<span style="color:red;">{{scope.row.name}}</span>么？</p>
 								  <div style="text-align: right; margin: 0">
-								    <el-button type="text" size="mini" @click="delStudent(scope.row.id)">确定</el-button>
+								    <el-button type="text" size="mini" @click="delSchool(scope.row.id)">确定</el-button>
 								  </div>
 
 								  <el-button slot="reference" size="mini" type="danger" icon="el-icon-delete"></el-button>
@@ -96,14 +90,14 @@
 </template>
 
 <script>
-  import { getStudent, delStudent, updateStudent } from '@/api/admin/student';
+  import { getSchool, delSchool, updateSchool } from '@/api/admin/school';
   export default {
     data() {
       return {
       	fileList: [],
         tableData: [],
         backList: [],
-      	listQuery: {
+        listQuery: {
 	      	pageNo: 1,
 	      	pageSize: 30
 	      }
@@ -114,7 +108,7 @@
     },
     methods: {
     	getlist(){
-    		getStudent(this.listQuery).then(res => {
+    		getSchool(this.listQuery).then(res => {
 	    		this.tableData = res.list;
 	    		for(let i in this.tableData){
         		this.$set(this.tableData[i], 'edit', false);
@@ -122,11 +116,23 @@
         	this.backList = JSON.parse(JSON.stringify(this.tableData));
 	    	})
     	},
-    	delStudent(id){
+    	delCom(id){
     		let data = {
     			id: id
     		}
-    		delStudent(data).then(res => {
+    		delSchool(data).then(res => {
+    			this.$message({
+	          message: '删除成功',
+	          type: 'success'
+	        });
+    			this.getlist();
+    		})
+    	},
+    	delSchool(id){
+    		let data = {
+    			id: id
+    		}
+    		delSchool(data).then(res => {
     			this.$message({
 	          message: '删除成功',
 	          type: 'success'
@@ -135,7 +141,7 @@
     		})
     	},
     	handleUpdata(scope){
-    		updateStudent(scope.row).then(res => {
+    		updateSchool(scope.row).then(res => {
     			if(res.success){
     				scope.row.edit = false;
     				this.$message({
@@ -154,9 +160,6 @@
     	},
     	submitUpload(){
     		this.$refs.upload.submit();
-    	},
-    	fileUpSuccess(){
-    		this.getlist();
     	}
     }
   }

@@ -30,7 +30,7 @@
 	          			</div>
 	          		</div>
 	          		<div class="edit">
-	          			<router-link to="/user/resume/details">
+	          			<router-link to="/com/inbox/details/1">
 		          			<el-button class="pull-right" size="mini" type="primary">查看</el-button>
 		          		</router-link>
 		          		

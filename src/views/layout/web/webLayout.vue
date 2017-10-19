@@ -3,7 +3,7 @@
 		<div class="header-wrapper">
 			<web-header class="header-container"></web-header>
 		</div>
-		<div class="main-wrapper pb95">
+		<div class="main-wrapper">
 			<app-main></app-main>
 		</div>
 		<div class="footer-wrapper">
@@ -29,6 +29,9 @@
 
 	html, body, #app{
 		height: 100%;
+	}
+	.main-wrapper{
+		height: calc(100vh -65px);
 	}
 	.web-wrapper{
 		min-height: 100%;

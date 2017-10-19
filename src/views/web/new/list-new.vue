@@ -2,18 +2,18 @@
 	<div>
     <el-row :gutter="25" class="new_list">
       <el-col :span="12" v-for="item in list" class="new_item" :key="item.title">
-        <div class="img pull-left" :style="'background-image:url('+ item.img +')'"></div>
+        <div class="img pull-left" :style="'background-image:url('+ item.pic +')'"></div>
         <div class="info">
           <h2 class="title mb10">
             <router-link to='/'>
             {{item.title}}
             </router-link>
           </h2>
-          <p class="text">{{item.text}}</p>
+          <p class="text">{{item.content}}</p>
           <div class="author">
             <span class="mr20">来源：{{item.author}}</span>
             <icon-svg icon-class="shijian" />
-            <span>{{item.time}}</span>
+            <span>{{item.createTime}}</span>
           </div>
         </div>
       </el-col>
@@ -46,6 +46,7 @@
         background-position: center;
         background-repeat: no-repeat;
         background-size: 100%;
+        background-color: #d8d8d8;
         transition: all .2s;
         &:hover{
           background-size: 120%;

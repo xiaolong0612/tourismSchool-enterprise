@@ -1,4 +1,4 @@
-<template>
+·<template>
 	<div class="pt100">
 		<el-form ref="form" :model="form" label-width="80px">
 

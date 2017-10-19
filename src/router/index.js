@@ -16,13 +16,15 @@ const Login = _import('login/index');
 /* 搜索列表 */
 const search_index = _import('web/search/index');
 /* 招聘详情 */
-const recruit_details = _import('web/recruit/details');
+const search_details = _import('web/search/details');
 
 /***************
  *    admin    *
  ***************/
 const admin_student_list = _import('admin/student/index');
 const admin_com_list = _import('admin/com/index');
+const admin_school_list = _import('admin/school/index');
+const admin_report_list = _import('admin/school/report');
 
 /***************
  *   用户信息   *
@@ -47,6 +49,7 @@ const com_recruit_list = _import('web/com/recruit/list');
 const com_recruit_details = _import('web/com/recruit/details');
 /* 收件箱 */
 const com_inbox_list = _import('web/com/inbox/list');
+const com_inbox_details = _import('web/com/inbox/details');
 
 
 
@@ -90,69 +93,9 @@ export const constantRouterMap = [
     component: webLayout,
     name: 'search',
     hidden: true,
-    children: [{ path: 'list', component: search_index }]
-  },
-  {
-    path: '/recruit',
-    component: webLayout,
-    name: 'recruit',
-    hidden: true,
-    children: [{ path: 'details', component: recruit_details }]
-  },
-  {
-    path: '/user',
-    component: webLayout,
-    name: '用户',
-    hidden: true,
     children: [
-      {
-        path: 'delivery',
-        component: user_delivery,
-        name: '投递箱'
-      },
-      {
-        path: 'resume/list',
-        component: user_resume_list,
-        name: '简历列表'
-      },
-      {
-        path: 'resume/details',
-        component: user_resume_details,
-        name: '简历详情'
-      },
-      {
-        path: 'collect/list',
-        component: user_collect,
-        name: '收藏夹'
-      }
-    ]
-  },
-  {
-    path: '/com',
-    component: webLayout,
-    name: '企业',
-    hidden: true,
-    children: [
-      {
-        path: 'recruit/release',
-        component: com_recruit_release,
-        name: '发布招聘'
-      },
-      {
-        path: 'recruit/list',
-        component: com_recruit_list,
-        name: '招聘列表'
-      },
-      {
-        path: 'recruit/list/details',
-        component: com_recruit_details,
-        name: '招聘详情'
-      },
-      {
-        path: 'inbox/list',
-        component: com_inbox_list,
-        name: '收件箱'
-      },
+      { path: 'list', component: search_index },
+      { path: 'list/details/:id', component: search_details }
     ]
   },
   {
@@ -169,7 +112,7 @@ export const constantRouterMap = [
     name: 'Home',
     hidden: true,
     children: [{ path: 'form-new-resume', component: form_new_resume }]
-  }
+  },
 ]
 
 export default new Router({
@@ -180,24 +123,62 @@ export default new Router({
 
 export const asyncRouterMap = [
   {
-    path: '/example',
-    component: adminLayout,
-    redirect: 'noredirect',
-    name: 'Example',
-    icon: 'zujian',
+    path: '/user',
+    component: webLayout,
+    name: '用户',
     hidden: true,
+    meta: { role: ['2'] },
     children: [
-      { path: 'index', component: Form, name: 'Form', icon: 'zonghe' }
+      {
+        path: 'delivery',
+        component: user_delivery,
+        name: '投递箱'
+      },
+      {
+        path: 'resume/list',
+        component: user_resume_list,
+        name: '简历列表'
+      },
+      {
+        path: 'resume/list/details/:id',
+        component: user_resume_details,
+        name: '简历详情'
+      },
+      {
+        path: 'collect/list',
+        component: user_collect,
+        name: '收藏夹'
+      }
     ]
   },
   {
-    path: '/student',
-    component: adminLayout,
-    redirect: '/student/list',
-    name: '学生',
-    icon: 'tubiaoleixingzhengchang',
-    noDropdown: true,
-    children: [{ path: 'index', component: admin_student_list, name: '学生列表', meta: { role: ['admin'] } }]
+    path: '/com',
+    component: webLayout,
+    name: '企业',
+    hidden: true,
+    meta: { role: ['3'] },
+    children: [
+      {
+        path: 'recruit/release',
+        component: com_recruit_release,
+        name: '发布招聘'
+      },
+      {
+        path: 'recruit/list',
+        component: com_recruit_list,
+        name: '招聘列表'
+      },
+      {
+        path: 'inbox/list',
+        component: com_inbox_list,
+        name: '收件箱'
+      },
+      {
+        path: 'inbox/details/:id',
+        component: com_inbox_details,
+        name: '简历'
+      },
+    ]
   },
   {
     path: '/com',
@@ -205,18 +186,62 @@ export const asyncRouterMap = [
     redirect: '/com/list',
     name: '企业',
     icon: 'tubiaoleixingzhengchang',
+    meta: { role: ['0'] },
     noDropdown: true,
-    children: [{ path: 'index', component: admin_com_list, name: '企业列表', meta: { role: ['admin'] } }]
+    children: [{ path: 'list', component: admin_com_list, name: '企业列表', meta: { role: ['0'] }}]
   },
   {
-    path: '/table',
+    path: '/school',
     component: adminLayout,
-    redirect: '/table/index',
-    name: 'Table',
+    redirect: '/school/list',
+    name: '学校',
     icon: 'tubiaoleixingzhengchang',
-    hidden: true,
+    meta: { role: ['0'] },
     noDropdown: true,
-    children: [{ path: 'index', component: Table, name: 'Table', meta: { role: ['admin'] } }]
+    children: [{ path: 'list', component: admin_school_list, name: '学校列表', meta: { role: ['0'] }}]
   },
+  {
+    path: '/student',
+    component: adminLayout,
+    redirect: '/student/list',
+    name: '学生',
+    icon: 'tubiaoleixingzhengchang',
+    meta: { role: ['0', '1'] },
+    noDropdown: true,
+    children: [{ path: 'list', component: admin_student_list, name: '学生列表', meta: { role: ['0', '1'] }}]
+  },
+  {
+    path: '/report',
+    component: adminLayout,
+    redirect: '/report/list',
+    name: '报表',
+    icon: 'tubiaoleixingzhengchang',
+    meta: { role: ['1'] },
+    noDropdown: true,
+    children: [{ path: 'list', component: admin_report_list, name: '报表', meta: { role: ['1'] }}]
+  },
+  // {
+  //   path: '/example',
+  //   component: adminLayout,
+  //   redirect: 'noredirect',
+  //   name: 'Example',
+  //   icon: 'zujian',
+  //   hidden: true,
+  //   meta: { role: ['0'] },
+  //   children: [
+  //     { path: 'index', component: Form, name: 'Form', icon: 'zonghe', meta: { role: ['0'] } }
+  //   ]
+  // },
+  // {
+  //   path: '/table',
+  //   component: adminLayout,
+  //   redirect: '/table/index',
+  //   name: 'Table',
+  //   icon: 'tubiaoleixingzhengchang',
+  //   hidden: true,
+  //   meta: { role: ['admin'] },
+  //   noDropdown: true,
+  //   children: [{ path: 'index', component: Table, name: 'Table', meta: { role: ['admin'] } }]
+  // },
   { path: '*', redirect: '/404', hidden: true }
 ];

@@ -1,54 +1,55 @@
 <template>
-	<div class="search_style_two pb80">
+	<div class="search_style_two ">
 		<div class="mb20 item" v-for="item in list" :key="item.recruit">
 			<el-row :gutter='20'>
 			  <el-col :span="12">
 			  	<div class="position_info" style="padding: 14px 15px 0">
 				  	<div class="name">
 					  	<h2>
-					  		<router-link to="/">
-					  			{{item.recruit}} [{{item.address}}]
+					  		<router-link :to="'/search/list/details/'+item.companyId">
+					  			{{item.jobName}} [{{item.workAddress}}]
 					  		</router-link>
 					  	</h2>
-					  	<span class="time">{{item.time}}</span>
+					  	<span class="time">{{item.releaseTime}}</span>
 					  </div>
 					  <p class="postion_req">
-					  	<span class="mr15">{{item.salary}}</span>
-					  	<font>{{item.exp}} / {{item.edu}}</font>
+					  	<span class="mr15">{{item.income}}</span>
+					  	<font>{{item.workExperience}} / {{item.qualificate}}</font>
+					  	<el-tag class="ml10" size="mini" type="success" style="vertical-align:top">{{item.jobTypeStr}}</el-tag>
 					  </p>
 					</div>
 			  </el-col>
 			  <el-col :span="12">
 			  	<div class="con_info" style="padding: 14px 15px 0">
-				  	<img class="pull-right" :src="item.company.logo" width="62">
+				  	<img class="pull-right" :src="item.companyLogo" width="62">
 				  	<div class="name">
 							<h2>
 					  		<router-link to="/">
-								{{item.company.name}}
+								{{item.companyName}}
 					  		</router-link>
 							</h2>
 				  	</div>
-					  <p class="con_industry">{{item.company.industry}}</p>
+					  <p class="con_industry">简介</p>
 				  </div>
 			  </el-col>
 			  <el-col :span="24" class="item_btm mt5">
 			  	<el-row :gutter='20'>
 			  		<el-col :span="12">
 			  			<div class="lable">
-				  			<el-tag class="mr5" type="gray" v-for="lable in item.lable" :key="lable">{{lable}}</el-tag>
+				  			<el-tag v-if="item.jobLabels.length != 0" class="mr5" type="gray" v-for="jobLabels in item.lable" :key="lable">{{lable}}</el-tag>
+				  			<span v-if="item.jobLabels.length == 0" class="labeltext">{{item.labletext}}</span>
 				  		</div>
 			  		</el-col>
 			  		<el-col :span="12">
 			  			<div class="btn_wrap">
-			  				<el-button icon="star-off" size="small" v-show="!item.is_collection" @click="collection(item)">收藏</el-button>
-			  				<el-button icon="star-on" size="small" v-show="item.is_collection" @click="collection(item)" style="color: #20a0ff;border-color: #20a0ff;">已收藏</el-button>
-			  				<el-button size="small" type="info" @click="delivery(item)">{{item.submit_btn_text}}</el-button>
+			  				<el-button size="small" type="primary" @click="dialogDelivery(item.id)">{{item.submit_btn_text}}</el-button>
 			  			</div>
 			  		</el-col>
 			  	</el-row>
 			  </el-col>
 			</el-row>
 		</div>
+		
 	</div>
 </template>
 <script>
@@ -61,9 +62,15 @@
     },
     data() {
     	return {
-    		is_collection: false
+    		is_collection: false,
     	}
     },
+    // watch: {
+    // 	list(curVal,oldVal){
+    // 		console.log(oldVal)
+    // 		this.getList();
+    // 	}
+    // },
 		mounted() {
 			this.getList();
 		},
@@ -72,31 +79,14 @@
     		for(let i=0; i<this.list.length; i++){
     			this.$set(this.list[i], 'submit_btn_text', '投个简历');
     			this.$set(this.list[i], 'is_collection', false);
+    			if(this.list[i].jobLabels.length == 0){
+    				this.$set(this.list[i], 'labletext', '这个岗位很赞');
+    			}
     		}
     	},
-    	collection(item){
-    		item.is_collection = !item.is_collection;
-    		if(item.is_collection){
-    			this.$message({
-	          showClose: true,
-	          message: '已收藏',
-	          type: 'success'
-	        });
-    		}else{
-    			this.$message({
-          	showClose: true,
-	          message: '已从收藏列表中删除'
-	        });
-    		}
-    	},
-    	delivery(item) {
-    		item.submit_btn_text = '已投递';
-    		this.$message({
-          showClose: true,
-          message: '简历投递成功',
-          type: 'success'
-        });
-    	}
+      dialogDelivery(id){
+      	this.$emit('jobid', id);
+      }
     }
 	}
 </script>
@@ -132,7 +122,7 @@
 				overflow: hidden;
 				text-overflow: ellipsis;
 				white-space: nowrap;
-				word-wrap: normal
+				word-wrap: normal;
 				span{
 					font-size: 16px;
 					color: #fd5f39;
@@ -143,10 +133,15 @@
 				height: 40px;
 				background-color: #fafafa;
 				.lable{
-					padding: 8px 15px 0;
+					padding: 4px 15px 0;
+				}
+				.labeltext{
+					line-height: 32px;
+					color: #555;
+					font-size: 14px;
 				}
 			  .btn_wrap{
-			  	padding: 6px 15px 0;
+			  	padding: 4px 15px 0;
 			  	text-align: right;
 			  }
 			}

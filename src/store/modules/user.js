@@ -1,42 +1,52 @@
 import { login, logout, getInfo } from '@/api/login';
-import { getToken, setToken, removeToken } from '@/utils/auth';
+import { getType, setType, removeType, getId, setId, removeId } from '@/utils/auth';
 
 const user = {
   state: {
-    user: '',
-    status: '',
-    code: '',
-    token: getToken(),
+    account: '',
+    age: '',
+    email: '',
+    id: getId(),
+    linkPhone: '',
     name: '',
-    avatar: '',
-    introduction: '',
+    openId: '',
+    password: '',
+    schoolId: '',
+    schoolName: '',
+    sex: '',
+    sexStr: '',
+    stuNo: '',
     roles: [],
-    setting: {
-      articlePlatform: []
-    }
+    type: getType()
   },
 
   mutations: {
-    SET_CODE: (state, code) => {
-      state.code = code;
+    SET_ACCOUNT: (state, account) => {
+      state.account = account;
     },
-    SET_TOKEN: (state, token) => {
-      state.token = token;
-    },
-    SET_INTRODUCTION: (state, introduction) => {
-      state.introduction = introduction;
-    },
-    SET_SETTING: (state, setting) => {
-      state.setting = setting;
-    },
-    SET_STATUS: (state, status) => {
-      state.status = status;
+    SET_ID: (state, id) => {
+      state.id = id;
     },
     SET_NAME: (state, name) => {
       state.name = name;
     },
-    SET_AVATAR: (state, avatar) => {
-      state.avatar = avatar;
+    SET_AGE: (state, age) => {
+      state.age = age;
+    },
+    SET_EMAIL: (state, email) => {
+      state.email = email;
+    },
+    SET_LINKPHONE: (state, linkPhone) => {
+      state.linkPhone = linkPhone;
+    },
+    SET_SCHOOLNAME: (state, schoolName) => {
+      state.schoolName = schoolName;
+    },
+    SET_STUNO: (state, stuNo) => {
+      state.stuNo = stuNo;
+    },
+    SET_TYPE: (state, type) => {
+      state.type = type;
     },
     SET_ROLES: (state, roles) => {
       state.roles = roles;
@@ -52,13 +62,13 @@ const user = {
   actions: {
     // 邮箱登录
     Login({ commit }, userInfo) {
-      const account = userInfo.account.trim();
       return new Promise((resolve, reject) => {
-        login(account, userInfo.password).then(response => {
-          console.log(response)
-          const data = response.data;
-          setToken(response.data.token);
-          commit('SET_TOKEN', data.token);
+        login(userInfo).then(res => {
+          setId(res.userinfo);
+          setType(res.type);
+
+          commit('SET_ID', getId());
+          commit('SET_TYPE', getType());
           resolve();
         }).catch(error => {
           reject(error);
@@ -69,13 +79,25 @@ const user = {
     // 获取用户信息
     GetInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
-        getInfo(state.token).then(response => {
-          const data = response.data;
-          commit('SET_ROLES', data.role);
-          commit('SET_NAME', data.name);
-          commit('SET_AVATAR', data.avatar);
-          commit('SET_INTRODUCTION', data.introduction);
-          resolve(response);
+        let user = {
+          id: getId(),
+          type: getType()
+        }
+        getInfo(user).then(res => {
+          const data = res.userinfo;
+          
+          setType(res.type);
+
+          commit('SET_NAME', name = user.type == 2 ? data.name : data.companyName);
+          commit('SET_TYPE', getType());
+          commit('SET_ID', data.id);
+          commit('SET_AGE', data.age);
+          commit('SET_EMAIL', data.email);
+          commit('SET_STUNO', data.stuNo);
+          commit('SET_SCHOOLNAME', data.schoolName);
+          commit('SET_ACCOUNT', data.account);
+          commit('SET_ROLES', getType().split(','));
+          resolve(getType().split(','));
         }).catch(error => {
           reject(error);
         });
@@ -100,9 +122,8 @@ const user = {
     LogOut({ commit, state }) {
       return new Promise((resolve, reject) => {
         logout(state.token).then(() => {
-          commit('SET_TOKEN', '');
           commit('SET_ROLES', []);
-          removeToken();
+          removeId();
           resolve();
         }).catch(error => {
           reject(error);
@@ -113,8 +134,8 @@ const user = {
     // 前端 登出
     FedLogOut({ commit }) {
       return new Promise(resolve => {
-        commit('SET_TOKEN', '');
-        removeToken();
+        commit('SET_ROLES', []);
+        removeId();
         resolve();
       });
     },
@@ -123,8 +144,8 @@ const user = {
     ChangeRole({ commit }, role) {
       return new Promise(resolve => {
         commit('SET_ROLES', [role]);
-        commit('SET_TOKEN', role);
-        setToken(role);
+        commit('SET_TYPE', role);
+        // setToken(role);
         resolve();
       })
     }

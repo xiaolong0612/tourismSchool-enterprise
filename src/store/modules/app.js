@@ -19,12 +19,12 @@ const app = {
       state.sidebar.opened = !state.sidebar.opened;
     },
     TOGGLE_HEADER: state => {
+          alert(1)
       if (state.header.type) {
-        Cookies.set('headerStatus', 1); // 企业
+        Cookies.set('headerStatus', 3); // 企业
       } else {
-        Cookies.set('headerStatus', 0); // 学生
+        Cookies.set('headerStatus', 2); // 学生
       }
-
       state.header.type = !state.header.type;
     }
   },

@@ -6,14 +6,18 @@
 		  		<div class="recruit-info">
 						<div class="clearfix">
 							<div class="pull-left">
-								<h2 class="name">{{item.recruit}}</h2>
-								<font class="time">[{{item.time}}]</font>
+								<h2 class="name">
+									<router-link :to="'/search/list/details/'+item.companyId">
+										{{item.jobName}}
+									</router-link>
+								</h2>
+								<font class="time">[{{item.releaseTime}}]</font>
 							</div>
-							<span class="pull-right salary">{{item.salary}}</span>
+							<span class="pull-right salary">{{item.income}}</span>
 						</div>
 						<div class="exp">
-							<span class="pull-right">{{item.address}}</span>
-							{{item.exp}} / {{item.edu}}
+							<span class="pull-right">{{item.workCity}}</span>
+							{{item.workExperience}} / {{item.qualificate}} / {{item.jobTypeStr}}
 
 						</div>
 						<div class="label mt5">
@@ -21,10 +25,10 @@
 						</div>
 		  		</div>
 		  		<div class="con-info">
-		  			<img class="logo pull-left" :src="item.company.logo">
+		  			<img class="logo pull-left" :src="item.companyLogo">
 		  			<div class="info-right">
-		  				<span class="name">{{item.company.name}}</span>
-		  				<p class="industry">{{item.company.industry}}</p>
+		  				<span class="name">{{item.companyName}}</span>
+		  				<!-- <p class="industry">{{item.company.industry}}</p> -->
 		  			</div>
 		  		</div>
 		  	</div>
@@ -45,6 +49,8 @@
       return {
 
       }
+    },
+    mounted() {
     }
   }
 </script>

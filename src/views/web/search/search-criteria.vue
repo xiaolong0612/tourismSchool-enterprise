@@ -1,23 +1,23 @@
 <template>
 	<div class="section mt65 search-wrap">
-		<div class="container">
+		<div class="container" v-loading="loading">
 			<el-form :inline="true" :model="formSearch" class="">
 				<el-row :gutter="20">
-					<el-col :span="6" :offset="2">
+					<el-col :span="12" :offset="2">
 					  <el-form-item>
-					    <el-input class="input" v-model="formSearch.keyword" placeholder="关键字搜索"></el-input>
+					    <el-input class="input" v-model="formSearch.jobName" placeholder="关键字搜索"></el-input>
 					  </el-form-item>
 					</el-col>
-					<el-col :span="6">
+					<!-- <el-col :span="6">
 					  <el-form-item>
-					    <el-select class="input" v-model="formSearch.major" placeholder="专业" filterable clearable>
+					    <el-select class="input" v-model="formSearch.jobName" placeholder="专业" filterable clearable>
 					      <el-option v-for="item in content_search.major" :label="item.label" :value="item.value" :key="item.value"></el-option>
 					    </el-select>
 					  </el-form-item>
-					</el-col>
+					</el-col> -->
 					<el-col :span="6">
 						<el-form-item>
-							<region-picker class="input" :data="content_search.city_data" placeholder="地区选择"></region-picker>
+							<region-picker class="input" v-model="formSearch.workCity" :data="content_search.city_data" placeholder="地区选择"></region-picker>
 						</el-form-item>
 					</el-col>
 					<el-col :span="3">
@@ -35,18 +35,31 @@
 <script>
 	import city_data from 'region-picker/dist/data.json';
 	import MDinput from '@/components/MDinput';
+  import { searchJob } from '@/api/com/recruit';
 	export default {
 		name: '',
 		components: {
 			MDinput
 		},
+		props: {
+      pageNo: {
+      	type: Number,
+      	default: 1,
+      }
+    },
 		data() {
 			return {
 				formSearch: {
-					keyword: '',
-					major: '',
-					address: ''
+					pageNo: this.pageNo,
+          pageSize: 10,
+          workCity: '厦门',
+          jobType: '',
+          jobName: '',
+          companyId: '',
+          beginDate: '',
+          endDate: ''
 				},
+				loading: false,
 				content_search: {
 					major: [{
 	          value: '1',
@@ -71,10 +84,36 @@
 				}
 			}
 		},
-		methods: {
-			onSubmit() {
-				this.$router.push({path:'/search/list'})
+		watch: {
+			pageNo(curVal,oldVal){
+				this.formSearch.pageNo =curVal;
+				this.getList();
 			}
+		},
+		mounted() {
+			this.formSearch.jobName = this.$route.query.jobName;
+			this.formSearch.workCity = this.$route.query.workCity;
+			this.getList();
+		},
+		methods: {
+			getList(){
+				this.loading = true;
+				searchJob(this.formSearch).then(res => {
+          this.$emit('search', res);
+          this.loading = false;
+        })
+			},
+			onSubmit() {
+				this.formSearch.pageNo =1;
+				if(this.$route.path == '/search/list'){
+					// console.log(this.$route)
+					// console.log(this.formSearch.workCity)
+					
+					this.getList();
+				}else{
+					this.$router.push({path:'/search/list', query: { jobName: this.formSearch.jobName, workCity: this.formSearch.workCity}});
+				}
+			},
 		}
 	}
 </script>

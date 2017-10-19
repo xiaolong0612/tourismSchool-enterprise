@@ -23,7 +23,12 @@
 				  </el-form-item>
 
 				  <el-form-item label="岗位类型">
-				    <el-input v-model="form.jobType" placeholder="例如:导游"></el-input>
+
+				  	<el-select v-model="form.jobType" placeholder="请选择">
+				      <el-option label="兼职" value="0"></el-option>
+				      <el-option label="全职" value="1"></el-option>
+				      <el-option label="实习" value="2"></el-option>
+				    </el-select>
 				  </el-form-item>
 
 				  <el-form-item label="学历">
@@ -82,6 +87,8 @@
 </template>
 
 <script>
+  import { parseTime } from '@/utils/index';
+  import { newJob } from '@/api/com/recruit';
 	import city_data from 'region-picker/dist/data.json';
   export default {
   	name: '',
@@ -101,29 +108,41 @@
           label: '福利好'
         }],
       	form: {
-      		companyId: '',
-      		companyName: '',
-      		jobName: '',
-      		income: '',
-      		workCity: '',
-      		workExperience: '',
-      		jobType: '',
-      		qualificate: '',
-      		recruitNumber: '',
-      		workAddress: '',
-      		linkName: '',
-      		linkPhone: '',
-      		receiveEmail: '',
-      		jobLabels: ''
+      		companyId: '1',
+      		companyName: '阿里巴巴',
+      		jobName: '导游',
+      		income: '100-1000',
+      		workCity: '厦门',
+      		workExperience: '12312',
+      		jobType: '1',
+      		qualificate: '1',
+      		recruitNumber: '1',
+      		workAddress: '1',
+      		linkName: '1',
+      		linkPhone: '1',
+      		receiveEmail: '1',
+      		jobLabels: '',
       	}
       }
     },
+    mounted(){
+    	this.resetForm('form');
+    },
     methods: {
       submitForm() {
-      		this.form.income = this.startIncome+'-'+this.endIncome;
-          console.log(this.form)
+    		this.form.income = this.startIncome+'-'+this.endIncome;
+        newJob(this.form).then(res => {
+        	if(res.success){
+        		this.$message.success('岗位发布成功')
+        	}else{
+        		this.$message.error('岗位发布失败，请刷新重试！！')
+        	}
+        })
       },
       resetForm(formName) {
+      	for(let index in this.form){
+      		this.form[index] = '';
+      	}
         this.$refs[formName].resetFields();
       }
     }

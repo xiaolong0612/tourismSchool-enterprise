@@ -1,12 +1,8 @@
 import fetch from '@/utils/fetch';
 
-export function login(account, password) {
-  const data = {
-    account,
-    password
-  };
+export function login(data) {
   return fetch({
-    url: '/login/login',
+    url: '/admin/login',
     method: 'post',
     data
   });
@@ -19,10 +15,10 @@ export function logout() {
   });
 }
 
-export function getInfo(token) {
+export function getInfo(data) {
   return fetch({
-    url: '/user/info',
-    method: 'get',
-    params: { token }
+    url: '/admin/get-login-info',
+    method: 'post',
+    data
   });
 }

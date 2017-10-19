@@ -284,3 +284,10 @@ export function getColor(){
   }
   return color;
 }
+
+// 全局路径
+export const gpath = {
+  action_school: 'http://118.178.93.124:8088/admin/school/upload',
+  action_student: 'http://118.178.93.124:8088/admin/student/upload',
+  user_hp: 'http://118.178.93.124:8088/ajaxfileupload'
+}

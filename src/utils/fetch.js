@@ -1,7 +1,6 @@
 import axios from 'axios'
 import { Message } from 'element-ui';
 import store from '../store';
-import { getToken } from '@/utils/auth';
 const qs = require('qs')
 
 // 创建axios实例
@@ -10,7 +9,7 @@ const service = axios.create({
   timeout: 5000,                // 请求超时时间
   headers: {'Content-Type': 'application/x-www-form-urlencoded'},
   transformRequest: [function (data) {
-    // data = qs.stringify(data)
+    data = qs.stringify(data)
     return data;
   }]
 });
@@ -47,7 +46,7 @@ service.interceptors.response.use(
       //   router.push({ path: '/login' })
       // });
     } else {
-      return response
+      return response.data
     }
   },
   error => {

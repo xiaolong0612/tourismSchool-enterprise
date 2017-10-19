@@ -48,3 +48,27 @@ export function searchJob(data) {
     data
   });
 }
+
+export function updateJob(data) {
+  return fetch({
+    url: '/admin/job/update-job',
+    method: 'post',
+    data
+  });
+}
+
+export function detailJob(data) {
+  return fetch({
+    url: '/admin/job/detail-job',
+    method: 'post',
+    data
+  });
+}
+
+export function delJob(data) {
+  return fetch({
+    url: '/admin/job/del-job',
+    method: 'post',
+    data
+  });
+}

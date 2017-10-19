@@ -7,7 +7,7 @@
 			  	<div class="bg-white recruit_details">
 			  		<div class="top_wrap">
 							<div class="pull-right" style="padding-top:8px;">
-								<el-button type="primary" @click="dialogResumeList = true">投个简历</el-button>
+								<el-button type="primary" @click="handlerDelivery">投个简历</el-button>
 							</div>
 							<h2 class="name">{{job.jobName}}</h2>
 			  		</div>
@@ -144,6 +144,7 @@
 </template>
 
 <script>
+	import { mapGetters } from 'vuex';
   import Sticky from '@/components/Sticky/index';
   import { detailJob } from '@/api/com/recruit';
   import resumeItemSelect from '@/views/web/user/resume/list-item-select';
@@ -152,6 +153,11 @@
 			Sticky,
 			resumeItemSelect
 		},
+		computed: {
+	    ...mapGetters([
+	      'account',
+	    ])
+	  },
 		data() {
 			return {
 				rate: 3.7,
@@ -196,6 +202,13 @@
 				detailJob(query).then(res => {
 					this.job = res.job
 				})
+			},
+			handlerDelivery(){
+				if(this.account.length == 0){
+					this.$message.error('请先登陆！！！');
+					return;
+				}
+				this.dialogResumeList = true;
 			},
       dialogResumeListClose(val){
         this.dialogResumeList = val
