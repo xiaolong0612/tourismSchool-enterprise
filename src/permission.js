@@ -29,6 +29,9 @@ function getWhiteList(){
       }
     }
   }
+  for (var i = list.length - 1; i >= 0; i--) {
+    list[i] = list[i].split(':')[0]
+  }
   return list;
 }
 

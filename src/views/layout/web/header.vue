@@ -95,7 +95,7 @@ import { getType, setType } from '@/utils/auth';
 						link: '/com/inbox/list',
 					},{
 						name: '公司信息',
-						link: '/index'
+						link: '/com/info'
 					}
 				],
 				user_header: [

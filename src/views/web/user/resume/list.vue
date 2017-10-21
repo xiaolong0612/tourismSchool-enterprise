@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="bg-gray" style="min-height:100%">
 		<div class="breadcrumb-wrap container pt95">
 			<el-breadcrumb separator="/">
 				  <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>

@@ -17,6 +17,7 @@ const Login = _import('login/index');
 const search_index = _import('web/search/index');
 /* 招聘详情 */
 const search_details = _import('web/search/details');
+const search_com_details = _import('web/search/com-details');
 
 /***************
  *    admin    *
@@ -50,7 +51,8 @@ const com_recruit_details = _import('web/com/recruit/details');
 /* 收件箱 */
 const com_inbox_list = _import('web/com/inbox/list');
 const com_inbox_details = _import('web/com/inbox/details');
-
+/* 企业信息 */
+const com_info = _import('web/com/info/index');
 
 
 
@@ -95,7 +97,8 @@ export const constantRouterMap = [
     hidden: true,
     children: [
       { path: 'list', component: search_index },
-      { path: 'list/details/:id', component: search_details }
+      { path: 'list/details/:id', component: search_details },
+      { path: 'com-details/:id', component: search_com_details }
     ]
   },
   {
@@ -177,6 +180,11 @@ export const asyncRouterMap = [
         path: 'inbox/details/:id',
         component: com_inbox_details,
         name: '简历'
+      },
+      {
+        path: 'info',
+        component: com_info,
+        name: '企业信息'
       },
     ]
   },

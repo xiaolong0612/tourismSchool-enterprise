@@ -392,7 +392,8 @@
         this.labelValue = '';
   		},
   		handleAvatarSuccess(res, file) {
-        this.user_info.pic = '/static/img/default-img/user.jpg';
+  			is_edit = true;
+        this.user_info.pic = res.url;
       },
       beforeAvatarUpload(file) {
         const isJPG = file.type === 'image/jpeg';

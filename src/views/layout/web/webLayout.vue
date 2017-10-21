@@ -28,10 +28,10 @@
 <style rel="stylesheet/scss" lang="scss">
 
 	html, body, #app{
-		height: 100%;
+		min-height: 100%;
 	}
-	.main-wrapper{
-		height: calc(100vh -65px);
+	.main-wrapper, .app-main{
+		min-height: calc(100vh - 95px);
 	}
 	.web-wrapper{
 		min-height: 100%;
@@ -39,11 +39,6 @@
 		overflow: auto;
 	}
 	.footer-wrapper{
-		position: absolute;
-  	bottom: 0;
-  	left: 0;
-  	right: 0;
-
+		margin-top: 100px;
 	}
-
 </style>
