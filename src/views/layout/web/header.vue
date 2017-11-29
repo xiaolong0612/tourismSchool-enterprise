@@ -7,34 +7,14 @@
 				</div>
 				<div class="navbar-collapse">
 					<ul class="pull-right navbar-nav">
-						<li @click="ToggleVal('3')" v-if="cut == 2">
-								切换企业版
-						</li>
-						<li @click="ToggleVal('2')" v-else>
-								切换学生版
-						</li>
-						<li v-for="item in link_list" :key="item.name" :class="{ 'active': item.active, 'border': item.name == '发布招聘'}" @click="active_link(item)">
-							<router-link :to='item.link'  v-if="item.children == undefined">
+						<li v-for="item in link_list" :key="item.name" :class="{ 'active': item.active, 'border': item.name == '发布招聘'}">
+							<router-link :to='item.link'>
 								{{item.name}}
 							</router-link>
-
-							<el-dropdown v-if="item.children != undefined" @command="handleCommand">
-							  <span class="el-dropdown-link">
-							  	<router-link :to="item.link">
-							    {{item.name}}
-							   	</router-link>
-							    <i class="el-icon-caret-bottom el-icon--right"></i>
-							  </span>
-							  <el-dropdown-menu slot="dropdown">
-							    <el-dropdown-item v-for="children in item.children" :key="item.name" :command="children.link">
-							    	{{children.name}}
-							    </el-dropdown-item>
-							  </el-dropdown-menu>
-							</el-dropdown>
 						</li>
-						<li v-if="name.length == 0" @click="ToggleVal('too')">登陆</li>
+						<li v-if="name.length == 0" @click="dialogLogin = true">登陆</li>
 						
-						<li  v-else>
+						<li v-else>
 							<el-popover
 							  placement="bottom"
 							  width="120">
@@ -59,6 +39,10 @@
 			  <el-form-item label="密码">
 			    <el-input type="password" v-model="loginForm.password" auto-complete="off"></el-input>
 			  </el-form-item>
+			  <el-form-item>
+	        <el-radio v-model="loginForm.type" label="2">学生</el-radio>
+	        <el-radio v-model="loginForm.type" label="3">企业</el-radio>
+	      </el-form-item>
 			  <el-form-item label="">
 			    <el-button type="primary" @click="submitLogin('loginForm')" :loading="loginLoading">提交</el-button>
 			    <el-button @click="dialogLogin = false">取消</el-button>
@@ -115,13 +99,13 @@ import { getType, setType } from '@/utils/auth';
 				loginForm: {
 					account: '18805070157',
 					password: '123456',
-					type: 2,
+					type: 0,
 				}
 			}
 		},
 		watch: {
   		'$route' (to, from) {
-  			this.active_link(to.path);
+  			this.activeLink(to.path);
 		  },
 		  type(curVal,oldVal){
 		  	this.type = curVal;
@@ -129,62 +113,28 @@ import { getType, setType } from '@/utils/auth';
 		  }
 		},
     mounted() {
-    	if(getType() == ''){
-    		setType(2);
-    	}
-    	this.cut = getType()
     	this.setHeader();
-    	this.set_active_link();
-    	this.active_link(this.link_list[0]);
-
-    	this.isLogin();
+    	this.activeLink(this.link_list[0]);
     },
 		methods: {
-			set_active_link(){
+			activeLink(link){
 				for(let i in this.link_list){
-					if(typeof this.link_list[i].children == 'undefined'){
-						this.$set(this.link_list[i], 'active', false);
-					
-					}else{
-						for(let c in this.link_list[i].children){
-							this.$set(this.link_list[i].children[c], 'active', false);
-						}
-					}
+					if(this.link_list[i].link == link) this.link_list[i].active = true;
+					else this.link_list[i].active = false;
 				}
-			},
-			active_link(item){
-				for(let i in this.link_list){
-					this.link_list[i].active = false;
-				}
-				item.active = true;
-			},
-			handleCommand(link){
-				this.$router.push({path: link})
-			},
-			ToggleVal(val) {
-				this.dialogLogin = true;
-				val = val == 'too' ? getType() : val;
-				this.loginForm.type = val;      
 			},
       setHeader(){
-        if(this.cut == 3){
+        if(this.type == 3){
         	this.link_list = this.com_header;
-        	this.loginForm.type = 3;
         }else{
         	this.link_list = this.user_header;
-        	this.loginForm.type = 2;
         }
-      },
-			handleSelect(){
 
-			},
-			isLogin(){
-				if(typeof this.account == 'undefined') return;
-				if(this.account.length > 0) this.loginIn = true;
-				else this.loginIn = false;
-			},
+        for(let i in this.link_list){
+					this.$set(this.link_list[i], 'active', false);
+				}
+      },
 			submitLogin(){
-				this.loginLoading = true;
 				this.$store.dispatch('Login', this.loginForm).then(() => {
           this.loginLoading = false;
           this.dialogLogin = false;
@@ -201,6 +151,7 @@ import { getType, setType } from '@/utils/auth';
 			},
 			logout() {
         this.$store.dispatch('LogOut').then(() => {
+        	this.$router.push({ path: '/' });
           location.reload();  // 为了重新实例化vue-router对象 避免bug
         });
       }

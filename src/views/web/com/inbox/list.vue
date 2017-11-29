@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div style="background:url(/static/banner/木纹背景-030.jpg);min-height:calc(100vh - 95px)">
 		<div class="breadcrumb-wrap container pt95">
 			<el-breadcrumb separator="/">
 				  <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
@@ -13,38 +13,55 @@
 	        <el-row :gutter="15" class="resumet_list">
 	          <el-col :span="6" v-for="item in list" :key="item.last_edit_time">
 	          	<div class="item mb20" :style="{borderLeftColor: item.border_color}">
-	          		<i class="el-icon-circle-cross"></i>
 	          		<div style="padding: 7px 7px 0">
-	          			<div class="img pull-left" :style="{backgroundImage: 'url('+item.img+')'}"></div>
-	          			<div class="info">
+	          			<!-- <div class="img pull-left" :style="{backgroundImage: 'url('+item.img+')'}"></div> -->
+	          			<!-- <div class="info">
 	          				<h2>
-	          					<router-link to="/">
-											{{item.name}}[{{item.recruit}}]
+	          					<router-link :to="{path: '/search/student-details', query: {id: item.studentId}}">
+											{{item.studentName}}[{{item.recruit}}]
 	          					</router-link>
 	          				</h2>
 	          				<font class="state">{{item.state}} / 1年</font>
 		          			<p>
-		          				{{item.address}} / 
+		          				{{item.jobName}} / 
 		          				{{item.edu}}
 		          			</p>
+	          			</div> -->
+	          			<div>
+	          				<span class="pull-right" style="font-size:14px;color:#555"> 
+	          					{{item.jobName}}
+	          				</span>
+	          				<router-link :to="{path: '/com/inbox/details', query: {id: item.resumeId,deliveryId: item.id,resumeState:item.resumeState, is_com_look: true}}">
+											{{item.studentName}}
+	          				</router-link>
 	          			</div>
 	          		</div>
 	          		<div class="edit">
-	          			<router-link to="/com/inbox/details/1">
+	          			<router-link :to="{path: '/com/inbox/details', query: {id: item.resumeId,deliveryId: item.id,resumeState:item.resumeState, is_com_look: true}}">
 		          			<el-button class="pull-right" size="mini" type="primary">查看</el-button>
 		          		</router-link>
 		          		
 	          			<span>收件时间:</span>
-	          			<font>{{item.last_edit_time}}</font>
+	          			<font>{{item.deliveryTime}}</font>
 	          		</div>
 	          	</div> 
 	          </el-col>
 	        </el-row>
+	        <div class="pt15">
+				  	<el-pagination
+					    layout="prev, pager, next"
+					    :current-page.sync="listQuery.pageNo"
+	        		:page-size="listQuery.pageSize"
+					    :total="total"
+					    @current-change="handleCurrentChange"
+					    class="pull-right">
+					  </el-pagination>
+				  </div>
 	      </el-tab-pane>
 		  </el-tabs>
 
 			<div class="resume_type">
-    		<el-select v-model="resume_type.select" placeholder="请选择">
+    		<el-select v-model="listQuery.resumeState" placeholder="请选择" @change="getList()">
 			    <el-option
 			      v-for="item in resume_type.list"
 			      :key="item.value"
@@ -59,98 +76,76 @@
 </template>
 
 <script>
+	import { mapGetters } from 'vuex';
   import { getColor } from '@/utils/index';
+  import { getInbox } from '@/api/com/inbox';
 	export default {
+		computed: {
+	    ...mapGetters([
+	      'id'
+	    ])
+	  },
 		data() {
 			return {
 				active_list: {
         	resume_list: 'resume',
         },
         resume_type: {
-        	select: '1',
         	list: [
         		{
-        			value: '1',
+        			value: '',
 		          label: '全部'
 		        },
         		{
+        			value: '0',
+		          label: '未处理'
+		        },
+        		{
+        			value: '1',
+		          label: '已处理'
+		        },
+        		{
         			value: '2',
-		          label: '导游'
+		          label: '录取'
+		        },
+        		{
+        			value: '3',
+		          label: '拒绝'
 		        },
         	]
         },
-        list: [
-        	{
-        		name: '小龙君',
-        		img: 'http://xq.openguts.com/static/img/default-img/user.jpg',
-        		recruit: '会展',
-        		edu: '本科',
-        		last_edit_time: '2017-9-12 12:00:00',
-        		address: '厦门',
-        		salary: '15K-39k',
-        		state: '全职'
-        	},
-        	{
-        		name: '小龙君',
-        		img: 'http://xq.openguts.com/static/img/default-img/user.jpg',
-        		recruit: '会展',
-        		edu: '本科',
-        		last_edit_time: '2017-9-12 12:00:00',
-        		address: '厦门',
-        		salary: '15K-39k',
-        		state: '全职'
-        	},
-        	{
-        		name: '小龙君',
-        		img: 'http://xq.openguts.com/static/img/default-img/user.jpg',
-        		recruit: '会展',
-        		edu: '本科',
-        		last_edit_time: '2017-9-12 12:00:00',
-        		address: '厦门',
-        		salary: '15K-39k',
-        		state: '全职'
-        	},
-        	{
-        		name: '小龙君',
-        		img: 'http://xq.openguts.com/static/img/default-img/user.jpg',
-        		recruit: '会展',
-        		edu: '本科',
-        		last_edit_time: '2017-9-12 12:00:00',
-        		address: '厦门',
-        		salary: '15K-39k',
-        		state: '全职'
-        	},
-        	{
-        		name: '小龙君',
-        		img: 'http://xq.openguts.com/static/img/default-img/user.jpg',
-        		recruit: '会展',
-        		edu: '本科',
-        		last_edit_time: '2017-9-12 12:00:00',
-        		address: '厦门',
-        		salary: '15K-39k',
-        		state: '全职'
-        	},
-        	{
-        		name: '小龙君',
-        		img: 'http://xq.openguts.com/static/img/default-img/user.jpg',
-        		recruit: '会展',
-        		edu: '本科',
-        		last_edit_time: '2017-9-12 12:00:00',
-        		address: '厦门',
-        		salary: '15K-39k',
-        		state: '全职'
-        	}
-        ]
+        total: 0,
+        listQuery: {
+        	pageNo: 1,
+        	pageSize: 28,
+        	companyId: '',
+        	state: '',
+        	resumeState: '',
+        },
+        list: []
 			}
 		},
 		mounted() {
+			this.setDefault();
 			this.getList();
 		},
 		methods: {
+			setDefault(){
+				this.listQuery.companyId = this.id;
+			},
     	getList() {
-    		for(let i=0; i<this.list.length; i++){
-    			this.$set(this.list[i], 'border_color', getColor());
-    		}
+    		getInbox(this.listQuery).then(res => {
+    			this.list = res.list;
+    			this.total = res.total;
+    			for(let i=0; i<this.list.length; i++){
+	    			this.$set(this.list[i], 'border_color', getColor());
+	    		}
+    		})
+    		
+    	},
+    	handleCurrentChange(val){
+    		this.listQuery.pageNo = val;
+    		this.getList();
     	}
     }
 	}
@@ -179,17 +174,6 @@
 			position: relative;
 			&:hover{
 				box-shadow: 0 0 10px 0 rgba(56, 81, 76, 0.12);
-				>i{
-					display: block;
-				}
-			}
-			>i{
-				display: none;
-				position: absolute;
-				top: 5px;
-				right: 5px;
-				color: #808080;
-				font-size: 20px;
 			}
 			.img{
 				width: 70px;

@@ -1,12 +1,12 @@
 <template>
-	<div>
+	<div style="background:url(/static/banner/西湖.jpg) no-repeat center / cover;min-height:calc(100vh - 95px)">
 		<div class="breadcrumb-wrap container pt95">
 			<el-breadcrumb separator="/">
 			  <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
 			  <el-breadcrumb-item>投递列表</el-breadcrumb-item>
 			</el-breadcrumb>
 		</div>
-		<div class="container pt30 pb100 delivery_list">
+		<div class="container pt30 pb50 delivery_list">
 			<el-tabs type="border-card" v-model="active_list.tabs" @tab-click="getList">
 			  <el-tab-pane
 			  	v-for="tab in tabList"
@@ -19,8 +19,8 @@
 						  	<div class="box mb15">
 						  		<div class="box_top">
 							  		<h2 class="position_name">
-							  			<router-link :to="'/com/recruit/list/details/'+item.jobId">
-							  				{{item.jobId}}
+							  			<router-link :to="{path: '/search/com-details', query:{id: item.jobId}}">
+							  				{{item.jobName}}
 							  				<span>15k-30k</span>
 							  			</router-link>
 							  		</h2>
@@ -34,47 +34,58 @@
 							  			<el-popover
 											  placement="left-end"
 											  width="540"
-											  trigger="click">
+											  trigger="hover">
 								        <div class="contact_info">
 								        	<el-alert
 								        		v-if="typeof item.stateStr.alert != undefined"
 												    :title="item.stateStr.alert_text"
 												    :type="item.stateStr.alert"
 												    class="mt10"
-												    :class="{'mb10': item.stateStr.type == 'danger'}"
+												    :class="{'mb10': item.stateStr.type == 'danger' || item.stateStr.type == 'text' || item.interviewLinker == ''}"
 												    :closable="false">
 												  </el-alert>
 								          <el-form
-								          	v-if="item.stateStr.type != 'danger'"
+								          	v-if="item.resumeState == 1 && item.interviewLinker != ''"
 								          	label-position="left"
+								          	label-width="70px"
 								          	inline
 								          	class="demo-table-expand">
 								          	<el-row>
-								          		<el-col :span="10">
+								          		<el-col :span="12">
 											          <el-form-item label="联系人">
-											            <span>xiaolongjun</span>
+											            <span>{{item.interviewLinker}}</span>
 											          </el-form-item>
 											        </el-col>
-								          		<el-col :span="10">
+								          		<el-col :span="12">
 											          <el-form-item label="面试时间">
-											            <span>4／12 16:00</span>
+											            <span>{{item.interviewTime}}</span>
 											          </el-form-item>
 											        </el-col>
-								          		<el-col :span="10">
+								          		<el-col :span="12">
 											          <el-form-item label="联系电话">
-											            <span>18678787979</span>
+											            <span>{{item.interviewTel}}</span>
 											          </el-form-item>
 											        </el-col>
-								          		<el-col :span="14">
-											          <el-form-item label="联系邮箱">
-											            <span>1057520381@qq.com</span>
+								          		<el-col :span="12">
+											          <el-form-item label="面试地点">
+											            <span>{{item.interviewAddr}}</span>
+											          </el-form-item>
+											        </el-col>
+								          		<el-col :span="12">
+											          <el-form-item label="携带物品">
+											            <span>{{item.itemName}}</span>
+											          </el-form-item>
+											        </el-col>
+								          		<el-col :span="12">
+											          <el-form-item label="备注">
+											            <span>{{item.interviewRemark}}</span>
 											          </el-form-item>
 											        </el-col>
 											      </el-row>
 									        </el-form>
 
 								          <el-form
-								          	v-if="item.state != 0 || item.state != 1"
+								          	v-if="(item.resumeState == 2 || item.resumeState == 3) && item.interviewEvaluate != 'undefined'"
 								          	label-position="left"
 								          	inline
 								          	class="demo-table-expand"
@@ -83,8 +94,9 @@
 								          		<el-col :span="24" class="mb10">
 											          <el-form-item label="评分">
 											            <el-rate
-																    v-model="item.score"
+																    v-model="item.interviewEvaluate.score"
 																    show-text
+																    disabled
 																    :colors="['#99A9BF', '#F7BA2A', '#FF9900']"
 																    style="padding: 8px 0">
 																  </el-rate>
@@ -92,47 +104,69 @@
 											        </el-col>
 								          		<el-col :span="24" class="mb10">
 											          <el-form-item label="评价内容">
-											            <el-input type="textarea" v-model="item.evaluate_content"></el-input>
+											          	<span>{{item.interviewEvaluate.evaluateContent}}</span>
 											          </el-form-item>
 											        </el-col>
-											        <el-form-item label="   " class="mb15">
+											        <!-- <el-form-item label="   " class="mb15">
 										            <el-button
 										            	class="ml5"
 										            	size="mini" 
 										            	type="primary"
 										            	@click="submitEvaluate(item)">提交</el-button>
-										          </el-form-item>
+										          </el-form-item> -->
 											      </el-row>
 									        </el-form>
 
 								        </div>
+									  		<el-button  slot="reference" v-if="item.resumeState != 0 && item.interviewEvaluate != 'undefined'" class="pull-right ml5" size="mini" :type="item.stateStr.type">{{item.stateStr.text}}</el-button>
 
-									  		<el-button  slot="reference" v-if="item.state != 0" class="pull-right ml5" size="mini" :type="item.stateStr.type">{{item.stateStr.text}}</el-button>
+									  		<el-button  slot="reference" v-if="item.interviewEvaluate == 'undefined' && (item.resumeState == 2 || item.resumeState == 3)" class="pull-right ml5" size="mini" :type="item.stateStr.type" @click="getEvaluateEvent(item)">{{item.stateStr.text}}</el-button>
 									    </el-popover>
 											
-											<el-tooltip v-if="item.state == 0" effect="dark" content="等待企业反馈" placement="top-start">
+											<el-tooltip v-if="item.resumeState == 0" effect="dark" content="等待企业反馈" placement="top-start">
 							  				<el-button class="pull-right ml5" size="mini" :type="item.stateStr.type">{{item.stateStr.text}}</el-button>
 											</el-tooltip>
 							  			<span class="pull-right">{{item.deliveryTime}}</span>
-							  			<span>使用简历:</span>
-							  			<font>简历一</font>
 							  		</div>
 							  	</div>
 						  	</div>
 						  </el-col>
 						</el-row>
-						<el-pagination
-	            @current-change="handleCurrentChange"
-	            :current-page.sync="listQuery.pageNo"
-	            :page-size="listQuery.pageSize"
-	            layout="total, prev, pager, next"
-	            :total="total">
-	          </el-pagination>
+						<div class="pull-right">
+							<el-pagination
+		            @current-change="handleCurrentChange"
+		            :current-page.sync="listQuery.pageNo"
+		            :page-size="listQuery.pageSize"
+		            layout="total, prev, pager, next"
+		            :total="total">
+		          </el-pagination>
+		        </div>
 	        </div>
 			  </el-tab-pane>
 			</el-tabs>
 		</div>
-		<div style="height:100px;"></div>
+		<el-dialog
+		  title="填写面试评价"
+		  :visible.sync="dialogEvaluate"
+		  width="30%">
+		  <el-form :model="form">
+		    <el-form-item label="评分" label-width="100px">
+		      <el-rate
+				    v-model="form.score"
+				    show-text
+				    :colors="['#99A9BF', '#F7BA2A', '#FF9900']"
+				    style="padding: 8px 0">
+				  </el-rate>
+		    </el-form-item>
+		    <el-form-item label="评价内容" label-width="100px">
+		      <el-input type="textarea" v-model="form.evaluate_content"></el-input>
+		    </el-form-item>
+		  </el-form>
+		  <span slot="footer" class="dialog-footer">
+		    <el-button @click="dialogEvaluate = false">取 消</el-button>
+		    <el-button type="primary" @click="submitEvaluate">确 定</el-button>
+		  </span>
+		</el-dialog>
 	</div>
 </template>
 <script>
@@ -160,24 +194,34 @@
           title: '待面试',
           name: '1',
         }, {
-          title: '不通过',
+          title: '同意',
           name: '2',
         }, {
-          title: '合适',
+          title: '拒绝',
           name: '3',
         }],
 				listQuery: {
 					pageNo: 1,
 					pageSize: 10,
 					studentId: '',
-					state: "",
+					resumeState: "",
 				},
 				total: 0,
 				loading: false,
-				list: []
+				form: {
+					evaluatetime: parseTime(new Date, '{y}-{m}-{d} {h}:{i}:{s}'),
+      		jobId: '',
+      		student_id: '',
+      		score: 0,
+      		evaluate_content: ''
+				},
+				list: [],
+				dialogEvaluate: false,
+				evaluateEvent:[]
 			}
 		},
 		mounted() {
+			this.form.student_id = this.id,
 			this.getList(this.active_list.tabs);
 		},
 		methods: {
@@ -185,12 +229,12 @@
 				this.loading = true;
 				val = val.name;
 				val = val > 3 ? '' : val;
-				this.listQuery.state = val;
+				this.listQuery.resumeState = val;
 				this.listQuery.studentId = this.id;
 				deliveryList(this.listQuery).then(res => {
 					if (typeof res == 'undefined') return;
 					for(let i=0; i<res.list.length; i++){
-		  			this.$set(res.list[i], 'stateStr', this.gerAlertType(res.list[i].state));
+		  			this.$set(res.list[i], 'stateStr', this.gerAlertType(res.list[i].resumeState));
 		  			this.$set(res.list[i], 'evaluate_content', '');
 		  			this.$set(res.list[i], 'score', 0);
 		  		}
@@ -218,18 +262,18 @@
 						break;
 					case 2:
 						return {
-							type: 'danger',
-							text: '不合适',
-							alert: 'warning',
-							alert_text: '非常荣幸收到您的简历，经过我们评估，认为您与该职位不太合适，无法进入面试阶段'
-						}
-						break;
-					case 3:
-						return {
 							type: 'success',
 							text: '通过',
 							alert:'success',
 							alert_text: '即将开始工作，请做好工作前的准备'
+						}
+						break;
+					case 3:
+						return {
+							type: 'danger',
+							text: '不合适',
+							alert: 'warning',
+							alert_text: '非常荣幸收到您的简历，经过我们评估，认为您与该职位不太合适，无法进入面试阶段'
 						}
 						break;
 				}
@@ -238,18 +282,17 @@
         this.listQuery.pageNo = val;
         this.getList(this.active_list.tabs);
       },
-      submitEvaluate(item){
-      	let data = {
-      		evaluatetime: parseTime(new Date, '{y}-{m}-{d} {h}:{i}:{s}'),
-      		jobId: parseInt(item.jobId),
-      		student_id: this.id,
-      		score: item.score,
-      		evaluate_content: item.evaluate_content
-      	}
-      	editEvaluate(data).then(res => {
+      getEvaluateEvent(item){
+      	this.dialogEvaluate = true;
+      	this.evaluateEvent = item;
+      },
+      submitEvaluate(){
+      	this.form.jobId = this.evaluateEvent.jobId,
+      	editEvaluate(this.form).then(res => {
       		if(res.success) this.$message.success('评价成功');
       		else this.$message.error('评价失败，请刷新重试！！！');
       		this.getList(this.active_list.tabs);
+      		this.dialogEvaluate = false;
       	})
       }
 		}

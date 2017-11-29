@@ -2,41 +2,26 @@ import fetch from '@/utils/fetch';
 
 // 收件箱
 
-
-export function saveInbox(data) {
-  return fetch({
-    url: '/admin/inbox/save-inbox',
-    method: 'post',
-    data
-  });
-}
-
+// 同意
 export function updateInbox(data) {
   return fetch({
-    url: '/admin/inbox/update-inbox',
+    url: '/admin/company-resume/mod-student-resume-delivery',
+    method: 'post',
+    data
+  });
+}
+//拒绝
+export function refuseInbox(data) {
+  return fetch({
+    url: '/admin/company-resume/mod-resume-delivery',
     method: 'post',
     data
   });
 }
 
-export function delInbox(data) {
+export function getInbox(data) {
   return fetch({
-    url: '/admin/inbox/del-inbox',
-    method: 'post',
-    data
-  });
-}
-
-export function detailInbox(data) {
-  return fetch({
-    url: '/admin/inbox/detail-inbox',
-    method: 'post',
-    data
-  });
-}
-export function searchInbox(data) {
-  return fetch({
-    url: '/admin/inbox/list-inbox',
+    url: '/admin/company-resume/list-resume-delivery',
     method: 'post',
     data
   });

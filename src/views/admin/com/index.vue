@@ -13,6 +13,7 @@
 		<div class="pt20">
 			<el-table
 		    :data="tableData"
+		    v-loading="listLoading"
 		    stripe
 		    style="width: 100%"
 		    max-height="700px">
@@ -32,7 +33,7 @@
 		      prop="industry"
 		      label="行业">
 
-					<template scope="scope">
+					<template slot-scope="scope">
 		      	<span v-show="!scope.row.edit">{{scope.row.industry}}</span>
 		      	<el-input v-show="scope.row.edit" size="small" v-model="scope.row.industry"></el-input>
 		      </template>
@@ -41,7 +42,7 @@
 		    <el-table-column
 		      prop="scale"
 		      label="规模">
-					<template scope="scope">
+					<template slot-scope="scope">
 		      	<span v-show="!scope.row.edit">{{scope.row.scale}}</span>
 		      	<el-input v-show="scope.row.edit" size="small" v-model="scope.row.scale"></el-input>
 		      </template>
@@ -50,7 +51,7 @@
 		      prop="linkName"
 		      label="联系人">
 				
-					<template scope="scope">
+					<template slot-scope="scope">
 		      	<span v-show="!scope.row.edit">{{scope.row.linkName}}</span>
 		      	<el-input v-show="scope.row.edit" size="small" v-model="scope.row.linkName"></el-input>
 		      </template>
@@ -60,7 +61,7 @@
 		      prop="linkPhone"
 		      label="联系电话">
 				
-					<template scope="scope">
+					<template slot-scope="scope">
 		      	<span v-show="!scope.row.edit">{{scope.row.linkPhone}}</span>
 		      	<el-input v-show="scope.row.edit" size="small" v-model="scope.row.linkPhone"></el-input>
 		      </template>
@@ -70,7 +71,7 @@
 		      prop="introduce"
 		      label="简介">
 				
-					<template scope="scope">
+					<template slot-scope="scope">
 		      	<span v-show="!scope.row.edit">{{scope.row.introduce}}</span>
 		      	<el-input v-show="scope.row.edit" size="small" v-model="scope.row.introduce"></el-input>
 		      </template>
@@ -79,7 +80,7 @@
 		    <el-table-column
 		      prop="webUrl"
 		      label="企业官网">
-		      <template scope="scope">
+		      <template slot-scope="scope">
 
 						<router-link v-show="!scope.row.edit" :to="scope.row.webUrl">
 							{{scope.row.webUrl}}
@@ -91,7 +92,7 @@
 		    <el-table-column
 		      label="操作"
 		      width="150px">
-		      <template scope="scope">
+		      <template slot-scope="scope">
 							<div v-show="!scope.row.edit">
 								<el-button size="mini" type="text" @click="scope.row.edit = true" class="mr5">编辑</el-button>
 								
@@ -113,6 +114,11 @@
 						</template>
 		    </el-table-column>
 		  </el-table>
+		  <div v-show="!listLoading" class="pull-right">
+	      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="listQuery.pageNo" :page-sizes="[30, 40, 50, 60, 70, 80]"
+	        :page-size="listQuery.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
+	      </el-pagination>
+	    </div>
 		</div>
 	</div>
 </template>
@@ -125,9 +131,11 @@
       	fileList: [],
         tableData: [],
         backList: [],
+        listLoading: false,
+        total: null,
         listQuery: {
 	      	pageNo: 1,
-	      	pageSize: 30
+	      	pageSize: 50
 	      }
       }
     },
@@ -136,12 +144,15 @@
     },
     methods: {
     	getlist(){
+    		this.listLoading = true;
     		getComList(this.listQuery).then(res => {
 	    		this.tableData = res.list;
 	    		for(let i in this.tableData){
         		this.$set(this.tableData[i], 'edit', false);
         	}
         	this.backList = JSON.parse(JSON.stringify(this.tableData));
+        	this.total = res.total;
+    			this.listLoading = false;
 	    	})
     	},
     	delCom(id){
@@ -185,6 +196,14 @@
 					scope.row[i] = this.backList[index][i]
 				}
       	scope.row.edit = false;
+    	},
+    	handleCurrentChange(val){
+    		this.listQuery.pageNo = val;
+    		this.getlist();
+    	},
+    	handleSizeChange(val){
+    		this.listQuery.pageSize = val;
+    		this.getlist();
     	}
     }
   }

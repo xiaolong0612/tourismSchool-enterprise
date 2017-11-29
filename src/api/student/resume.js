@@ -76,7 +76,7 @@ export function searchResume(data) {
 // 获取单个简历内容
 export function getResumeDetails(data) {
   return fetch({
-    url: '/ admin/resume/get-resume',
+    url: '/admin/resume/get-resume',
     method: 'post',
     data
   });

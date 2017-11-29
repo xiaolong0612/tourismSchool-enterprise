@@ -1,5 +1,5 @@
 <template>
-	<div class="bg-gray">
+	<div class="bg-gray pb100">
 		<div class="user-bg">
 			<div class="breadcrumb-wrap container">
 				<el-breadcrumb separator="/">
@@ -110,8 +110,42 @@
 				<div></div>
 				<p>以前的工作有助于经验的收集</p>
 			</div>
-
-			<div class="t-center">
+			<div>
+				<el-table
+			    :data="user_info.workList"
+			    :show-header="false"
+			    style="width: 100%">
+			    <el-table-column
+			      property="companyName">
+			    </el-table-column>
+			    <el-table-column>
+			      <template slot-scope="scope">
+			        <el-popover trigger="hover" placement="top">
+			          <p>工作描述: {{ scope.row.workContent }}</p>
+			          <span slot="reference">{{ scope.row.workJob }}</span>
+			        </el-popover>
+			      </template>
+			    </el-table-column>
+			    <el-table-column
+			      property="endDate">
+			      <template slot-scope="scope">
+			      	<span>{{scope.row.endDate}}</span>
+			      </template>
+			    </el-table-column>
+			    <el-table-column
+			    	v-if="is_edit"
+			    	width="100px">
+			    	<template slot-scope="scope">
+				    	<i 
+				    		class="el-icon-edit mr15 c-blue"
+				    		@click="editRow(scope.$index, user_info.workList, 'work')"></i>
+				    	<i class="el-icon-delete c-danger"
+				    		@click="deleteRow(scope.$index, user_info.workList, 'work')"></i>
+				    </template>
+			    </el-table-column>
+			  </el-table>
+			</div>
+			<div class="t-center mt10">
 				<el-button icon='el-icon-plus' size="mini" type="primary" @click="dialogAddWork = true" class="addbtn" v-if="is_edit">添加</el-button>
 			</div>
 		</div>
@@ -122,9 +156,33 @@
 				<div></div>
 				<p>教育的根源很苦，但果实甜美集</p>
 			</div>
-
-			<div class="t-center">
-				<el-button icon='el-icon-plus' size="mini" type="primary" @click="dialogAddWork = true" class="addbtn" v-if="is_edit">添加</el-button>
+			<div>
+				<el-table
+			    :data="user_info.eduList"
+			    :show-header="false"
+			    style="width: 100%">
+			    <el-table-column property="schoolName"></el-table-column>
+			    <el-table-column property="major"></el-table-column>
+			    <el-table-column property="qualificate"></el-table-column>
+			    <el-table-column property="graduateYear"></el-table-column>
+			    <el-table-column
+			      property="endDate">
+			      <template slot-scope="scope">
+			      	<span>{{scope.row.endDate}}</span>
+			      </template>
+			    </el-table-column>
+			    <el-table-column
+			    	v-if="is_edit"
+			    	width="100px">
+			    	<template slot-scope="scope">
+				    	<i class="el-icon-edit mr15 c-blue"></i>
+				    	<i class="el-icon-delete c-danger"></i>
+				    </template>
+			    </el-table-column>
+			  </el-table>
+			</div>
+			<div class="t-center mt10">
+				<el-button icon='el-icon-plus' size="mini" type="primary" @click="dialogAddEdu = true" class="addbtn" v-if="is_edit">添加</el-button>
 			</div>
 		</div>
 
@@ -151,7 +209,6 @@
 				</el-row>
 			</div>
 		</div>
-		<div style="height:200px"></div>
 
 		<div class="fixed-edit">
 			<ul>
@@ -180,7 +237,7 @@
 
 		    <el-form-item label="任职时间">
 		      <el-date-picker
-			      v-model="formData.work.endDate"
+			      v-model="formData.work.time"
 			      type="daterange"
 			      range-separator="至"
 			      start-placeholder="开始日期"
@@ -230,6 +287,7 @@
 
 <script>
   import { mapGetters } from 'vuex';
+  import { parseTime } from '@/utils/index';
   import { getResumeDetails, saveResume, updateResume } from '@/api/student/resume';
   export default {
     computed: {
@@ -242,6 +300,7 @@
   	data() {
   		return {
   			is_edit: false,
+  			is_edit_exp: false,
   			inputVisible: false,
   			labelValue: '',
   			user_info: {
@@ -259,24 +318,7 @@
   				expectIncome: '',
   				expectJob: '',
   				work: [],
-  				edu: [],
-  				// workList: [
-  				// 	{
-  				// 		workJob: '1',
-  				// 		companyName: '1',
-  				// 		beginDate: '1',
-  				// 		endDate: '11',
-  				// 		workContent: '1'
-  				// 	}
-  				// ],
-  				// eduList: [
-  				// 	{
-  				// 		major: '1',
-  				// 		schoolName: '1',
-  				// 		qualificate: '',
-  				// 		graduateYear: ''
-  				// 	}
-  				// ]
+  				edu: []
   			},
   			dialogAddWork: false,
   			dialogAddEdu: false,
@@ -285,8 +327,7 @@
   				work: {
 						workJob: '1',
 						companyName: '1',
-						beginDate: '1',
-						endDate: '1',
+						time: '',
 						workContent: ''
 					},
 					edu: {
@@ -314,11 +355,21 @@
   			let id = this.$route.params.id;
   			getResumeDetails({id}).then(res => {
   				let data = res.resume;
-  				for(let index in data){
-  					if(index == 'labelName'){
-  						this.user_info[index] = data[index] == '' ? [] : data[index].split(',');
+  				for(var label in this.user_info){
+  					if(label == 'labelName'){
+  						this.user_info[label] = data[label] == '' ? [] : data[label].split(',');
+  					}else if(label == 'work'){
+  						let workList;
+  						workList = typeof data.workList == 'undefined' ? [] : data.workList
+  						this.user_info['workList'] = JSON.parse(JSON.stringify(workList));
+  						this.user_info.wrok = JSON.parse(JSON.stringify(workList));
+  					}else if(label == 'edu'){
+  						let eduList;
+  						eduList = typeof data.eduList == 'undefined' ? [] : data.eduList
+  						this.user_info['eduList'] = JSON.parse(JSON.stringify(data.eduList));
+  						this.user_info.edu = JSON.parse(JSON.stringify(eduList));
   					}else{
-  						this.user_info[index] = data[index];
+  						this.user_info[label] = data[label];
   					}
   				}
   			})
@@ -346,9 +397,10 @@
   		formToString(){
   			let data = JSON.parse(JSON.stringify(this.user_info));
   			data.labelName = this.user_info.labelName.join(',');
-  			data.work = JSON.stringify(this.user_info.work);
-  			data.edu = JSON.stringify(this.user_info.edu);
-  			console.log(data)
+  			data.work = JSON.stringify(this.user_info.workList);
+  			data.edu = JSON.stringify(this.user_info.eduList);
+  			delete data.workList;
+  			delete data.eduList;
   			return data
   		},
   		closeEdit(){
@@ -361,14 +413,21 @@
   		},
   		addExp(position){
   			if(position == 'work'){
-  				var str = JSON.stringify(this.formData.work); 
-  				this.user_info.work.push(this.formData.work)
+  				this.user_info.work.push({
+  					workJob: this.formData.work.workJob,
+						companyName: this.formData.work.companyName,
+						beginDate: parseTime(this.formData.work.time[0], '{y}-{m}-{d}'),
+						endDate: parseTime(this.formData.work.time[1], '{y}-{m}-{d}'),
+						workContent: this.formData.work.workContent
+  				})
+  				this.user_info.workList = this.user_info.work
   				this.dialogAddWork = false;
   			}else{
-  				var str = JSON.stringify(this.formData.edu); 
-  				this.user_info.edu.push(this.formData.edu)
+  				this.user_info.edu.push(this.formData.edu);
+  				this.user_info.eduList = this.user_info.edu;
   				this.dialogAddEdu = false;
   			}
+      	this.is_edit_exp = false;
   			console.log(this.user_info)
   		},
   		handleTagClose(tag){
@@ -392,20 +451,43 @@
         this.labelValue = '';
   		},
   		handleAvatarSuccess(res, file) {
-  			is_edit = true;
-        this.user_info.pic = res.url;
+  			this.is_edit = true;
+        this.user_info.pic = res.url.split('@')[0];
+  			console.log(res.url);
+  			console.log(this.user_info)
       },
       beforeAvatarUpload(file) {
         const isJPG = file.type === 'image/jpeg';
         const isLt2M = file.size / 1024 / 1024 < 2;
 
-        if (!isJPG) {
-          this.$message.error('上传头像图片只能是 JPG 格式!');
-        }
+        // if (!isJPG) {
+        //   this.$message.error('上传头像图片只能是 JPG 格式!');
+        // }
         if (!isLt2M) {
           this.$message.error('上传头像图片大小不能超过 2MB!');
         }
         return isJPG && isLt2M;
+      },
+      deleteRow(index, rows) {
+      	console.log(rows)
+        rows.splice(index, 1);
+      },
+      editRow(index, rows, type){
+      	this.is_edit_exp = true;
+      	if(type == 'work'){
+      		this.dialogAddWork = true;
+      		for(let label in this.formData[type]){
+      			if(label == 'time') this.formData[type][label] = [rows[index].beginDate, rows[index].endDate];
+      			else this.formData[type][label] = rows[index][label];
+	      	}
+	      	console.log(this.formData)
+      	}
+      	else{
+      		this.dialogAddEdu = true;
+      		for(let label in this.formData[type]){
+	      		this.formData[type][label] = rows[index][label];
+	      	}
+      	}
       }
   	}
   }

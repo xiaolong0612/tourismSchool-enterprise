@@ -97,8 +97,9 @@ export const constantRouterMap = [
     hidden: true,
     children: [
       { path: 'list', component: search_index },
-      { path: 'list/details/:id', component: search_details },
-      { path: 'com-details/:id', component: search_com_details }
+      { path: 'list/details', component: _import('web/search/details') },
+      { path: 'com-details', component: search_com_details },
+      { path: 'student-details', component: _import('web/search/student-details') }
     ]
   },
   {
@@ -177,7 +178,7 @@ export const asyncRouterMap = [
         name: '收件箱'
       },
       {
-        path: 'inbox/details/:id',
+        path: 'inbox/details',
         component: com_inbox_details,
         name: '简历'
       },

@@ -87,9 +87,10 @@ const user = {
           const data = res.userinfo;
           
           setType(res.type);
-
-          commit('SET_NAME', name = user.type == 2 ? data.name : data.companyName);
-          commit('SET_TYPE', getType());
+          if (res.type == 3) commit('SET_NAME', data.companyName);
+          if (res.type == 2) commit('SET_NAME', data.name);
+          console.log(res)
+          commit('SET_TYPE', res.type);
           commit('SET_ID', data.id);
           commit('SET_AGE', data.age);
           commit('SET_EMAIL', data.email);

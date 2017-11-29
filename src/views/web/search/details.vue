@@ -61,40 +61,7 @@
 			  	</div>
 			  	<div class="evaluate_wrap mt10 bg-white">
 						<h2 class="title">面试评价</h2>
-						<div class="evaluate_list">
-							<ul>
-								<li class="item" v-for="evaluate in job.evaluates" :key="evaluate.evaluateTime">
-									<img class="user-img" src="https://static.lagou.com/thumbnail_100x100/images/jd_portrait.png">
-									<div class="evaluate-info">
-										<div class="user-name">
-											
-											<time class="pull-right" style="color:#808080;font-size:12px;">{{evaluate.evaluateTime}}</time>
-
-											<span>小龙君</span>
-
-											<font style="color:#999">面试评分</font>
-											<div class="rate_wrap">
-												<el-rate
-													disabled
-												  show-score
-												  text-color="#ff9900"
-												  v-model="evaluate.score">
-												</el-rate>
-											</div>
-										</div>
-										<p class="evaluate-text">
-											<span style="color:#808080;">[面试过程]</span>
-											{{evaluate.evaluateContent}}
-										</p>
-									</div>
-								</li>
-							</ul>
-							<!-- <el-pagination
-						    layout="prev, pager, next"
-						    :total="1000"
-						    class="pull-right">
-						  </el-pagination> -->
-						</div>
+						<list-evaluate :jobId="$route.query.id"></list-evaluate>
 			  	</div>
 			  </el-col>
 			  <el-col :span="8">
@@ -145,12 +112,12 @@
 
 <script>
 	import { mapGetters } from 'vuex';
-  import Sticky from '@/components/Sticky/index';
+  import listEvaluate from '@/views/web/search/list-evaluate';
   import { detailJob } from '@/api/com/recruit';
   import resumeItemSelect from '@/views/web/user/resume/list-item-select';
 	export default {
 		components: { 
-			Sticky,
+			listEvaluate,
 			resumeItemSelect
 		},
 		computed: {
@@ -161,7 +128,7 @@
 		data() {
 			return {
 				rate: 3.7,
-				jobId: this.$route.params.id,
+				jobId: this.$route.query.id,
 				dialogResumeList: false,
 				job: {
 		      jobName: "工程师",//岗位名称
@@ -197,7 +164,7 @@
 		methods: {
 			getDetails(){
 				let query={
-					id: this.$route.params.id
+					id: this.$route.query.id
 				}
 				detailJob(query).then(res => {
 					this.job = res.job
@@ -275,44 +242,6 @@
 				border-top: 1px solid rgba(135,141,153,.4);
 				margin-top: -25px;
 				padding: 30px 0 40px;
-				.item{
-					border-top: 1px dashed #E0E0E0;
-					padding: 20px 0;
-					&:first-child{
-						border-top: 0px dashed #E0E0E0;
-					}
-					.user-img{
-						border-radius: 100%;
-						width: 50px;
-						height: 50px;
-						float: left;
-					}
-					.evaluate-info{
-						margin-left: 60px;
-						.user-name{
-							line-height: 20px;
-							padding: 2px 0;
-							>span{
-								display: inline-block;
-								vertical-align: top;
-								width: 80px;
-								color:#555;
-							}
-							>font{
-								font-size: 14px;
-							}
-							.rate_wrap{
-								display: inline-block;
-								vertical-align: top;
-							}
-						}
-						.evaluate-text{
-							color: #555;
-							font-size: 14px;
-							line-height: 25px;
-						}
-					}
-				}
 			}
 		}
 	}

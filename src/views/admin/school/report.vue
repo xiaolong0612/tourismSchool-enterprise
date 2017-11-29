@@ -3,6 +3,7 @@
 		<div class="pt20">
 			<el-table
 		    :data="tableData"
+		    v-loading="listLoading"
 		    stripe
 		    style="width: 100%"
 		    max-height="700px">
@@ -32,14 +33,11 @@
 		    </el-table-column>
 
 		  </el-table>
-		  <el-pagination
-	      @current-change="handleCurrentChange"
-	      :current-page.sync="listQuery.pageNo"
-	      :page-size="listQuery.pageSize"
-	      layout="total, prev, pager, next"
-	      :total="total"
-	      class="mt10">
-	    </el-pagination>
+		  <div v-show="!listLoading" class="pull-right">
+	      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="listQuery.pageNo" :page-sizes="[30, 40, 50, 60, 70, 80]"
+	        :page-size="listQuery.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
+	      </el-pagination>
+	    </div>
 		</div>
 	</div>
 </template>
@@ -52,9 +50,11 @@
       	fileList: [],
         tableData: [],
         backList: [],
+        listLoading: false,
+        total: null,
         listQuery: {
 	      	pageNo: 1,
-	      	pageSize: 30
+	      	pageSize: 50
 	      },
 	      total: 0
       }
@@ -64,13 +64,23 @@
     },
     methods: {
     	getlist(){
+    		this.listLoading = true;
     		getReport(this.listQuery).then(res => {
 	    		this.tableData = res.list;
 	    		this.total = res.total;
+	    		this.listLoading = false;
 	    	})
     	},
     	handleCurrentChange(val){
     		this.listQuery.pageNo = val;
+    		this.getlist();
+    	},
+    	handleCurrentChange(val){
+    		this.listQuery.pageNo = val;
+    		this.getlist();
+    	},
+    	handleSizeChange(val){
+    		this.listQuery.pageSize = val;
     		this.getlist();
     	}
     }

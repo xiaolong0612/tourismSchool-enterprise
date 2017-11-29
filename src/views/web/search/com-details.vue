@@ -1,5 +1,5 @@
 <template>
-	<div class="com-info-wrap">
+	<div class="com-info-wrap pb100">
 		<div class="top-banner"></div>
 
 		<div class="panel_white small_container com-content">
@@ -111,11 +111,10 @@
 
 <script>
   import { mapGetters } from 'vuex';
-  import { getResumeDetails, saveResume, updateResume } from '@/api/student/resume';
+  import { getResumeDetails } from '@/api/student/resume';
   export default {
   	data() {
   		return {
-  			is_edit: false,
   			com_info: {
   				companyName: '微众 教育',
   				pic: '',
@@ -129,7 +128,15 @@
   			}
   		}
   	},
+  	mounted(){
+  		this.getList();
+  	},
   	methods: {
+  		getList(){
+  			getResumeDetails({id: this.$route.query.id}).then(res => {
+  				console.log(res)
+  			})
+  		},
   		handleAvatarSuccess(res, file) {
   			this.is_edit = true;
         this.com_info.pic = res.url;

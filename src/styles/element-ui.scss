@@ -16,7 +16,7 @@
   position: relative;
   margin: 0 auto;
 }
-
+.el-table td, .el-table th{padding:4px 0}
 //element ui upload
 .upload-container {
   .el-upload {
@@ -26,4 +26,7 @@
       height: 200px;
     }
   }
+}
+.el-pagination{
+  padding: 20px 5px;
 }

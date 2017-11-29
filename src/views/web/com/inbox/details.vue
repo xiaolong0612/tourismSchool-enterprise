@@ -1,10 +1,10 @@
 <template>
-	<div class="bg-gray">
+	<div class="bg-gray pb100">
 		<div class="user-bg">
 			<div class="breadcrumb-wrap container">
 				<el-breadcrumb separator="/">
-				  <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-				  <el-breadcrumb-item :to="{ path: '/user/resume/list' }">简历列表</el-breadcrumb-item>
+				  <!-- <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item> -->
+				  <el-breadcrumb-item :to="{ path: '/com/inbox/list' }">收件列表</el-breadcrumb-item>
 				  <el-breadcrumb-item>简历详情</el-breadcrumb-item>
 				</el-breadcrumb>
 			</div>
@@ -12,120 +12,109 @@
 		<div class="section user-wrap small_container panel_white ">
 			<div class="about_intro">
         <el-row>
-        		<el-col :xs="24" :sm="10">
-        				<div class="user-img">
-        					<div 
-        						v-show="user_label"
-        						class="user-label"
-        						@click="user_label =! user_label">
-        						<el-tag>认真</el-tag>
-										<el-tag type="gray">活泼</el-tag>
-										<el-tag type="primary">开朗</el-tag>
-										<el-tag type="success">热情</el-tag>
-										<el-tag type="warning">喜欢音乐</el-tag>
-										<el-tag type="danger">热爱生活</el-tag>
-        					</div>
+        		<el-col :span="10">
+        				<div class="user-img" :style="'background-image:url()'">
         				</div>
+        				
             </el-col>
-        		<el-col :xs="23" :sm="14">
+        		<el-col :span="14">
                 <h4>
-                    I'm 小龙君
+                    <span>{{user_info.linkName}}</span>
                 </h4>
-                <h5>
-                	《长城》【唐】汪遵
-                    秦筑长城比铁牢，蕃戎不敢过临洮。 
-										虽然万里连云际，争及尧阶三尺高。
-                </h5>
                 <ul class="border_bottom_list">
-
-                    <li>
-                    	<strong class="list_title">期望职位: </strong>
-                    	Web工程师
-                    </li>
-                    <li>
-                    	<strong class="list_title">所在城市:</strong>
-                    	厦门市
-                    </li>
-                    <li>
-                    	<strong class="list_title">出生日期:</strong>
-                    	12 July 1997
-                   	</li>
-                    <li>
-                    	<strong class="list_title">Email: </strong>
-                    	<a href="#">david@resume.com</a>
-                    </li>
-                    <li>
+										<!-- 基本信息 -->
+                    <li class="clearfix">
                     	<strong class="list_title">tel : </strong>
-                    	+186 3678 7915
+                    	<span>{{user_info.linkPhone}}</span>
+                    </li>
+                    <li class="clearfix">
+                    	<strong class="list_title">年龄:</strong>
+                    	<span>{{age}}</span>
+                   	</li>
+                    <li class="clearfix">
+                    	<strong class="list_title">在职状态: </strong>
+                    	<span>{{user_info.working}}</span>
                     </li>
                 </ul>
+								<el-form label-width="80px" label-position="left" class="mt25">
+
+							    <el-form-item label="个性标签" >
+							      <div class="small_container">
+											<el-tag 
+												v-for="tag in user_info.labelName"
+												:key="tag">{{tag}}</el-tag>
+										</div>
+							    </el-form-item>
+
+							    <el-form-item label="期望工作" class="mb0">
+							      <div class="expect_wrap">
+												<el-row>
+													<el-col :span="12">
+														<icon-svg icon-class="ffan_lingdai" />
+														<span>{{user_info.expectJob}}</span>
+													</el-col>
+													<el-col :span="12">
+														<icon-svg icon-class="dibiao" />
+														<span>{{user_info.expectAddress}}</span>
+													</el-col>
+													<el-col :span="12">
+														<icon-svg icon-class="bill-copy" />
+														<span>{{user_info.expectIncome}}</span>
+													</el-col>
+												</el-row>
+											</div>
+							    </el-form-item>
+
+							  </el-form>
+
 
             </el-col>
         </el-row>
       </div>
-			<div v-show="!user_label" @click="user_label=!user_label" class="small_container" style="padding: 20px 0 0px">
-				<span style="font-size: 14px">个性标签：</span>
-				<el-tag>认真</el-tag>
-				<el-tag type="gray">活泼</el-tag>
-				<el-tag type="primary">开朗</el-tag>
-				<el-tag type="success">热情</el-tag>
-				<el-tag type="warning">喜欢音乐</el-tag>
-				<el-tag type="danger">热爱生活</el-tag>
+		</div>
+
+		<div class="small_container section panel_white mb40">
+			<div class="section_title">
+				<h4>我的经验</h4>
+				<div></div>
+				<p>以前的工作有助于经验的收集</p>
+			</div>
+			<div>
+				<el-table
+					v-show="user_info.work.length != 0"
+			    :data="user_info.work"
+			    :show-header="false"
+			    style="width: 100%">
+			    <el-table-column
+			      property="companyName">
+			    </el-table-column>
+			    <el-table-column>
+			      <template slot-scope="scope">
+			        <el-popover trigger="hover" placement="top">
+			          <p>工作描述: {{ scope.row.workContent }}</p>
+			          <span slot="reference">{{ scope.row.workJob }}</span>
+			        </el-popover>
+			      </template>
+			    </el-table-column>
+			    <el-table-column
+			      property="endDate">
+			      <template slot-scope="scope">
+			      	<span>{{scope.row.endDate}}</span>
+			      </template>
+			    </el-table-column>
+			  </el-table>
 			</div>
 		</div>
-		<div class="section bg-white pt70 pb70">
-			<div class="container">
-				<el-row>
-					<el-col :md="10" :sm="24" :xs="24">
-						<h5 class="mb25">期望工作</h5>
-						<div class="mb30 expect_wrap">
-							<el-row>
-								<el-col :md="6" :xs="6">
-									<icon-svg icon-class="ffan_lingdai" />
-									<span>导游</span>
-								</el-col>
-								<el-col :md="6" :xs="6">
-									<icon-svg icon-class="dibiao" />
-									<span>厦门</span>
-								</el-col>
-								<el-col :md="6" :xs="6">
-									<icon-svg icon-class="shijian" />
-									<span>全职</span>
-								</el-col>
-								<el-col :md="6" :xs="6">
-									<icon-svg icon-class="bill-copy" />
-									<span>5k～10k</span>
-								</el-col>
-							</el-row>
-						</div>
-						<h5 class="mb25">自我介绍</h5>
-						<p style="line-height:25px;">
-							Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.
-						</p>
-					</el-col>
-					<el-col :md="12" :sm="24" :xs="24" :offset="2">
-						<h5 class="mb25">我的技能</h5>
-						<div class="skill_wrap">
-							<p>技能一</p>
-							<el-progress :show-text="false" :stroke-width="10" :percentage="0"></el-progress>
-							<p>技能二</p>
-							<el-progress :show-text="false" :stroke-width="10" :percentage="70"></el-progress>
-							<p>技能三</p>
-							<el-progress :show-text="false" :stroke-width="10" :percentage="100" status="success"></el-progress>
-							<p>技能四</p>
-							<el-progress :show-text="false" :stroke-width="10" :percentage="50" status="exception"></el-progress>
-						</div>
-					</el-col>
-				</el-row>
+
+		<div class="small_container section panel_white mb40">
+			<div class="section_title">
+				<h4>我的教育</h4>
+				<div></div>
+				<p>教育的根源很苦，但果实甜美集</p>
 			</div>
 		</div>
-		<div class="section">
-			<list-live :list="list.work"></list-live>
-		</div>
-		<div class="section bg-white">
-			<list-live :list="list.education"></list-live>
-		</div>
-		<div class="section honor_wrap pt70 pb100">
+
+		<div class="section honor_wrap">
 			<div class="container">
 				<div class="section_title">
 					<h4>荣誉</h4>
@@ -148,59 +137,175 @@
 				</el-row>
 			</div>
 		</div>
+
+		<div class="fixed-edit" v-if="is_com_look">
+			<ul>
+				<transition name="el-zoom-in-center" v-if="resumeState == 2 || resumeState == 1">
+					<li style="background:#67c23a">已<br>邀<br>请</li>
+				</transition>
+				<transition name="el-zoom-in-center" v-if="resumeState == 3">
+					<li class="bg-danger">已<br>拒<br>绝</li>
+				</transition>
+				<transition name="el-zoom-in-center" v-if="resumeState == 0">
+					<li style="background:#67c23a" @click="is_agree_dialog = true">同<br>意</li>
+				</transition>
+				<transition name="el-zoom-in-center" v-if="resumeState == 0">
+					<li class="bg-danger" @click="is_refuse_dialog = true">拒<br>绝</li>
+				</transition>
+			</ul>
+		</div>
+		<el-dialog
+		  title="邀请信息"
+		  :visible.sync="is_agree_dialog"
+		  width="30%">
+		  <el-form :model="agreeForm" label-width="100px">
+
+		    <el-form-item label="联系人">
+		      <el-input v-model="agreeForm.interviewLinker" auto-complete="off"></el-input>
+		    </el-form-item>
+
+		    <el-form-item label="联系方式">
+		      <el-input v-model="agreeForm.interviewTel" auto-complete="off"></el-input>
+		    </el-form-item>
+		    
+		    <el-form-item label="面试时间">
+		      <el-input v-model="agreeForm.interviewTime" auto-complete="off"></el-input>
+		    </el-form-item>
+		    
+		    <el-form-item label="面试地点">
+		      <el-input v-model="agreeForm.interviewAddr" auto-complete="off"></el-input>
+		    </el-form-item>
+		    
+		    <el-form-item label="携带物品">
+		      <el-input v-model="agreeForm.itemName" auto-complete="off"></el-input>
+		    </el-form-item>
+		    
+		    <el-form-item label="备注">
+		      <el-input v-model="agreeForm.interviewRemark" type="textarea" auto-complete="off"></el-input>
+		    </el-form-item>
+
+		  </el-form>
+		  <span slot="footer" class="dialog-footer">
+		    <el-button @click="is_agree_dialog = false">取 消</el-button>
+		    <el-button type="primary" @click="updateInbox">确 定</el-button>
+		  </span>
+		</el-dialog>
+
+		<el-dialog
+		  title="邀请信息"
+		  :visible.sync="is_refuse_dialog"
+		  width="30%">
+		  <el-form :model="refuseForm" label-width="100">
+		    
+		    <el-form-item label="原因">
+		      <el-input v-model="refuseForm.interviewConclusion" type="textarea" auto-complete="off"></el-input>
+		    </el-form-item>
+
+		  </el-form>
+		  <span slot="footer" class="dialog-footer">
+		    <el-button @click="is_refuse_dialog = false">取 消</el-button>
+		    <el-button type="primary" @click="refuseInbox">确 定</el-button>
+		  </span>
+		</el-dialog>
 	</div>
 </template>
+
 <script>
-  import ListLive from '@/views/web/user/resume/list-live';
+  import { mapGetters } from 'vuex';
+  import { getResumeDetails } from '@/api/student/resume';
+  import { updateInbox, refuseInbox } from '@/api/com/inbox';
   export default {
-    components: { ListLive },
+    computed: {
+      ...mapGetters([
+        'name',
+        'id',
+        'age'
+      ])
+    },
   	data() {
   		return {
-  			list: {
-  				work: {
-  					title: '我的经验',
-  					label: "以前的工作有助于经验的收集",
-  					list:[
-	  					{
-	  					name: '本科计算机工程',
-	  					time: '2016年12月-现在',
-	  					exp: 'Quisque non tortor nec sapien pellentesque rutrum. Ut id neque et enim commodo dictum consectetur vitae orci. In suscipit dolor nec est finibus, nec semper nisi placerat. Aenean sit amet condimentum mauris.'
-	  					},{
-	  					name: '本科计算机工程',
-	  					time: '2016年12月-现在',
-	  					exp: 'Quisque non tortor nec sapien pellentesque rutrum. Ut id neque et enim commodo dictum consectetur vitae orci. In suscipit dolor nec est finibus, nec semper nisi placerat. Aenean sit amet condimentum mauris.'
-	  					},{
-	  					name: '本科计算机工程',
-	  					time: '2016年12月-现在',
-	  					exp: 'Quisque non tortor nec sapien pellentesque rutrum. Ut id neque et enim commodo dictum consectetur vitae orci. In suscipit dolor nec est finibus, nec semper nisi placerat. Aenean sit amet condimentum mauris.'
-	  					}
-  					]
-  				},
-  				education: {
-  					title: '我的教育',
-  					label: "教育的根源很苦，但果实甜美集",
-  					list:[
-	  					{
-	  					name: '本科计算机工程',
-	  					time: '2016年12月-现在',
-	  					exp: 'Quisque non tortor nec sapien pellentesque rutrum. Ut id neque et enim commodo dictum consectetur vitae orci. In suscipit dolor nec est finibus, nec semper nisi placerat. Aenean sit amet condimentum mauris.'
-	  					},{
-	  					name: '本科计算机工程',
-	  					time: '2016年12月-现在',
-	  					exp: 'Quisque non tortor nec sapien pellentesque rutrum. Ut id neque et enim commodo dictum consectetur vitae orci. In suscipit dolor nec est finibus, nec semper nisi placerat. Aenean sit amet condimentum mauris.'
-	  					},{
-	  					name: '本科计算机工程',
-	  					time: '2016年12月-现在',
-	  					exp: 'Quisque non tortor nec sapien pellentesque rutrum. Ut id neque et enim commodo dictum consectetur vitae orci. In suscipit dolor nec est finibus, nec semper nisi placerat. Aenean sit amet condimentum mauris.'
-	  					}
-  					]
-  				}
+  			is_agree_dialog: false,
+  			is_refuse_dialog: false,
+  			is_com_look: false,
+  			user_info: {
+  				studentId: '',
+  				pic: "",
+  				linkName: '',
+  				linkPhone: '',
+  				certificate: '',
+  				selfIntro: '',
+  				skillDescript: '',
+  				pic: '',
+  				labelName: [],
+  				working: '',
+  				expectAddress: '',
+  				expectIncome: '',
+  				expectJob: '',
+  				work: [],
+  				edu: []
   			},
-  			user_label: false
+  			agreeForm: {
+  				id: '',
+  				interviewLinker: '1',
+  				interviewTel: '1',
+					interviewTime: '1',
+					interviewAddr: '1',
+					itemName: '1',
+					interviewRemark: '1'
+  			},
+  			refuseForm: {
+  				id: '',
+  				type: 1,
+  				resumeState: 3,
+					interviewConclusion: '1'
+  			},
+  			resumeState: '',
+  		}
+  	},
+  	mounted(){
+  		this.setDefault();
+  		this.getInfo();
+  	},
+  	methods: {
+  		setDefault(){
+  			this.is_com_look = typeof this.$route.query.is_com_look == 'undeined' ? false : true;
+  			this.agreeForm.id = typeof this.$route.query.deliveryId == 'undeined' ? '' : this.$route.query.deliveryId;
+  			this.refuseForm.id = this.agreeForm.id;
+  			this.resumeState = this.$route.query.resumeState;
+  		},
+  		getInfo(){
+  			let id = this.$route.query.id;
+  			getResumeDetails({id}).then(res => {
+  				if(typeof res == 'undefined') return;
+  				let data = res.resume;
+  				for(let index in data){
+  					if(index == 'labelName'){
+  						this.user_info[index] = data[index] == '' ? [] : data[index].split(',');
+  					}else{
+  						this.user_info[index] = data[index];
+  					}
+  				}
+  			})
+  		},
+  		updateInbox(){
+  			this.is_agree_dialog = false;
+  			updateInbox(this.agreeForm).then(res => {
+  				console.log(res)
+  				this.resumeState = 2;
+  			})
+  		},
+  		refuseInbox(){
+  			this.is_refuse_dialog = false;
+  			refuseInbox(this.refuseForm).then(res => {
+  				console.log(res)
+  				this.resumeState = 3;
+  				console.log(this.$route.query.resumeState)
+  			})
   		}
   	}
   }
 </script>
+
 <style rel="stylesheet/scss" lang="scss">
   @import "src/styles/mixin.scss";
 	.user-bg{
@@ -212,9 +317,18 @@
 			padding: 80px 0 0;
 		}
 	}
+	.section_title{
+		text-align: center;
+		margin-bottom: 50px;
+		>div{
+			border-bottom: solid 2px #457aff;
+	    margin: 10px auto;
+	    max-width: 50px;
+		}
+	}
 	.user-wrap{
     margin-top: -250px;
-    margin-bottom: 70px;
+    margin-bottom: 40px;
     padding: 25px;
     background-color: #FFFFFF;
     .about_intro {
@@ -224,19 +338,19 @@
 	    .user-img{
 				width: 325px;
 				height: 345px;
+				line-height: 345px;
+				text-align: center;
 				overflow: hidden;
 				background: url(/static/img/default-img/user.jpg) center no-repeat;
 				background-size: cover;
 				border-radius: 8px;
 				position: relative;
-				.user-label{
-					position: absolute;
-					bottom: 0;
-					left: 0;
+				.avatar-uploader{
+					font-size: 50px;
+					border: 1px solid #ccc;
+					border-radius: 8px;
+					height: 100%;
 					width: 100%;
-					background-color: rgba(0,0,0,.2);
-					padding: 15px;
-					box-sizing: border-box;
 				}
 	    }
 	    h4{
@@ -247,6 +361,7 @@
 		    margin-bottom: 10px;
 		    margin-top: 5px;
 		    font-size: 20px;
+		    height: 30px;
 	    }
 	    h5{
 	    	margin-bottom: 10px;
@@ -254,11 +369,28 @@
 		    font-size: 17px;
 		    font-weight: 500;
 	    }
+	    .border_bottom_list{
+	    	li{
+	    		line-height: 46px;
+	    		padding: 0;
+	    		.el-input{
+	    			width: 50%;
+	    		}
+	    		.el-select{
+	    			.el-input{
+	    				width: 100%;
+	    			}
+	    		}
+	    	}
+	    }
 		}
 	}
 	.expect_wrap{
 		color: #555;
 		font-size: 14px;
+		.el-input{
+			width: 60%
+		}
 	}
 	.skill_wrap{
 		p{
@@ -307,4 +439,38 @@
 			height: 100%;
 		}
 	}
+	.fixed-edit{
+		position: fixed;
+		bottom: 30%;
+		right: 0;
+		li{
+			display: block;
+			font-size: 14px;
+			color: #fff;
+			text-align: center;
+			padding: 10px 15px;
+			margin-bottom: 10px;
+			border-radius: 4px 0 0 4px;
+		}
+	}
+
+.border_bottom_list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  li {
+    text-transform: capitalize;
+    padding: 12px 0;
+    font-size: 16px;
+    border-bottom: 1px solid #f7f7f7;
+    .list_title {
+      display: block;
+      min-width: 95px;
+      font-weight: 500;
+      letter-spacing: 0;
+      float: left;
+      color: #000000;
+    }
+  }
+}
 </style>

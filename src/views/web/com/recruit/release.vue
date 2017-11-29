@@ -1,21 +1,23 @@
 <template>
-	<div class="release_wrap">
+	<div class="release_wrap" style="min-height:calc(100vh - 94px)">
 		<div class="pt100 pb40 small_container">
 			<div class="curved_box">
-				<el-form ref="form" :model="form" label-width="80px" class="form_wrap">
+				<el-form ref="form" :model="form" :inline="true" label-width="100px" class="form_wrap">
 
 				  <el-form-item label="岗位名称">
 				    <el-input v-model="form.jobName" placeholder="例如:导游"></el-input>
 				  </el-form-item>
 
 				  <el-form-item label="待遇">
-						<el-col :span="11">
-					    <el-input v-model="startIncome" placeholder="请输入最低金额"></el-input>
-				    </el-col>
-				    <el-col class="t-center" :span="2">-</el-col>
-				    <el-col :span="11">
-					    <el-input v-model="endIncome" placeholder="请输入最高金额"></el-input>
-					  </el-col>
+				  	<el-row>
+							<el-col :span="11">
+						    <el-input v-model="startIncome" placeholder="请输入最低金额"></el-input>
+					    </el-col>
+					    <el-col class="t-center" :span="2">-</el-col>
+					    <el-col :span="11">
+						    <el-input v-model="endIncome" placeholder="请输入最高金额"></el-input>
+						  </el-col>
+						</el-row>
 				  </el-form-item>
 
 				  <el-form-item label="工作经验">
@@ -61,7 +63,7 @@
 
 				  <el-form-item label="岗位标签">
 				    <el-select
-					    v-model="form.jobLabels"
+					    v-model="form.labels"
 					    multiple
 					    filterable
 					    allow-create
@@ -74,12 +76,14 @@
 					    </el-option>
 					  </el-select>
 				  </el-form-item>
-
-					<el-form-item>
-				    <el-button type="primary" @click="submitForm">立即发布</el-button>
-				    <el-button @click="resetForm('form')">重置</el-button>
-				    <el-button>取消</el-button>
-				  </el-form-item>
+					<div class="t-center">
+						<el-form-item >
+					    <el-button v-if="is_edit" type="primary" @click="updateJob">保存编辑</el-button>
+					    <el-button v-else type="primary" @click="submitForm">立即发布</el-button>
+					    <el-button @click="resetForm('form')">重置</el-button>
+					    <el-button>取消</el-button>
+					  </el-form-item>
+					 </div>
 				</el-form>
 			</div>
 		</div>
@@ -87,13 +91,15 @@
 </template>
 
 <script>
+	import { mapGetters } from 'vuex';
   import { parseTime } from '@/utils/index';
-  import { newJob } from '@/api/com/recruit';
+  import { newJob, updateJob, detailJob } from '@/api/com/recruit';
 	import city_data from 'region-picker/dist/data.json';
   export default {
   	name: '',
     data() {
       return {
+      	is_edit: false,
       	city_data,
       	startIncome: '',
       	endIncome: '',
@@ -108,30 +114,65 @@
           label: '福利好'
         }],
       	form: {
-      		companyId: '1',
-      		companyName: '阿里巴巴',
-      		jobName: '导游',
-      		income: '100-1000',
-      		workCity: '厦门',
-      		workExperience: '12312',
-      		jobType: '1',
-      		qualificate: '1',
-      		recruitNumber: '1',
-      		workAddress: '1',
-      		linkName: '1',
-      		linkPhone: '1',
-      		receiveEmail: '1',
-      		jobLabels: '',
+      		companyId: '',
+      		companyName: '',
+      		jobName: '',
+      		income: '',
+      		workCity: '',
+      		workExperience: '',
+      		jobType: '',
+      		qualificate: '',
+      		recruitNumber: '',
+      		workAddress: '',
+      		linkName: '',
+      		linkPhone: '',
+      		receiveEmail: '',
+      		labels: '',
       	}
       }
     },
+    computed: {
+	    ...mapGetters([
+	      'id',
+	      'name'
+	    ])
+	  },
     mounted(){
-    	this.resetForm('form');
+    	// this.resetForm('form');
+    	this.isEdit();
+    	this.setDefault();
     },
     methods: {
+    	setDefault(){
+    		this.form.companyId = this.id;
+    		this.form.companyName = this.name;
+    	},
+    	isEdit(){
+    		if(typeof this.$route.query.id != 'undefined') this.is_edit = true;
+    		else return;
+    		detailJob({id: this.$route.query.id}).then( res => {
+    			console.log(res)
+    			this.form = res.job;
+    		})    	
+    	},
+    	updateJob(){
+    		delete this.form.company;
+    		delete this.form.releaseTime;
+    		updateJob(this.form).then( res => {
+    			if(res.success){
+    				this.$message.success('编辑成功');
+    				this.$router.push({ path: '/com/recruit/list' });
+    			}
+    			else{
+    				this.$message.error('编辑失败，请刷新重试！！')
+    			}
+    		})
+    	},
       submitForm() {
     		this.form.income = this.startIncome+'-'+this.endIncome;
-        newJob(this.form).then(res => {
+    		let query = JSON.parse(JSON.stringify(this.form));
+    		query.labels = this.form.labels.join(',');
+        newJob(query).then(res => {
         	if(res.success){
         		this.$message.success('岗位发布成功')
         	}else{
@@ -155,14 +196,14 @@
 		background-size: cover;
 		.form_wrap{
 			padding: 40px;
-			width: 450px;
+			// width: 450px;
 		}
 		.curved_box {
 		  background: #FDFDFD;
 	    background: -webkit-gradient(linear, 0% 0%, 0% 80%, from(#FFF), to(#F2F2F2));
 	    background: -moz-linear-gradient(#FFF,#F2F2F2 80%);
 	    color: #333;
-	    width: 500px;
+	    // width: 500px;
 	    margin: 0 auto;
 	    padding: 20px 0 10px;
 	    border: 1px solid #dedede;

@@ -19,7 +19,6 @@
 	      </el-tab-pane>
 		  </el-tabs>
 		</div>
-    <div style="height:150px;"></div>
 	</div>
 </template>
 <script>
@@ -50,7 +49,7 @@
         },
         newQuery:{
           pageNo: 1,
-          pageSize: 20,
+          pageSize: 4,
           title: '',
         },
         recruitQuery: {

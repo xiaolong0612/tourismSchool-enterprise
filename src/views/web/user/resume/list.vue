@@ -1,5 +1,5 @@
 <template>
-	<div class="bg-gray" style="min-height:100%">
+	<div class="bg-gray" style="background:url(/static/banner/禾苗.jpg) no-repeat center / cover;min-height:calc(100vh - 95px)">
 		<div class="breadcrumb-wrap container pt95">
 			<el-breadcrumb separator="/">
 				  <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
@@ -12,35 +12,38 @@
 		    	
 	        <!-- <resume-item :list="list" v-if="is_resume_item"></resume-item> -->
 	        <el-row :gutter="15" class="resumet_list">
-			      <el-col :span="6" v-for="item in list" :key="item.id">
-			        <div class="item mb20" :style="{borderLeftColor: item.border_color}">
-			          <i class="el-icon-circle-cross" @click="delResume(item.id)"></i>
-			          <div style="padding: 7px 7px 0" class="clearfix">
-			            <div class="img pull-left" :style="{backgroundImage: 'url('+item.pic+')'}"></div>
-			            <div class="info">
-			              <h2>
-			                <router-link :to="'/user/resume/list/details/'+item.id">
-			                {{item.expectJob}}
-			                <span>({{item.expectIncome}})</span>
-			                </router-link>
-			              </h2>
-			              <font class="state">{{item.working}}</font>
-			              <p>
-			                {{item.expectAddress}}
-			                <!-- {{item.edu}} -->
-			              </p>
-			            </div>
-			          </div>
-			          <div class="edit clearfix">
-			            <router-link :to="'/user/resume/list/details/'+item.id" class="pull-right">
-			              <el-button size="mini" type="primary">查看</el-button>
-			            </router-link>
-			            
-			            <span class="pull-left">最后编辑于:</span><font class="pull-left">2017-09-10 12:00:00</font>
-			            <!-- <font>{{item.last_edit_time}}</font> -->
-			          </div>
-			        </div> 
-			      </el-col>
+
+            <transition name="el-zoom-in-top" v-for="item in list" :key="item.id">
+  			      <el-col :span="6">
+  			        <div class="item mb20" :style="{borderLeftColor: item.border_color}">
+  			          <i class="el-icon-circle-cross" @click="delResume(item.id)"></i>
+  			          <div style="padding: 7px 7px 0" class="clearfix">
+  			            <div class="img pull-left" :style="{backgroundImage: 'url('+item.pic+')'}"></div>
+  			            <div class="info">
+  			              <h2>
+  			                <router-link :to="'/user/resume/list/details/'+item.id">
+  			                {{item.expectJob}}
+  			                <span>({{item.expectIncome}})</span>
+  			                </router-link>
+  			              </h2>
+  			              <font class="state">{{item.working}}</font>
+  			              <p>
+  			                {{item.expectAddress}}
+  			                <!-- {{item.edu}} -->
+  			              </p>
+  			            </div>
+  			          </div>
+  			          <div class="edit clearfix">
+  			            <router-link :to="'/user/resume/list/details/'+item.id" class="pull-right">
+  			              <el-button size="mini" type="primary">查看</el-button>
+  			            </router-link>
+  			            
+  			            <span class="pull-left">最后编辑于:</span><font class="pull-left">2017-09-10 12:00:00</font>
+  			            <!-- <font>{{item.last_edit_time}}</font> -->
+  			          </div>
+  			        </div> 
+  			      </el-col>
+            </transition>
 			    </el-row>
 
 	      </el-tab-pane>
@@ -65,7 +68,7 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex';
+  import { mapGetters, } from 'vuex';
   import { getColor } from '@/utils/index';
   import { searchResume, delResume } from '@/api/student/resume';
   import resumeItem from '@/views/web/user/resume/list-item';
@@ -113,15 +116,20 @@
         this.listQuery.studentId = this.id
     		searchResume(this.listQuery).then(res => {
           if(typeof res == 'undefined') return;
-    			this.list = res.list;
-	    		for(let i=0; i<this.list.length; i++){
-	    			this.$set(this.list[i], 'border_color', getColor());
+	    		for(let i=0; i<res.list.length; i++){
+            this.$set(res.list[i], 'border_color', getColor());
+            this.$set(res.list[i], 'show', false);
 	    		}
+          this.list = res.list;
 	    		this.is_resume_item = true;
     		})
     	},
       delResume(id){
-        delResume({id}).then(res => {
+        let query = {
+          studentId: this.id,
+          id: id,
+        }
+        delResume(query).then(res => {
           if(typeof res == 'undefined') return;
           this.$message({
             message: '删除成功',

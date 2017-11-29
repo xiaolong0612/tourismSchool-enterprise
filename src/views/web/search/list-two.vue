@@ -6,7 +6,7 @@
 			  	<div class="position_info" style="padding: 14px 15px 0">
 				  	<div class="name">
 					  	<h2>
-					  		<router-link :to="'/search/list/details/'+item.companyId">
+					  		<router-link :to="{path:'/search/list/details', query:{id:item.id}}">
 					  			{{item.jobName}} [{{item.workAddress}}]
 					  		</router-link>
 					  	</h2>
@@ -24,7 +24,7 @@
 				  	<img class="pull-right" :src="item.companyLogo" width="62">
 				  	<div class="name">
 							<h2>
-					  		<router-link to="/">
+					  		<router-link :to="{path:'/search/com-details', query:{id:companyId}}">
 								{{item.companyName}}
 					  		</router-link>
 							</h2>

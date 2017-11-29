@@ -1,5 +1,5 @@
 <template>
-	<div class="com-info-wrap">
+	<div class="com-info-wrap pb100">
 		<div class="top-banner"></div>
 
 		<div class="panel_white small_container com-content">

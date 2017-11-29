@@ -51,7 +51,7 @@ export function searchJob(data) {
 
 export function updateJob(data) {
   return fetch({
-    url: '/admin/job/update-job',
+    url: '/admin/job/mod-job',
     method: 'post',
     data
   });
@@ -68,6 +68,13 @@ export function detailJob(data) {
 export function delJob(data) {
   return fetch({
     url: '/admin/job/del-job',
+    method: 'post',
+    data
+  });
+}
+export function jobEvaluate(data) {
+  return fetch({
+    url: '/admin/interview-evaluate/list-interview-evaluate',
     method: 'post',
     data
   });

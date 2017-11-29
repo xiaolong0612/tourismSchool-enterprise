@@ -38,7 +38,4 @@
 		position: relative;
 		overflow: auto;
 	}
-	.footer-wrapper{
-		margin-top: 100px;
-	}
 </style>
