@@ -85,7 +85,7 @@
 									        </el-form>
 
 								          <el-form
-								          	v-if="(item.resumeState == 2 || item.resumeState == 3) && item.interviewEvaluate != 'undefined'"
+								          	v-if="(item.resumeState == 2 || item.resumeState == 3) && typeof item.interviewEvaluate != 'undefined'"
 								          	label-position="left"
 								          	inline
 								          	class="demo-table-expand"
@@ -118,9 +118,9 @@
 									        </el-form>
 
 								        </div>
-									  		<el-button  slot="reference" v-if="item.resumeState != 0 && item.interviewEvaluate != 'undefined'" class="pull-right ml5" size="mini" :type="item.stateStr.type">{{item.stateStr.text}}</el-button>
+									  		<el-button  slot="reference" v-if="item.resumeState != 0 && typeof item.interviewEvaluate != 'undefined'" class="pull-right ml5" size="mini" :type="item.stateStr.type">{{item.stateStr.text}}</el-button>
 
-									  		<el-button  slot="reference" v-if="item.interviewEvaluate == 'undefined' && (item.resumeState == 2 || item.resumeState == 3)" class="pull-right ml5" size="mini" :type="item.stateStr.type" @click="getEvaluateEvent(item)">{{item.stateStr.text}}</el-button>
+									  		<el-button  slot="reference" v-if="typeof item.interviewEvaluate == 'undefined' && (item.resumeState == 2 || item.resumeState == 3)" class="pull-right ml5" size="mini" :type="item.stateStr.type" @click="getEvaluateEvent(item)">{{item.stateStr.text}}</el-button>
 									    </el-popover>
 											
 											<el-tooltip v-if="item.resumeState == 0" effect="dark" content="等待企业反馈" placement="top-start">
@@ -159,7 +159,7 @@
 				  </el-rate>
 		    </el-form-item>
 		    <el-form-item label="评价内容" label-width="100px">
-		      <el-input type="textarea" v-model="form.evaluate_content"></el-input>
+		      <el-input type="textarea" v-model="form.evaluateContent"></el-input>
 		    </el-form-item>
 		  </el-form>
 		  <span slot="footer" class="dialog-footer">
@@ -211,9 +211,9 @@
 				form: {
 					evaluatetime: parseTime(new Date, '{y}-{m}-{d} {h}:{i}:{s}'),
       		jobId: '',
-      		student_id: '',
+      		studentId: '',
       		score: 0,
-      		evaluate_content: ''
+      		evaluateContent: ''
 				},
 				list: [],
 				dialogEvaluate: false,
@@ -221,7 +221,7 @@
 			}
 		},
 		mounted() {
-			this.form.student_id = this.id,
+			this.form.studentId = this.id,
 			this.getList(this.active_list.tabs);
 		},
 		methods: {

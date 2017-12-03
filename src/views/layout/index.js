@@ -5,7 +5,7 @@ export { default as Navbar } from './admin/Navbar';
 
 export { default as Sidebar } from './admin/Sidebar';
 
-export { default as Levelbar } from './admin/Levelbar';
+export { default as TagsView } from './admin/TagsView'
 
 /**
  * web layout

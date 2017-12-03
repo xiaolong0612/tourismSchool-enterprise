@@ -1,5 +1,5 @@
 <template>
-	<div class="pt100 bg-gray pb50">
+	<div class="pt100 bg-gray pb50 full-height">
 		<div class="container recruit_look">
 		
 			<el-row :gutter="10">
@@ -14,15 +14,20 @@
 			  		<div>
 			  			<el-form label-position="left" inline label-width="80px">
 			  				<el-row>
-			  					<el-col :span="24">
+			  					<!-- <el-col :span="24">
 			  						<el-form-item label="企业标签" class="pt10 pb10 mb0">
 					            <el-tag size="medium" v-if="job.jobLabels.length != 0" v-for="item in job.jobLabels" :key='item'>{{item}}</el-tag>
 					            <span  v-if="job.jobLabels.length == 0">企业福利好，快快加入我们吧</span>
 					          </el-form-item>
-			  					</el-col>
+			  					</el-col> -->
 					        <el-col :span="12">
 					          <el-form-item label="薪水待遇" class="mb0">
 					            <span style="color:#fa6041">{{job.income}}</span>
+					          </el-form-item>
+					        </el-col>
+					        <el-col :span="12">
+					          <el-form-item label="招聘人数" class="mb0">
+					            <span>{{job.recruitNumber}}</span>
 					          </el-form-item>
 					        </el-col>
 					        <el-col :span="12">
@@ -46,13 +51,13 @@
 					          </el-form-item>
 					        </el-col>
 					        <el-col :span="12">
-					          <el-form-item label="更新于" class="mb0">
-					            <span>2017-09-10</span>
-					          </el-form-item>
-					        </el-col>
-					        <el-col :span="24">
 					          <el-form-item label="工作地点" class="mb0">
 					            <span>{{job.workAddress}}</span>
+					          </el-form-item>
+					        </el-col>
+					        <el-col :span="12">
+					          <el-form-item label="更新于" class="mb0">
+					            <span>{{job.releaseTime}}</span>
 					          </el-form-item>
 					        </el-col>
 					      </el-row>
@@ -67,35 +72,35 @@
 			  <el-col :span="8">
 			  	<div class="bg-white com-info">
 			  		<div class="mb20">
-							<img class="logo mr5" :src="job.companyLogo">
-							<span class="name">{{job.companyName}}</span>
+							<img class="logo mr5" :src="job.company.pic">
+							<span class="name">{{job.company.companyName}}</span>
 						</div>
 						<div class="item">
 							<span>
 								<icon-svg icon-class="caidan" />
 							</span>
-							<font>旅游</font>
+							<font>{{job.company.industry}}</font>
 						</div>
 
 						<div class="item">
 							<span>
 								<icon-svg icon-class="jianjie" />
 							</span>
-							<font>我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害我公司很厉害</font>
+							<font>{{job.company.introduce}}</font>
 						</div>
 
 						<div class="item">
 							<span>
 								<icon-svg icon-class="e60213" />
 							</span>
-							<font>100-300人</font>
+							<font>{{job.company.scale}}</font>
 						</div>
 
 						<div class="item">
 							<span>
 								<icon-svg icon-class="zhuye" />
 							</span>
-							<font><router-link to="www.baidu.com">www.baidu.com</router-link></font>
+							<font><router-link to="www.baidu.com">{{job.company.webUrl}}</router-link></font>
 						</div>
 					</div>
 			  </el-col>
@@ -127,35 +132,47 @@
 	  },
 		data() {
 			return {
-				rate: 3.7,
 				jobId: this.$route.query.id,
 				dialogResumeList: false,
 				job: {
-		      jobName: "工程师",//岗位名称
-		      companyName: "校企",//公司名称
-		      id: "1",//id
-		      income: "3000",//待遇
-		      workCity: "厦门",
-		      workExperience: "2年",//工作经验
-		      qualificate: "本科",//学历
-		      jobTypeStr: "全职",//岗位类型
-		      recruitNumber: "3人",//招聘人数
-		      linkName: "张三",//联系人
-		      linkPhone: "18850521231",//联系电话
-		      workAddress: "软件园",//工作具体地址
-		      receiveEmail: "18850521231@qq.com",//接收邮箱
-		      evaluates: [
-		        {
-							id: "1",//id
-							evaluateContent: "3000",//评价内容
-							score: "80",//打分
-							evaluateTime: "2017-09-10",//评价时间
-							studentId: "3",//学生id
-							jobId: "3",//岗位id
-							studentName: "张三",//学生名称
-	        	}
-	        ]
-	    	}
+	        company: {
+	            account: "",
+	            companyName: "",
+	            id: '',
+	            industry: "",
+	            introduce: "",
+	            linkName: "",
+	            linkPhone: "",
+	            location: "",
+	            openId: "",
+	            password: "",
+	            pic: "",
+	            scale: "",
+	            state: '',
+	            webUrl: ""
+	        },
+	        companyId: '',
+	        companyLogo: "",
+	        companyName: "",
+	        evaluates: [],
+	        id: '',
+	        income: "",
+	        jobLabels: [],
+	        jobName: "",
+	        jobType: '',
+	        jobTypeStr: "",
+	        linkName: "",
+	        linkPhone: "",
+	        major: "",
+	        qualificate: "",
+	        receiveEmail: "",
+	        recruitNumber: '',
+	        releaseTime: "",
+	        state: '',
+	        workAddress: "",
+	        workCity: "",
+	        workExperience: ""
+	    	},
 			}
 		},
 		mounted() {

@@ -12,7 +12,7 @@ export function saveDetails(data) {
 
 export function updateDetails(data) {
   return fetch({
-    url: '/admin/details/update-details',
+    url: '/admin/company/mod-company',
     method: 'post',
     data
   });

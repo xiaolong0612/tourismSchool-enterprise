@@ -5,20 +5,22 @@
         </div>
         <div class="main-container">
             <navbar></navbar>
+            <tags-view></tags-view>
             <app-main></app-main>
         </div>
     </div>
 </template>
 
 <script>
-    import { Navbar, Sidebar, AppMain } from '@/views/layout';
+    import { Navbar, Sidebar, AppMain, TagsView } from '@/views/layout';
 
     export default {
       name: 'ladminayout',
       components: {
         Navbar,
         Sidebar,
-        AppMain
+        AppMain,
+        TagsView
       },
       computed: {
         sidebar() {

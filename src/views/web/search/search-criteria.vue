@@ -36,6 +36,7 @@
 	import city_data from 'region-picker/dist/data.json';
 	import MDinput from '@/components/MDinput';
   import { searchJob } from '@/api/com/recruit';
+  import { getCity } from '@/utils/index';
 	export default {
 		name: '',
 		components: {
@@ -98,6 +99,8 @@
 		methods: {
 			getList(){
 				this.loading = true;
+				console.log(getCity(this.formSearch.workCity))
+				this.formSearch.workCity = getCity(this.formSearch.workCity);
 				searchJob(this.formSearch).then(res => {
           this.$emit('search', res);
           this.loading = false;

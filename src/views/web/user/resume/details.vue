@@ -11,10 +11,11 @@
 		</div>
 		<div class="section user-wrap small_container panel_white ">
 			<div class="about_intro">
-        <el-row>
-        		<el-col :span="10">
-        				<div class="user-img" :style="'background-image:url()'">
+        		<!-- <el-col :span="10">
+        				<div class="user-img" :style="'background-image:url('+user_info.pic+')'">
         					<el-upload
+        						style="width:100%;height:100%;"
+        						v-if="is_edit"
 									  class="avatar-uploader"
 									  :action="gpath.user_hp"
 									  :show-file-list="false"
@@ -25,82 +26,104 @@
 									</el-upload>
         				</div>
         				
+            </el-col> -->
+	  		<el-form :model="user_info" ref="user_info" label-width="100px">
+        	<el-row>
+	  				<el-col :span="24">
+		  				<el-form-item style="margin-left:-100px;">
+		    				<div class="user-img mb20" :style="'background-image:url('+user_info.pic+')'">
+		    					<el-upload
+		    						style="width:100%;height:100%;"
+		    						v-if="is_edit"
+									  class="avatar-uploader"
+									  :action="gpath.user_hp"
+									  :show-file-list="false"
+									  :on-success="handleAvatarSuccess"
+									  :before-upload="beforeAvatarUpload">
+									  <img v-if="user_info.pic" :src="user_info.pic" class="avatar" style="width:100%;">
+									  <div class="change_img-remind">点击<br>更换头像</div>
+									</el-upload>
+		    				</div>
+		    			</el-form-item>
+		    		</el-col>
+		    		<el-col :span="24">
+	    				<el-form-item style="margin-left:-100px;">
+	              <h4 class="t-center">
+	                  <span v-if="!is_edit">{{user_info.linkName}}</span>
+	                  <el-input v-if="is_edit" v-model="user_info.linkName" placeholder="请填写姓名"></el-input>
+	              </h4>
+	            </el-form-item>
+	          </el-col>
+						<!-- 基本信息 -->
+						<el-col :span="12">
+              <el-form-item label="联系方式:" >
+                	<span v-if="!is_edit">{{user_info.linkPhone}}</span>
+                	<el-input v-if="is_edit" v-model="user_info.linkPhone"></el-input>
+              </el-form-item>
             </el-col>
-        		<el-col :span="14">
-                <h4>
-                    <span v-if="!is_edit">{{user_info.linkName}}</span>
-                    <el-input v-if="is_edit" v-model="user_info.linkName" placeholder="请填写姓名"></el-input>
-                </h4>
-                <ul class="border_bottom_list">
-										<!-- 基本信息 -->
-                    <li class="clearfix">
-                    	<strong class="list_title">tel : </strong>
-                    	<span v-if="!is_edit">{{user_info.linkPhone}}</span>
-                    	<el-input v-if="is_edit" v-model="user_info.linkPhone"></el-input>
-                    </li>
-                    <li class="clearfix">
-                    	<strong class="list_title">年龄:</strong>
-                    	<span>{{age}}</span>
-                   	</li>
-                    <li class="clearfix">
-                    	<strong class="list_title">在职状态: </strong>
-                    	<a v-if="!is_edit" href="#">{{user_info.working}}</a>
-                    	<el-select v-if="is_edit" v-model="user_info.working" placeholder="请选择">
-									      <el-option label="待业" value="待业"></el-option>
-									      <el-option label="在职" value="在职"></el-option>
-									    </el-select>
-                    </li>
-                </ul>
-								<el-form label-width="80px" label-position="left" class="mt25">
-
-							    <el-form-item label="个性标签" >
-							      <div class="small_container">
-											<el-tag 
-												v-for="tag in user_info.labelName"
-												:closable="is_edit"
-												:key="tag"
-												@close="handleTagClose(tag)">{{tag}}</el-tag>
-											<el-input
-												style="width:80px"
-												v-if="is_edit"
-											  class="input-new-tag"
-											  v-model="labelValue"
-											  ref="saveTagInput"
-											  size="small"
-											  placeholder="New tag"
-											  @keyup.enter.native="handleInputConfirm"
-											  @blur="handleInputConfirm"
-											></el-input>
-										</div>
-							    </el-form-item>
-
-							    <el-form-item label="期望工作" class="mb0">
-							      <div class="expect_wrap">
-												<el-row>
-													<el-col :span="12">
-														<icon-svg icon-class="ffan_lingdai" />
-														<span v-if="!is_edit">{{user_info.expectJob}}</span>
-					                  <el-input v-if="is_edit" v-model="user_info.expectJob" placeholder="期望岗位"></el-input>
-													</el-col>
-													<el-col :span="12">
-														<icon-svg icon-class="dibiao" />
-														<span v-if="!is_edit">{{user_info.expectAddress}}</span>
-					                  <el-input v-if="is_edit" v-model="user_info.expectAddress" placeholder="期望地点"></el-input>
-													</el-col>
-													<el-col :span="12">
-														<icon-svg icon-class="bill-copy" />
-														<span v-if="!is_edit">{{user_info.expectIncome}}</span>
-														<el-input v-if="is_edit" v-model="user_info.expectIncome" placeholder="期望薪资"></el-input>
-													</el-col>
-												</el-row>
-											</div>
-							    </el-form-item>
-
-							  </el-form>
-
-
+            <el-col :span="12">
+          		<el-form-item label="年龄:" >
+              	<span>{{age}}</span>
+          		</el-form-item>
+          	</el-col>
+          </el-row>
+          <el-row>
+					  <el-col :span="6">
+            	<el-form-item label="在职状态:" >
+              	<a v-if="!is_edit" href="#">{{user_info.working}}</a>
+              	<el-select v-if="is_edit" v-model="user_info.working" placeholder="请选择">
+						      <el-option label="待业" value="待业"></el-option>
+						      <el-option label="在职" value="在职"></el-option>
+						    </el-select>
+            	</el-form-item>
             </el-col>
-        </el-row>
+						<el-col :span="18">
+					    <el-form-item label="期望工作:" class="mb0">
+					      <div class="expect_wrap">
+									<el-row>
+										<el-col :span="6">
+											<icon-svg icon-class="ffan_lingdai" />
+											<span v-if="!is_edit">{{user_info.expectJob}}</span>
+		                  <el-input v-if="is_edit" v-model="user_info.expectJob" placeholder="期望岗位"></el-input>
+										</el-col>
+										<el-col :span="8">
+											<icon-svg icon-class="dibiao" />
+											<span v-if="!is_edit">{{user_info.expectAddress}}</span>
+		                  <el-input v-if="is_edit" v-model="user_info.expectAddress" placeholder="期望地点"></el-input>
+										</el-col>
+										<el-col :span="8" :offset="2">
+											<icon-svg icon-class="bill-copy" />
+											<span v-if="!is_edit">{{user_info.expectIncome}}</span>
+											<el-input v-if="is_edit" v-model="user_info.expectIncome" placeholder="期望薪资"></el-input>
+										</el-col>
+									</el-row>
+								</div>
+					    </el-form-item>
+					  </el-col>
+					</el-row>
+					<el-row>
+					  <el-col :span="24">
+					    <el-form-item label="个性标签:" >
+								<el-tag 
+									v-for="tag in user_info.labelName"
+									:closable="is_edit"
+									:key="tag"
+									@close="handleTagClose(tag)">{{tag}}</el-tag>
+								<el-input
+									style="width:80px"
+									v-if="is_edit"
+								  class="input-new-tag"
+								  v-model="labelValue"
+								  ref="saveTagInput"
+								  size="small"
+								  placeholder="New tag"
+								  @keyup.enter.native="handleInputConfirm"
+								  @blur="handleInputConfirm"
+								></el-input>
+					    </el-form-item>
+					  </el-col>
+        	</el-row>
+				</el-form>
       </div>
 		</div>
 
@@ -165,18 +188,21 @@
 			    <el-table-column property="major"></el-table-column>
 			    <el-table-column property="qualificate"></el-table-column>
 			    <el-table-column property="graduateYear"></el-table-column>
-			    <el-table-column
+			    <!-- <el-table-column
 			      property="endDate">
 			      <template slot-scope="scope">
 			      	<span>{{scope.row.endDate}}</span>
 			      </template>
-			    </el-table-column>
+			    </el-table-column> -->
 			    <el-table-column
 			    	v-if="is_edit"
 			    	width="100px">
 			    	<template slot-scope="scope">
-				    	<i class="el-icon-edit mr15 c-blue"></i>
-				    	<i class="el-icon-delete c-danger"></i>
+				    	<i 
+				    		class="el-icon-edit mr15 c-blue"
+				    		@click="editRow(scope.$index, user_info.workList, 'edu')"></i>
+				    	<i class="el-icon-delete c-danger"
+				    		@click="deleteRow(scope.$index, user_info.workList, 'edu')"></i>
 				    </template>
 			    </el-table-column>
 			  </el-table>
@@ -186,7 +212,7 @@
 			</div>
 		</div>
 
-		<div class="section honor_wrap">
+		<!-- <div class="section honor_wrap">
 			<div class="container">
 				<div class="section_title">
 					<h4>荣誉</h4>
@@ -208,7 +234,7 @@
 				  </el-col>
 				</el-row>
 			</div>
-		</div>
+		</div> -->
 
 		<div class="fixed-edit">
 			<ul>
@@ -372,6 +398,7 @@
   						this.user_info[label] = data[label];
   					}
   				}
+  				if(this.user_info.pic == '') this.user_info.pic = '/static/default_img.gif'
   			})
   		},
   		saveResume(){
@@ -522,15 +549,17 @@
 	    text-align: left;
 	    margin: 0 auto;
 	    max-width: 100%;
+	    .el-form-item{margin-bottom: 0}
 	    .user-img{
-				width: 325px;
-				height: 345px;
-				line-height: 345px;
+				width: 80px;
+				height: 80px;
 				text-align: center;
 				overflow: hidden;
 				background: url(/static/img/default-img/user.jpg) center no-repeat;
 				background-size: cover;
-				border-radius: 8px;
+				margin: 0 auto;
+				border-radius: 100%;
+				box-shadow: 0 0 2px 4px #f7f7f7;
 				position: relative;
 				.avatar-uploader{
 					font-size: 50px;
@@ -538,6 +567,19 @@
 					border-radius: 8px;
 					height: 100%;
 					width: 100%;
+				}
+				.change_img-remind{
+					position: absolute;
+					top: 0;
+					left: 0;
+					width: 100%;
+					height: 100%;
+					line-height: 20px;
+					font-size: 14px;
+					color: #fff;
+					padding-top: 18px;
+					text-align: center;
+					background-color: rgba(0,0,0,.3);
 				}
 	    }
 	    h4{

@@ -3,6 +3,7 @@ import { getType, setType, removeType, getId, setId, removeId } from '@/utils/au
 
 const user = {
   state: {
+    user: {},
     account: '',
     age: '',
     email: '',
@@ -21,6 +22,9 @@ const user = {
   },
 
   mutations: {
+    SET_USER: (state, user) => {
+      state.user = user;
+    },
     SET_ACCOUNT: (state, account) => {
       state.account = account;
     },
@@ -85,7 +89,7 @@ const user = {
         }
         getInfo(user).then(res => {
           const data = res.userinfo;
-          
+          commit('SET_USER', data);
           setType(res.type);
           if (res.type == 3) commit('SET_NAME', data.companyName);
           if (res.type == 2) commit('SET_NAME', data.name);

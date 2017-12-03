@@ -2,9 +2,9 @@
 	<div class="release_wrap" style="min-height:calc(100vh - 94px)">
 		<div class="pt100 pb40 small_container">
 			<div class="curved_box">
-				<el-form ref="form" :model="form" :inline="true" label-width="100px" class="form_wrap">
+				<el-form ref="form" :model="form" :rules="rules" :inline="true" label-width="100px" class="form_wrap">
 
-				  <el-form-item label="岗位名称">
+				  <el-form-item label="岗位名称" prop="jobName">
 				    <el-input v-model="form.jobName" placeholder="例如:导游"></el-input>
 				  </el-form-item>
 
@@ -41,11 +41,11 @@
 				    <el-input v-model="form.recruitNumber" placeholder="例如:1人"></el-input>
 				  </el-form-item>
 
-				  <el-form-item label="工作城市">
+				  <el-form-item label="工作城市" prop="workCity">
 				    <region-picker class="input" v-model="form.workCity" :data="city_data" :max-level='2' :min-level='2' placeholder="请选择城市"></region-picker>
 				  </el-form-item>
 
-				  <el-form-item label="详细地址">
+				  <el-form-item label="详细地址" prop="workAddress">
 				    <el-input v-model="form.workAddress" placeholder="例如:思明区软二望海路17号楼之二701"></el-input>
 				  </el-form-item>
 
@@ -53,12 +53,12 @@
 				    <el-input v-model="form.linkName" placeholder="例如:赵经理"></el-input>
 				  </el-form-item>
 
-				  <el-form-item label="联系方式">
-				    <el-input v-model="form.linkPhone" placeholder="例如:18636363615"></el-input>
+				  <el-form-item label="联系方式" prop="linkPhone">
+				    <el-input v-model="form.linkPhone" placeholder="例如:186******15"></el-input>
 				  </el-form-item>
 
-				  <el-form-item label="邮箱">
-				    <el-input v-model="form.receiveEmail" placeholder="例如:1057510575@qq.com"></el-input>
+				  <el-form-item label="邮箱" prop="receiveEmail">
+				    <el-input v-model="form.receiveEmail" placeholder="例如:10********@qq.com"></el-input>
 				  </el-form-item>
 
 				  <el-form-item label="岗位标签">
@@ -80,7 +80,7 @@
 						<el-form-item >
 					    <el-button v-if="is_edit" type="primary" @click="updateJob">保存编辑</el-button>
 					    <el-button v-else type="primary" @click="submitForm">立即发布</el-button>
-					    <el-button @click="resetForm('form')">重置</el-button>
+					    <el-button @click="resetForm()">重置</el-button>
 					    <el-button>取消</el-button>
 					  </el-form-item>
 					 </div>
@@ -92,12 +92,20 @@
 
 <script>
 	import { mapGetters } from 'vuex';
-  import { parseTime } from '@/utils/index';
+  import { parseTime, getCity } from '@/utils/index';
+  import { validatPhone } from '@/utils/validate';
   import { newJob, updateJob, detailJob } from '@/api/com/recruit';
 	import city_data from 'region-picker/dist/data.json';
   export default {
   	name: '',
     data() {
+    	const isPhone = (rule, value, callback) => {
+	      if (validatPhone(value)) {
+	        callback(new Error('请输入正确的联系方式'))
+	      } else {
+	        callback()
+	      }
+	    }
       return {
       	is_edit: false,
       	city_data,
@@ -116,18 +124,36 @@
       	form: {
       		companyId: '',
       		companyName: '',
-      		jobName: '',
+      		jobName: 'web工程师',
       		income: '',
-      		workCity: '',
-      		workExperience: '',
-      		jobType: '',
-      		qualificate: '',
-      		recruitNumber: '',
-      		workAddress: '',
-      		linkName: '',
-      		linkPhone: '',
-      		receiveEmail: '',
-      		labels: '',
+      		workCity: '厦门市',
+      		workExperience: '1年',
+      		jobType: '0',
+      		qualificate: '本科',
+      		recruitNumber: '1人',
+      		workAddress: '软件园',
+      		linkName: '赵经理',
+      		linkPhone: '18636787915',
+      		receiveEmail: '1057520381@qq.com',
+      		labels: [],
+      	},
+      	rules: {
+      		jobName: [
+      			{ required: true, message: '请输入岗位名称', trigger: 'blur' }
+      		],
+      		workCity: [
+      			{ required: true, message: '请输入城市', trigger: 'blur' }
+      		],
+      		workAddress: [
+      			{ required: true, message: '请输入详细地址', trigger: 'blur' }
+      		],
+      		linkPhone: [
+      			{ required: true, message: '请输入联系方式', trigger: 'blur' }
+      		],
+      		receiveEmail: [
+      			{ required: true, message: '请输入邮箱地址', trigger: 'blur' },
+      			{ type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur,change' }
+      		]
       	}
       }
     },
@@ -138,7 +164,7 @@
 	    ])
 	  },
     mounted(){
-    	// this.resetForm('form');
+    	this.resetForm();
     	this.isEdit();
     	this.setDefault();
     },
@@ -151,13 +177,23 @@
     		if(typeof this.$route.query.id != 'undefined') this.is_edit = true;
     		else return;
     		detailJob({id: this.$route.query.id}).then( res => {
-    			console.log(res)
     			this.form = res.job;
+    			this.form['labels'] = res.job.jobLabels;
+    			delete this.form.jobLabels;
+    			console.log(this.form)
     		})    	
     	},
     	updateJob(){
+    		debugger
     		delete this.form.company;
     		delete this.form.releaseTime;
+    		if(this.endIncome == ''){
+      		this.form.income = this.startIncome
+      	}else{
+      		this.form.income = this.startIncome+'-'+this.endIncome;
+      	}
+    		this.form.workCity = getCity(this.form.workCity);
+    		this.form.labels = this.form.labels.join(',');
     		updateJob(this.form).then( res => {
     			if(res.success){
     				this.$message.success('编辑成功');
@@ -169,9 +205,14 @@
     		})
     	},
       submitForm() {
-    		this.form.income = this.startIncome+'-'+this.endIncome;
+      	if(this.endIncome == ''){
+      		this.form.income = this.startIncome
+      	}else{
+      		this.form.income = this.startIncome+'-'+this.endIncome;
+      	}
     		let query = JSON.parse(JSON.stringify(this.form));
     		query.labels = this.form.labels.join(',');
+    		query.workCity = getCity(query.workCity);
         newJob(query).then(res => {
         	if(res.success){
         		this.$message.success('岗位发布成功')
@@ -180,11 +221,23 @@
         	}
         })
       },
-      resetForm(formName) {
-      	for(let index in this.form){
-      		this.form[index] = '';
+      resetForm() {
+      	this.form = {
+      		companyId: '',
+      		companyName: '',
+      		jobName: '',
+      		income: '',
+      		workCity: '',
+      		workExperience: '',
+      		jobType: '',
+      		qualificate: '',
+      		recruitNumber: '',
+      		workAddress: '',
+      		linkName: '',
+      		linkPhone: '',
+      		receiveEmail: '',
+      		labels: [],
       	}
-        this.$refs[formName].resetFields();
       }
     }
   }

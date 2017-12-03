@@ -1,13 +1,13 @@
 <template>
-	<div class="bg-gray">
+	<div class="bg-gray full-height">
 		<search-criteria/>
-		<div class="container pt40 pb40" v-if="list.is_new_list">
+		<!-- <div class="container pt40 pb40" v-if="list.is_new_list">
 			<el-tabs v-model="active_list.new_list">
 		    <el-tab-pane label="新闻列表" name="new">
 					<list-new :list="list.new_list"/>
 	      </el-tab-pane>
 		  </el-tabs>
-		</div>
+		</div> -->
 		<div class="container new-recruit" v-if="list.is_recruit_list">
 			<el-tabs v-model="active_list.recruit_list">
 		    <el-tab-pane label="最新招聘" name="recruit">

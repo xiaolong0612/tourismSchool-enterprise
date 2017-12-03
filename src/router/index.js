@@ -190,6 +190,16 @@ export const asyncRouterMap = [
     ]
   },
   {
+    path: '/welcome',
+    component: adminLayout,
+    redirect: '/welcome/index',
+    name: '首页',
+    icon: 'tubiaoleixingzhengchang',
+    meta: { role: ['0'] },
+    noDropdown: true,
+    children: [{ path: 'index', component: _import('admin/welcome/index'), name: 'welcome', meta: { role: ['0'] }}]
+  },
+  {
     path: '/com',
     component: adminLayout,
     redirect: '/com/list',
@@ -225,7 +235,7 @@ export const asyncRouterMap = [
     redirect: '/report/list',
     name: '报表',
     icon: 'tubiaoleixingzhengchang',
-    meta: { role: ['1'] },
+    meta: { role: ['0', '1'] },
     noDropdown: true,
     children: [{ path: 'list', component: admin_report_list, name: '报表', meta: { role: ['1'] }}]
   },

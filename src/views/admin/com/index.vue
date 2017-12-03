@@ -1,15 +1,15 @@
 <template>
 	<div class="p30">
-		<!-- <div class="form-wrap bg-gray p20">
-			<el-upload
+		<div class="form-wrap bg-gray p20">
+			<!-- <el-upload
 			  class="upload-demo"
 			  action="https://jsonplaceholder.typicode.com/posts/"
 			  show-file-list='false'
 			  :file-list="fileList">
 			  <el-button size="small" type="primary">点击上传</el-button>
 			  <div slot="tip" class="el-upload__tip">只能上传excel文件，且不超过500kb</div>
-			</el-upload>
-		</div> -->
+			</el-upload> -->
+		</div>
 		<div class="pt20">
 			<el-table
 		    :data="tableData"
@@ -17,6 +17,16 @@
 		    stripe
 		    style="width: 100%"
 		    max-height="700px">
+		    <el-table-column type="expand">
+		      <template slot-scope="props">
+		        <el-form label-position="left" label-width="100px">
+		          <el-form-item label="企业简介">
+					      	<span v-show="!props.row.edit">{{props.row.introduce}}</span>
+					      	<el-input v-show="props.row.edit" type="textarea" size="small" v-model="props.row.introduce"></el-input>
+		          </el-form-item>
+		        </el-form>
+		      </template>
+		    </el-table-column>
 		    <el-table-column
 		      prop="id"
 		      label="序号">
@@ -67,16 +77,7 @@
 		      </template>
 
 		    </el-table-column>
-		    <el-table-column
-		      prop="introduce"
-		      label="简介">
-				
-					<template slot-scope="scope">
-		      	<span v-show="!scope.row.edit">{{scope.row.introduce}}</span>
-		      	<el-input v-show="scope.row.edit" size="small" v-model="scope.row.introduce"></el-input>
-		      </template>
 
-		    </el-table-column>
 		    <el-table-column
 		      prop="webUrl"
 		      label="企业官网">

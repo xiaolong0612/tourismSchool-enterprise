@@ -73,7 +73,7 @@ import { getType, setType } from '@/utils/auth';
             this.$store.dispatch('Login', this.loginForm).then(res => {
               this.loading = false;
               if(getType() == 0){
-                this.$router.push({ path: '/com/list' });
+                this.$router.push({ path: '/welcome/index' });
               }else{
                 this.$router.push({ path: '/student/list' });
               }

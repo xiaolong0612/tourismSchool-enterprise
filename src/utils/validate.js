@@ -32,4 +32,10 @@ export function validatAlphabets(str) {
   return reg.test(str);
 }
 
+/* 大小写字母*/
+export function validatPhone(str) {
+  const mobile = /^1[3|5|8]\d{9}$/ , phone = /^0\d{2,3}-?\d{7,8}$/;
+  return mobile.test(str) || phone.test(str)
+}
+
 

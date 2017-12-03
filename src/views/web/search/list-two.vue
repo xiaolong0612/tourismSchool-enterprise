@@ -24,7 +24,7 @@
 				  	<img class="pull-right" :src="item.companyLogo" width="62">
 				  	<div class="name">
 							<h2>
-					  		<router-link :to="{path:'/search/com-details', query:{id:companyId}}">
+					  		<router-link :to="{path:'/search/com-details', query:{id:item.companyId}}">
 								{{item.companyName}}
 					  		</router-link>
 							</h2>

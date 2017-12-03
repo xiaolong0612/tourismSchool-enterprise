@@ -2,6 +2,7 @@
  * Created by xiaolongjun on 17/8/27.
  */
 
+
 export function parseTime(time, cFormat) {
  if (arguments.length === 0) {
    return null;
@@ -267,6 +268,32 @@ export function deepClone(source) {
    }
  }
  return targetObj;
+}
+
+// 获取城市名称   邮编转文字
+export function getCity(str){
+  if(str == undefined) return;
+  let date = require('region-picker/dist/data.json').districts;
+  for(let p=0; p<date.length; p++){
+    if(date[p].adcode == str){
+      return date[p].name;
+    }
+    else{
+      for(let c=0; c<date[p].districts.length; c++){
+        if(date[p].districts[c].adcode == str){
+          return date[p].name+"/"+date[p].districts[c].name;
+        }
+        else{
+          for(let a=0; a<date[p].districts[c].districts.length; a++){
+            if(date[p].districts[c].districts[a].adcode == str){
+              return date[p].name+"/"+date[p].districts[c].name+"/"+date[p].districts[c].districts[a].name;
+            }
+          }
+        }
+      }
+    }
+  }
+  // return '厦门'
 }
 
 export function getColor(){

@@ -67,6 +67,7 @@ p {font-size: 14px;}
     height: 0;
   }
 }
+.full-height{min-height: calc(100vh - 94px)}
 .pull-left{float: left;}
 .pull-right{float: right;}
 
@@ -80,6 +81,7 @@ p {font-size: 14px;}
 .bg-warning{background-color:#EB9E05;}
 .bg-danger{background-color:#FA5555;}
 .bg-info{background-color:#878D99;}
+.c-gray{color: #808080}
 .c-blue{color: #409EFF}
 .c-success{color: #67C23A}
 .c-warning{color: #EB9E05}

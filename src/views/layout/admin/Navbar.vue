@@ -1,7 +1,6 @@
 <template>
     <el-menu class="navbar" mode="horizontal">
         <hamburger class="hamburger-container" :toggleClick="toggleSideBar" :isActive="sidebar.opened"></hamburger>
-        <levelbar></levelbar>
         <el-button type="danger" size="small" @click="logout" class="logout pull-right mr30 mt10">
           退出
         </el-button>
@@ -24,12 +23,10 @@
 
 <script>
     import { mapGetters } from 'vuex';
-    import Levelbar from './Levelbar';
     import Hamburger from '@/components/Hamburger';
 
     export default {
       components: {
-        Levelbar,
         Hamburger
       },
       computed: {
@@ -40,7 +37,7 @@
       },
       methods: {
         toggleSideBar() {
-          this.$store.dispatch('ToggleSideBar')
+          this.$store.dispatch('toggleSideBar')
         },
         logout() {
           this.$store.dispatch('LogOut').then(() => {
