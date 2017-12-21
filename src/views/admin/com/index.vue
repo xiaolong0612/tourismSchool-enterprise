@@ -1,14 +1,34 @@
 <template>
 	<div class="p30">
 		<div class="form-wrap bg-gray p20">
-			<!-- <el-upload
-			  class="upload-demo"
-			  action="https://jsonplaceholder.typicode.com/posts/"
-			  show-file-list='false'
-			  :file-list="fileList">
-			  <el-button size="small" type="primary">点击上传</el-button>
-			  <div slot="tip" class="el-upload__tip">只能上传excel文件，且不超过500kb</div>
-			</el-upload> -->
+			<el-form :inline="true" class="clearfix">
+				<el-form-item class="mb0">
+					<el-upload
+					  ref="upload"
+					  :action="gpath.action_company"
+					  :file-list="fileList"
+					  :auto-upload="false"
+					  :on-success="getlist"
+					  accept=".xlsx, .xls">
+					  <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+					  <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>
+					  <div slot="tip" class="el-upload__tip">只能上传excel文件，且不超过10M</div>
+					</el-upload>
+				</el-form-item>
+				<el-form-item class="mb0" label="企业名称">
+					<el-select v-model="listQuery.name" filterable placeholder="请选择" @change="getlist">
+				    <el-option
+				      v-for="item in comList"
+				      :key="item.id"
+				      :label="item.companyName"
+				      :value="item.companyName">
+				    </el-option>
+				  </el-select>
+				</el-form-item>
+			  <el-form-item label="企业总数" class="mb0 pull-right">
+			    <span class="c-success">{{total}}</span>个
+			  </el-form-item>
+			</el-form>
 		</div>
 		<div class="pt20">
 			<el-table
@@ -29,7 +49,8 @@
 		    </el-table-column>
 		    <el-table-column
 		      prop="id"
-		      label="序号">
+		      label="序号"
+		      width="50px">
 		    </el-table-column>
 		    <el-table-column
 		      prop="companyName"
@@ -41,7 +62,8 @@
 		    </el-table-column>
 		    <el-table-column
 		      prop="industry"
-		      label="行业">
+		      label="行业"
+		      width="120px">
 
 					<template slot-scope="scope">
 		      	<span v-show="!scope.row.edit">{{scope.row.industry}}</span>
@@ -51,7 +73,8 @@
 		    </el-table-column>
 		    <el-table-column
 		      prop="scale"
-		      label="规模">
+		      label="规模"
+		      width="100px">
 					<template slot-scope="scope">
 		      	<span v-show="!scope.row.edit">{{scope.row.scale}}</span>
 		      	<el-input v-show="scope.row.edit" size="small" v-model="scope.row.scale"></el-input>
@@ -59,7 +82,8 @@
 		    </el-table-column>
 		    <el-table-column
 		      prop="linkName"
-		      label="联系人">
+		      label="联系人"
+		      width="100px">
 				
 					<template slot-scope="scope">
 		      	<span v-show="!scope.row.edit">{{scope.row.linkName}}</span>
@@ -69,7 +93,8 @@
 		    </el-table-column>
 		    <el-table-column
 		      prop="linkPhone"
-		      label="联系电话">
+		      label="联系电话"
+		      width="120px">
 				
 					<template slot-scope="scope">
 		      	<span v-show="!scope.row.edit">{{scope.row.linkPhone}}</span>
@@ -83,9 +108,9 @@
 		      label="企业官网">
 		      <template slot-scope="scope">
 
-						<router-link v-show="!scope.row.edit" :to="scope.row.webUrl">
+						<a v-show="!scope.row.edit" target="_blank" :href="scope.row.webUrl">
 							{{scope.row.webUrl}}
-						</router-link>
+						</a>
 		      	<el-input v-show="scope.row.edit" size="small" v-model="scope.row.webUrl"></el-input>
 		      </template>
 
@@ -99,7 +124,8 @@
 								
 								<el-popover
 								  placement="top"
-								  width="160">
+								  width="160"
+								  trigger="click">
 								  <p>确定删除<span style="color:red;">{{scope.row.companyName}}</span>么？</p>
 								  <div style="text-align: right; margin: 0">
 								    <el-button type="text" size="mini" @click="delCom(scope.row.id)">确定</el-button>
@@ -125,10 +151,12 @@
 </template>
 
 <script>
+  import { comList } from '@/api/form';
   import { getComList, delCom, updateCom } from '@/api/admin/com';
   export default {
     data() {
       return {
+	      comList: [],
       	fileList: [],
         tableData: [],
         backList: [],
@@ -136,17 +164,30 @@
         total: null,
         listQuery: {
 	      	pageNo: 1,
-	      	pageSize: 50
+	      	pageSize: 50,
+	      	name: '',
 	      }
       }
     },
     mounted() {
+    	this.getFormComList();
       this.getlist();
     },
     methods: {
+    	getFormComList(){
+    		comList().then(res => {
+    			this.comList = res.data;
+    		})
+    	},
     	getlist(){
     		this.listLoading = true;
     		getComList(this.listQuery).then(res => {
+    			if(typeof res.code != 'undefined'){
+    				if(res.code == -1){
+    					this.listLoading = false;
+    					return;
+    				}
+    			}
 	    		this.tableData = res.list;
 	    		for(let i in this.tableData){
         		this.$set(this.tableData[i], 'edit', false);
@@ -161,18 +202,11 @@
     			id: id
     		}
     		delCom(data).then(res => {
-    			this.$message({
-	          message: '删除成功',
-	          type: 'success'
-	        });
-    			this.getlist();
-    		})
-    	},
-    	delCom(id){
-    		let data = {
-    			id: id
-    		}
-    		delStudent(data).then(res => {
+    			if(typeof res.code != 'undefined'){
+    				if(res.code == -1){
+    					return;
+    				}
+    			}
     			this.$message({
 	          message: '删除成功',
 	          type: 'success'
@@ -190,6 +224,9 @@
 		        });
     			}
     		})
+    	},
+    	submitUpload(){
+    		this.$refs.upload.submit();
     	},
     	handleCancel(scope){
 				let index = scope.$index;

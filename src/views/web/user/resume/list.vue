@@ -1,12 +1,12 @@
 <template>
-	<div class="bg-gray" style="background:url(/static/banner/禾苗.jpg) no-repeat center / cover;min-height:calc(100vh - 95px)">
+	<div class="bg-gray" style="background:url(/static/banner/slider-2.jpg) no-repeat center / cover;min-height:calc(100vh - 95px)">
 		<div class="breadcrumb-wrap container pt95">
 			<el-breadcrumb separator="/">
 				  <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
 				  <el-breadcrumb-item>简历列表</el-breadcrumb-item>
 				</el-breadcrumb>
 		</div>
-		<div class="container pt20 resume_type_list_wrap pb50">
+		<div class="container panel_white mt20 pt20 resume_type_list_wrap pb50">
 			<el-tabs v-model="active_list.resume_list">
 		    <el-tab-pane label="简历列表" name="resume">
 		    	
@@ -51,7 +51,7 @@
 
 			<div class="resume_type">
         <router-link to="/user/resume/list/details/0">
-          <el-button type="primary" class="mr10">新建简历</el-button>
+          <el-button type="primary" class="mr10" size="small">新建简历</el-button>
         </router-link>
     		<el-select v-model="resume_type.select" placeholder="请选择">
 			    <el-option
@@ -148,7 +148,7 @@
 		.resume_type{
 			position: absolute;
 			top: 15px;
-			right: 15px;
+			right: 30px;
 		}
 	}
 	.resumet_list{

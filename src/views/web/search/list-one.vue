@@ -2,12 +2,12 @@
 	<div class="recruit-layout-one pb40">
 		<el-row :gutter='20'>
 		  <el-col :span="8" v-for="item in list" :key="item.recruit">
-		  	<div class="item mb15">
+		  	<div class="item mb20">
 		  		<div class="recruit-info">
 						<div class="clearfix">
 							<div class="pull-left">
 								<h2 class="name">
-									<router-link :to="'/search/list/details/'+item.companyId">
+									<router-link  :to="{path:'/search/list/details', query:{id:item.id}}">
 										{{item.jobName}}
 									</router-link>
 								</h2>
@@ -17,18 +17,29 @@
 						</div>
 						<div class="exp">
 							<span class="pull-right">{{item.workCity}}</span>
-							{{item.workExperience}} / {{item.qualificate}} / {{item.jobTypeStr}}
+							{{item.workExperience}} <font v-if="item.workExperience!=''">/</font> {{item.qualificate}} <font v-if="item.qualificate!=''">/</font> {{item.jobTypeStr}}
 
 						</div>
 						<div class="label mt5">
 		  				<el-tag size="small" class="mr5" type="gray" v-for="lable in item.lable" :key="lable">{{lable}}</el-tag>
 						</div>
 		  		</div>
-		  		<div class="con-info">
-		  			<img class="logo pull-left" :src="item.companyLogo">
+		  		<div class="con-info clearfix">
+		  			<router-link :to="{path:'/search/com-details', query:{id:item.companyId}}">
+		  				<img class="logo pull-left" :src="item.company.pic">
+		  			</router-link>
 		  			<div class="info-right">
-		  				<span class="name">{{item.companyName}}</span>
-		  				<!-- <p class="industry">{{item.company.industry}}</p> -->
+		  				<router-link :to="{path:'/search/com-details', query:{id:item.companyId}}">
+		  					{{item.companyName}}
+		  				</router-link>
+		  				<el-popover
+							  placement="top"
+							  width="300"
+							  trigger="hover"
+							  :content="item.company.introduce">
+							  <p slot="reference" class="industry eli">{{item.company.introduce}}</p>
+							</el-popover>
+		  				
 		  			</div>
 		  		</div>
 		  	</div>
@@ -50,7 +61,13 @@
 
       }
     },
+    watch: {
+  		list(curVal,oldVal){
+  			this.list = curVal;
+  		}
+  	},
     mounted() {
+    	console.log(this.list)
     }
   }
 </script>
@@ -59,8 +76,7 @@
 		.item{
 			box-sizing: border-box;
 			position: relative;
-			height: 200px;
-			padding: 20px 18px 0;
+			padding: 20px 18px 15px;
 			border: 1px solid #EAEEED;
 			background-color: #fff;
 			&:hover{
@@ -106,9 +122,6 @@
 					height: 20px;
 					line-height: 20px;
 					font-size: 14px;
-					.name{
-						color: #333
-					}
 					.industry{
 						color: #999;
 						text-overflow: ellipsis;

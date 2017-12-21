@@ -22,3 +22,18 @@ export function getInfo(data) {
     data
   });
 }
+
+export function registerCom(data){
+  return fetch({
+    url: '/admin/company/new-company',
+    method: 'post',
+    data
+  });
+}
+export function registerStudent(data){
+  return fetch({
+    url: '/admin/student/save-student',
+    method: 'post',
+    data
+  });
+}

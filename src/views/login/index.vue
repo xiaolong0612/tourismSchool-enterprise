@@ -3,7 +3,7 @@
     <el-form autoComplete="on" :model="loginForm" :rules="loginRules" ref="loginForm" label-position="left" label-width="0px"
       class="card-box login-form">
       <h3 class="title">系统登录</h3>
-      <el-form-item>
+      <el-form-item prop="account">
         <span class="svg-container"><icon-svg icon-class="jiedianyoujian"></icon-svg></span>
         <el-input name="account" type="text" v-model="loginForm.account" autoComplete="on" placeholder="账号"></el-input>
       </el-form-item>
@@ -48,8 +48,11 @@ import { getType, setType } from '@/utils/auth';
           type: '0'
         },
         loginRules: {
-          password: [
-                { required: true, trigger: 'blur', validator: validatePass }
+          account: [
+            { required: true, message: '账号不能为空', trigger: 'blur' }
+          ],
+          password:[
+            { required: true, trigger: 'blur', validator: validatePass }
           ]
         },
         radio: 0,
@@ -62,7 +65,8 @@ import { getType, setType } from '@/utils/auth';
     },
     methods: {
       getType(){
-        this.radio = getType().length == 0 ? 0 : getType();
+        this.radio = getType() ? 0 : getType();
+        console.log(this.radio)
       },
       handleLogin() {
         this.$refs.loginForm.validate(valid => {

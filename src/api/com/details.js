@@ -26,9 +26,9 @@ export function delDetails(data) {
   });
 }
 
-export function detailDetails(data) {
+export function getDetails(data) {
   return fetch({
-    url: '/admin/details/detail-details',
+    url: '/admin/company/detail-company',
     method: 'post',
     data
   });

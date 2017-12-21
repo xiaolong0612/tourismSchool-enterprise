@@ -2,19 +2,25 @@
 	<div>
 		<header class="header">
 			<div class="container">
-				<div class="navber-header pull-left clearfix">
-					<router-link to="index" class="logo">旅游校企</router-link>
+				<div class="navber-header pull-left clearfix" style="line-height:0">
+					<router-link to="/" class="logo">
+						<img src="/static/logo.png" height="50px" style="margin-top:7px">
+					</router-link>
 				</div>
 				<div class="navbar-collapse">
 					<ul class="pull-right navbar-nav">
 						<li v-for="item in link_list" :key="item.name" :class="{ 'active': item.active, 'border': item.name == '发布招聘'}">
-							<router-link :to='item.link'>
+							<a :href='item.link' v-if="item.name == '操作手册'">
+								{{item.name}}
+							</a>
+							<router-link :to='item.link' v-else>
 								{{item.name}}
 							</router-link>
 						</li>
+
 						<li v-if="name.length == 0" @click="dialogLogin = true">登陆</li>
 						
-						<li v-else>
+						<li v-else style="margin:7px 15px">
 							<el-popover
 							  placement="bottom"
 							  width="120">
@@ -22,9 +28,10 @@
 							  <div style="text-align: right; margin: 0">
 							    <el-button type="primary" size="mini" @click="logout">确定</el-button>
 							  </div>
-								
-								<span  slot="reference">{{name}}</span>
-
+								<div slot="reference">
+									<span style="cursor:pointer;vertical-align:middle">{{name}}</span>
+									<img class="logo" :src="user.pic">
+								</div>
 							</el-popover>
 						</li>
 					</ul>
@@ -36,12 +43,13 @@
 			  <el-form-item label="账号">
 			    <el-input type="text" v-model="loginForm.account" auto-complete="off"></el-input>
 			  </el-form-item>
-			  <el-form-item label="密码">
+			  <el-form-item label="密码" class="mb0">
 			    <el-input type="password" v-model="loginForm.password" auto-complete="off"></el-input>
 			  </el-form-item>
 			  <el-form-item>
-	        <el-radio v-model="loginForm.type" label="2">学生</el-radio>
-	        <el-radio v-model="loginForm.type" label="3">企业</el-radio>
+			  	<router-link class="c-blue pull-right" to="/register">没有账号</router-link>
+	        <el-radio v-model="loginForm.type" label="2">我要应聘</el-radio>
+	        <el-radio v-model="loginForm.type" label="3">我要招聘</el-radio>
 	      </el-form-item>
 			  <el-form-item label="">
 			    <el-button type="primary" @click="submitLogin('loginForm')" :loading="loginLoading">提交</el-button>
@@ -57,6 +65,7 @@ import { getType, setType } from '@/utils/auth';
 	export default {
 		computed: {
 	    ...mapGetters([
+	    	'user',
 	      'name',
 	      'account',
 	      'type'
@@ -72,10 +81,13 @@ import { getType, setType } from '@/utils/auth';
 						name: '发布招聘',
 						link: '/com/recruit/release'
 					},{
+						name: '操作手册',
+						link: '/static/file/旅游校企对接平台操作手册说明书-企业端.docx'
+					},{
 						name: '招聘列表',
 						link: '/com/recruit/list',
 					},{
-						name: '收件箱',
+						name: '谁来应聘',
 						link: '/com/inbox/list',
 					},{
 						name: '公司信息',
@@ -87,18 +99,23 @@ import { getType, setType } from '@/utils/auth';
 						name: '首页',
 						link: '/index'
 					},{
+						name: '操作手册',
+						link: '/static/file/旅游校企对接平台操作手册说明书-学生端.docx'
+					},{
 						name: '我的简历',
 						link: '/user/resume/list',
 					},{
-						name: '投递箱',
+						name: '我的求职',
 						link: '/user/delivery'
 					}
 				],
 				link_list: [],
 				activeIndex: '1',
 				loginForm: {
-					account: '18805070157',
-					password: '123456',
+					// account: '18805070157',
+					// password: '123456',
+					account: '',
+					password: '',
 					type: 0,
 				}
 			}
@@ -179,14 +196,7 @@ import { getType, setType } from '@/utils/auth';
     webkit-transition: all 0.3s ease-in-out;
     -webkit-transition: all 0.3s ease-in-out;
     transition: all 0.3s ease-in-out;
-    .logo{
-	    display: block;
-	    font-family: "Raleway", sans-serif;
-	    text-transform: uppercase;
-	    font-weight: 600;
-	    height: 100%;
-	    color: #000000;
-		}
+
 		// .navbar-collapse > .el-menu{
 		// 	background-color: transparent;
 		// 	>.el-menu-item, .el-submenu__title{
@@ -240,6 +250,12 @@ import { getType, setType } from '@/utils/auth';
 			    .el-badge{
 			    	vertical-align: top;
 			    }
+				}
+				.logo{
+					width: 50px;
+					height: 50px;
+					vertical-align:middle;
+					border-radius: 100%;
 				}
 			}
 		}

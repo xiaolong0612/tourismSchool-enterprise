@@ -1,16 +1,42 @@
 <template>
 	<div class="p30">
 		<div class="form-wrap bg-gray p20">
-			<el-upload
-			  ref="upload"
-			  :action="gpath.action_student"
-			  :file-list="fileList"
-			  :auto-upload="false"
-			  accept=".xlsx, .xls">
-			  <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
-			  <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>
-			  <div slot="tip" class="el-upload__tip">只能上传excel文件，且不超过500kb</div>
-			</el-upload>
+			<el-form :inline="true">
+				<el-form-item label="学生总数" class="pull-right mb0">
+			    <span class="c-success">{{total}}</span>人
+			  </el-form-item>
+
+				<el-form-item class="mb0" label="学校名称" v-if="type == 0">
+					<!-- <el-input v-model="listQuery.schoolName" placeholder="请输入" @change="search"></el-input> -->
+					<el-select v-model="listQuery.schoolId" filterable placeholder="请选择" @change="search">
+				    <el-option
+				      v-for="item in schoolList"
+				      :key="item.id"
+				      :label="item.name"
+				      :value="item.id">
+				    </el-option>
+				  </el-select>
+				</el-form-item>
+				<el-form-item class="mb0" label="学生姓名">
+					<el-input v-model="listQuery.name" placeholder="请输入" @change="getlist"></el-input>
+				</el-form-item>
+				<el-form-item class="mb0">
+					<el-upload
+					  ref="upload"
+					  :action="gpath.action_student"
+					  :file-list="fileList"
+					  :auto-upload="false"
+					  :on-success="getlist"
+					  accept=".xlsx, .xls">
+					  <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+					  <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>
+					  <!-- <div slot="tip" class="el-upload__tip">只能上传excel文件，且不超过500kb</div> -->
+					</el-upload>
+				</el-form-item>
+				<el-form-item class="mb0">
+					<el-button size="small" type="primary" class="ml20" @click="handleDownload">导出excel</el-button>
+				</el-form-item>
+			</el-form>
 		</div>
 		<div class="pt20">
 			<el-table
@@ -69,7 +95,8 @@
 		    </el-table-column>
 		    <el-table-column
 		      label="操作"
-		      width="150px">
+		      width="150px"
+					trigger="click">
 		      <template slot-scope="scope">
 							<div v-show="!scope.row.edit">
 								<el-button size="mini" type="text" @click="scope.row.edit = true" class="mr5">编辑</el-button>
@@ -102,10 +129,19 @@
 </template>
 
 <script>
+	import { mapGetters } from 'vuex';
+  import { getSchool } from '@/api/admin/school';
   import { getStudent, delStudent, updateStudent } from '@/api/admin/student';
   export default {
+  	computed: {
+	    ...mapGetters([
+	      'type',
+	      'user'
+	    ])
+	  },
     data() {
       return {
+      	schoolList: [],
       	fileList: [],
         tableData: [],
         backList: [],
@@ -113,17 +149,49 @@
         total: null,
       	listQuery: {
 	      	pageNo: 1,
-	      	pageSize: 30
+	      	pageSize: 30,
+	      	schoolId: '',
+	      	studentName: ''
+	      },
+	      schoolQuery: {
+	      	pageNo: 1,
+	      	pageSize: 100,
 	      }
       }
     },
     mounted() {
+    	if(this.type == 1){
+    		this.listQuery.schoolId = this.user.id;
+    	}else {
+    		this.getSchool();
+    	}
       this.getlist();
     },
     methods: {
+    	search(){
+    		this.getlist();
+    	},
+    	getSchool(){
+    		getSchool(this.schoolQuery).then(res => {
+    			if(typeof res.code != 'undefined'){
+    				if(res.code == -1){
+    					return;
+    				}
+    			}
+	    		this.schoolList = res.list;
+    			this.listQuery.schoolId = typeof this.$route.query != undefined ? this.$route.query.schoolId : '';
+    			this.getlist();
+	    	})
+    	},
     	getlist(){
     		this.listLoading = true;
     		getStudent(this.listQuery).then(res => {
+    			if(typeof res.code != 'undefined'){
+    				if(res.code == -1){
+    					this.listLoading = false;
+    					return;
+    				}
+    			}
 	    		this.tableData = res.list;
 	    		this.total = res.total;
 	    		for(let i in this.tableData){
@@ -138,6 +206,11 @@
     			id: id
     		}
     		delStudent(data).then(res => {
+    			if(typeof res.code != 'undefined'){
+    				if(res.code == -1){
+    					return;
+    				}
+    			}
     			this.$message({
 	          message: '删除成功',
 	          type: 'success'
@@ -176,7 +249,28 @@
     	handleSizeChange(val){
     		this.listQuery.pageSize = val;
     		this.getlist();
-    	}
+    	},
+    	handleDownload() {
+	      this.downloadLoading = true
+	      require.ensure([], () => {
+	        const { export_json_to_excel } = require('@/vendor/Export2Excel')
+	        const tHeader = ['编号', '姓名', '账号', '年龄', '学校','电话','邮箱','性别']
+	        const filterVal = ['stuNo', 'name','account', 'age', 'schoolName','linkPhone','email','sexStr']
+	        const list = this.tableData
+	        const data = this.formatJson(filterVal, list)
+	        export_json_to_excel(tHeader, data, '学生列表')
+	        this.downloadLoading = false
+	      })
+	    },
+	    formatJson(filterVal, jsonData) {
+	      return jsonData.map(v => filterVal.map(j => {
+	        if (j === 'timestamp') {
+	          return parseTime(v[j])
+	        } else {
+	          return v[j]
+	        }
+	      }))
+	    }
     }
   }
 </script>

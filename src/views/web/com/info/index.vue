@@ -50,7 +50,7 @@
 							  </el-col> -->
 							  <el-col :span="12">
 							  	<el-form-item label="企业官网" label-width="68px">
-							  		<router-link :to="com_info.webUrl" v-if="!is_edit">{{com_info.webUrl}}</router-link>
+							  		<a target="_blank" :href="com_info.webUrl" v-if="!is_edit">{{com_info.webUrl}}</a>
 								    <el-input v-if="is_edit" v-model="com_info.webUrl"></el-input>
 								  </el-form-item>
 							  </el-col>

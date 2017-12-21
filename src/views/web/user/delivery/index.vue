@@ -38,7 +38,7 @@
 								        <div class="contact_info">
 								        	<el-alert
 								        		v-if="typeof item.stateStr.alert != undefined"
-												    :title="item.stateStr.alert_text"
+												    :title="item.interviewConclusion == '' ? item.stateStr.alert_text : item.interviewConclusion"
 												    :type="item.stateStr.alert"
 												    class="mt10"
 												    :class="{'mb10': item.stateStr.type == 'danger' || item.stateStr.type == 'text' || item.interviewLinker == ''}"
@@ -194,10 +194,10 @@
           title: '待面试',
           name: '1',
         }, {
-          title: '同意',
+          title: '面试成功',
           name: '2',
         }, {
-          title: '拒绝',
+          title: '无结果',
           name: '3',
         }],
 				listQuery: {
@@ -271,7 +271,7 @@
 					case 3:
 						return {
 							type: 'danger',
-							text: '不合适',
+							text: '无结果',
 							alert: 'warning',
 							alert_text: '非常荣幸收到您的简历，经过我们评估，认为您与该职位不太合适，无法进入面试阶段'
 						}

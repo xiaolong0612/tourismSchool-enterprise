@@ -4,15 +4,7 @@
 
 		<div class="panel_white small_container com-content">
 			<div class="com-name mb10">
-				<el-upload
-				  class="com-logo"
-				  :action="gpath.user_hp"
-				  :show-file-list="false"
-				  :on-success="handleAvatarSuccess"
-				  :before-upload="beforeAvatarUpload">
-				  <img v-if="com_info.pic" :src="com_info.pic" class="avatar" style="width:100%;">
-				  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-				</el-upload>
+				<img v-if="com_info.pic" :src="com_info.pic" class="avatar" style="width:80px;height:80px;">
 				<span>{{com_info.companyName}}</span>
 			</div>
 
@@ -40,7 +32,7 @@
 						  </el-col>
 						  <el-col :span="12">
 						  	<el-form-item label="企业官网">
-						  		<router-link :to="com_info.webUrl">{{com_info.webUrl}}</router-link>
+						  		<a target="_blank" :href="com_info.webUrl">{{com_info.webUrl}}</a>
 							  </el-form-item>
 						  </el-col>
 						</el-row>
@@ -103,6 +95,7 @@
 					该企业招聘职位
 				</h2>
 				<div class="section-content">
+					<job-list class="mt20" :companyId="$route.query.id"></job-list>
 				</div>
 			</div>
 		</div>
@@ -111,8 +104,10 @@
 
 <script>
   import { mapGetters } from 'vuex';
-  import { getResumeDetails } from '@/api/student/resume';
+  import { getDetails } from '@/api/com/details';
+  import jobList from './job-list';
   export default {
+  	components: { jobList },
   	data() {
   		return {
   			com_info: {
@@ -125,34 +120,21 @@
   				webUrl: '21321',
   				linkName: '312312',
   				linkPhone: '321312'
-  			}
+  			},
+  			
   		}
   	},
   	mounted(){
-  		this.getList();
+  		this.getDetails();
   	},
   	methods: {
-  		getList(){
-  			getResumeDetails({id: this.$route.query.id}).then(res => {
+  		getDetails(){
+  			getDetails({id: this.$route.query.id}).then(res => {
   				console.log(res)
+  				this.com_info = res.company
   			})
   		},
-  		handleAvatarSuccess(res, file) {
-  			this.is_edit = true;
-        this.com_info.pic = res.url;
-      },
-      beforeAvatarUpload(file) {
-        const isJPG = file.type === 'image/jpeg';
-        const isLt2M = file.size / 1024 / 1024 < 2;
-
-        if (!isJPG) {
-          this.$message.error('上传头像图片只能是 JPG 格式!');
-        }
-        if (!isLt2M) {
-          this.$message.error('上传头像图片大小不能超过 2MB!');
-        }
-        return isJPG && isLt2M;
-      }
+  		
   	}
   }
 </script>

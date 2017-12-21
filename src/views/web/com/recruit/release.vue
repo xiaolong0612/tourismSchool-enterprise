@@ -67,12 +67,13 @@
 					    multiple
 					    filterable
 					    allow-create
-					    placeholder="请选择标签,可自行添加">
+					    placeholder="请选择标签"
+              @change="labelChange">
 					    <el-option
 					      v-for="item in defaultJobLabels"
-					      :key="item.value"
-					      :label="item.label"
-					      :value="item.value">
+					      :key="item.id"
+					      :label="item.name"
+					      :value="item.name">
 					    </el-option>
 					  </el-select>
 				  </el-form-item>
@@ -81,7 +82,7 @@
 					    <el-button v-if="is_edit" type="primary" @click="updateJob">保存编辑</el-button>
 					    <el-button v-else type="primary" @click="submitForm">立即发布</el-button>
 					    <el-button @click="resetForm()">重置</el-button>
-					    <el-button>取消</el-button>
+					    
 					  </el-form-item>
 					 </div>
 				</el-form>
@@ -95,6 +96,7 @@
   import { parseTime, getCity } from '@/utils/index';
   import { validatPhone } from '@/utils/validate';
   import { newJob, updateJob, detailJob } from '@/api/com/recruit';
+  import { listLabel } from '@/api/admin/label';
 	import city_data from 'region-picker/dist/data.json';
   export default {
   	name: '',
@@ -109,23 +111,14 @@
       return {
       	is_edit: false,
       	city_data,
-      	startIncome: '',
+      	startIncome: '面议',
       	endIncome: '',
-      	defaultJobLabels: [{
-      		value: '轻松',
-          label: '轻松'
-        }, {
-      		value: '自由',
-          label: '自由'
-        }, {
-      		value: '福利好',
-          label: '福利好'
-        }],
+      	defaultJobLabels: [],
       	form: {
       		companyId: '',
       		companyName: '',
-      		jobName: 'web工程师',
-      		income: '',
+      		jobName: '会计',
+      		income: '面议',
       		workCity: '厦门市',
       		workExperience: '1年',
       		jobType: '0',
@@ -164,9 +157,10 @@
 	    ])
 	  },
     mounted(){
-    	this.resetForm();
+    	// this.resetForm();
     	this.isEdit();
     	this.setDefault();
+      this.listLabel();
     },
     methods: {
     	setDefault(){
@@ -175,16 +169,14 @@
     	},
     	isEdit(){
     		if(typeof this.$route.query.id != 'undefined') this.is_edit = true;
-    		else return;
+    		else return false;
     		detailJob({id: this.$route.query.id}).then( res => {
     			this.form = res.job;
     			this.form['labels'] = res.job.jobLabels;
     			delete this.form.jobLabels;
-    			console.log(this.form)
     		})    	
     	},
     	updateJob(){
-    		debugger
     		delete this.form.company;
     		delete this.form.releaseTime;
     		if(this.endIncome == ''){
@@ -193,16 +185,23 @@
       		this.form.income = this.startIncome+'-'+this.endIncome;
       	}
     		this.form.workCity = getCity(this.form.workCity);
-    		this.form.labels = this.form.labels.join(',');
-    		updateJob(this.form).then( res => {
-    			if(res.success){
-    				this.$message.success('编辑成功');
-    				this.$router.push({ path: '/com/recruit/list' });
-    			}
-    			else{
-    				this.$message.error('编辑失败，请刷新重试！！')
-    			}
-    		})
+    		this.form.labels = this.labels.length == 0 ? '' : this.form.labels.join(',');
+        this.$refs['form'].validate((valid) => {
+          if (valid) {
+        		updateJob(this.form).then( res => {
+        			if(res.success){
+        				this.$message.success('编辑成功');
+        				this.$router.push({ path: '/com/recruit/list' });
+        			}
+        			else{
+        				this.$message.error('编辑失败，请刷新重试！！')
+        			}
+        		})
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        })  
     	},
       submitForm() {
       	if(this.endIncome == ''){
@@ -211,14 +210,33 @@
       		this.form.income = this.startIncome+'-'+this.endIncome;
       	}
     		let query = JSON.parse(JSON.stringify(this.form));
-    		query.labels = this.form.labels.join(',');
-    		query.workCity = getCity(query.workCity);
-        newJob(query).then(res => {
-        	if(res.success){
-        		this.$message.success('岗位发布成功')
-        	}else{
-        		this.$message.error('岗位发布失败，请刷新重试！！')
-        	}
+    		query.workCity = this.form.workCity == '' ? '' : getCity(this.form.workCity);
+        query.labels = query.labels.length == 0 ? '' : query.labels.join(',');
+        this.$refs['form'].validate((valid) => {
+          if (valid) {
+            newJob(query).then(res => {
+            	if(res.success){
+            		this.$message.success('岗位发布成功');
+                this.$router.push({ path: '/com/recruit/list' });
+            	}else{
+            		this.$message.error('岗位发布失败，请刷新重试！！')
+            	}
+            })
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        })
+      },
+      listLabel(){
+        let query = {
+          pageNo: 1,
+          pageSize: 100,
+          type: 1,
+          name:'',
+        };
+        listLabel(query).then(res => {
+          this.defaultJobLabels = res.list;
         })
       },
       resetForm() {
@@ -238,6 +256,9 @@
       		receiveEmail: '',
       		labels: [],
       	}
+      },
+      labelChange(){
+        console.log(this.form.labels)
       }
     }
   }

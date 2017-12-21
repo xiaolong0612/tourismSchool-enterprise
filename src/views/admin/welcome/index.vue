@@ -2,38 +2,37 @@
 	<div class="welcome" style="min-height:calc(100vh - 84px)">
 		<el-row>
 			<el-col :span="24">
-				<chart-line id="lineChart" :setChartOption="line" height="50vh" class="chart"></chart-line>
+				<chart id="lineChart" :setChartOption="line" height="50vh" class="chart"></chart>
 			</el-col>
 		</el-row>
 		<el-row :gutter="30" class="mt30">			
 			<el-col :span="8">
-				<chart-pie id="pie1" :setChartOption="pie_1" height="50vh" class="chart"></chart-pie>
+				<chart id="pie1" :setChartOption="pie_1" height="50vh" class="chart"></chart>
 			</el-col>
 		  <el-col :span="8">
-		  	<chart-pie id="pie2" :setChartOption="pie_1" height="50vh" class="chart"></chart-pie>
+		  	<chart id="bar" :setChartOption="bar" height="50vh" class="chart"></chart>
 		  </el-col>
 		  <el-col :span="8">
-		  	<chart-pie id="pie3" :setChartOption="pie_1" height="50vh" class="chart"></chart-pie>
+		  	<chart id="pie2" :setChartOption="pie_2" height="50vh" class="chart"></chart>
 		  </el-col>
 		</el-row>
 	</div>
 </template>
 
 <script>
-	import ChartLine from '@/components/Charts/line';
-	import ChartPie from '@/components/Charts/pie';
-	import { welcomeTop, welcomeCount } from '@/api/admin/index';
+	import Chart from '@/components/Charts/index';
+  import { parseTime } from '@/utils/index';
+	import { welcomeTop, welcomeCount,welcomeSchool,welcomeJob } from '@/api/admin/index';
 	export default {
     name: 'welcome',
     components: {
-      ChartLine,
-      ChartPie
+      Chart
     },
     data() {
     	return{
     		top_form: {
     			beginTime:'2017-10-01',
-    			endTime: '2017-12-03'
+    			endTime: parseTime(new Date(),'{y}-{m}-{d}')
     		},
     		line: {},
     		bar:{},
@@ -44,16 +43,34 @@
     mounted(){
       this.welcomeTop();
       this.welcomeCount();
+      this.welcomeSchool();
+      this.welcomeJob();
     },
     methods: {
     	welcomeTop(){
+    		let d = new Date();
+    		d.setMonth(d.getMonth() - 3);
+				this.top_form.beginTime = parseTime(d, '{y}-{m}-{d}');
     		welcomeTop(this.top_form).then(res => {
-    			this.setLineOption(res);
+    			this.line = this.setLineOption(res);
     		})
     	},
     	welcomeCount(){
     		welcomeCount().then(res => {
-    			this.setPie1Option(res)
+    			this.pie_1 = this.setPie1Option(res,'应聘处理情况');
+    			console.log(this.pie_1, '岗位热度')
+    		})
+    	},
+    	welcomeSchool(){
+    		welcomeSchool().then(res => {
+    			console.log(this.pie_2, '热门学校')
+    			this.pie_2 = this.setPie1Option(res,'热门学校');
+    		})
+    	},
+    	welcomeJob(){
+    		welcomeJob().then(res => {
+    			this.bar = this.setBarOption(res, '热门岗位');
+    			// this.pie_2 = this.setPie1Option(res, '');
     		})
     	},
     	setLineOption(res){
@@ -67,9 +84,9 @@
 	    			data: res.data[i]
 	    		})
 	    	}
-	    	this.line = {
+	    	let line = {
 	    		title: {
-	        	text: '最近招聘展示',
+	        	text: '用户应聘数据统计',
 	        	left: 'center'
 					},
 					tooltip: {
@@ -83,7 +100,7 @@
 					grid: {
 					  left: '3%',
 					  right: '4%',
-					  bottom: '3%',
+					  bottom: '80px',
 					  containLabel: true
 					},
 					toolbox: {
@@ -91,6 +108,20 @@
 					      saveAsImage: {}
 					  }
 					},
+					dataZoom: [
+		        {
+		            show: true,
+		            realtime: true,
+		            start: 90,
+		            end: 100
+		        },
+		        {
+		            type: 'inside',
+		            realtime: true,
+		            start: 90,
+		            end: 100
+		        }
+			    ],
 					xAxis: {
 					  type: 'category',
 					  boundaryGap: false,
@@ -101,13 +132,14 @@
 					},
 					series: series
 	    	}
+	    	return line
 	    },
-	    setPie1Option(res){
+	    setPie1Option(res, title){
 
 	    	let server = res.data;
-	    	this.pie_1 = {
+	    	let pie = {
 					title : {
-					  text: '岗位热度',
+					  text: title,
 					  x:'center'
 					},
 					tooltip : {
@@ -119,23 +151,62 @@
 					  y : 'bottom',
 					  data:res.title
 					},
-					toolbox: {
-					  feature : {
-					      saveAsImage : {show: true}
-					  }
-					},
 					calculable : true,
 					series : [
 					  {
-				      name:'',
-				      type:'pie',
+				      name:'半径模式',
+	            type:'pie',
 				      radius : [30, 110],
-				      roseType : 'area',
+	            roseType : 'radius',
 				      data: server
 					  }
 					]
 				};
-				console.log(this.pie_1)
+				return pie;
+	    },
+	    setBarOption(res, title){
+	    	console.log(res.count)
+	    	let bar = {
+	    		title : {
+					  text: title,
+					  x:'center'
+					},
+					tooltip : {
+					  trigger: 'axis',
+					  axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+					    type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+					  }
+					},
+					grid: {
+					  left: '3%',
+					  right: '4%',
+					  bottom: '3%',
+					  containLabel: true
+					},
+					xAxis : [
+					  {
+				      type : 'category',
+				      data : res.job,
+				      axisTick: {
+				          alignWithLabel: true
+				      }
+					  }
+					],
+					yAxis : [
+					  {
+					      type : 'value'
+					  }
+					],
+					series : [
+					  {
+				      name:'',
+				      type:'bar',
+				      barMaxWidth: '80px',
+				      data:res.count
+					  }
+					]
+	    	};
+	    	return bar;
 	    }
     }
   }

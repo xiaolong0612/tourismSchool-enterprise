@@ -36,11 +36,13 @@ service.interceptors.response.use(
     const code = response.data.code;
     // 50014:Token 过期了 50012:其他客户端登录了 50008:非法的token
     if (code === -1) {
+      if(response.data.msg == '') return;
       Message({
         message: response.data.msg,
         type: 'error',
         duration: 5 * 1000
       });
+      return response;
       // 登出
       // store.dispatch('FedLogOut').then(() => {
       //   router.push({ path: '/login' })

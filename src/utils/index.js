@@ -272,6 +272,7 @@ export function deepClone(source) {
 
 // 获取城市名称   邮编转文字
 export function getCity(str){
+  if(isNaN(str)) return str;
   if(str == undefined) return;
   let date = require('region-picker/dist/data.json').districts;
   for(let p=0; p<date.length; p++){
@@ -314,7 +315,8 @@ export function getColor(){
 
 // 全局路径
 export const gpath = {
-  action_school: 'http://118.178.93.124:8088/admin/school/upload',
-  action_student: 'http://118.178.93.124:8088/admin/student/upload',
-  user_hp: 'http://118.178.93.124:8088/ajaxfileupload'
+  action_school: 'http://39.106.126.82:8080/admin/school/upload',
+  action_student: 'http://39.106.126.82:8080/admin/student/upload',
+  action_company: 'http://39.106.126.82:8080/admin/company/upload',
+  user_hp: 'http://39.106.126.82:8080/ajaxfileupload'
 }

@@ -1,38 +1,66 @@
 <template>
-	<div>
-    <el-row :gutter="25" class="new_list">
-      <el-col :span="12" v-for="item in list" class="new_item" :key="item.title">
-        <div class="img pull-left" :style="'background-image:url('+ item.pic +')'"></div>
-        <div class="info">
-          <h2 class="title mb10">
-            <router-link to='/'>
-            {{item.title}}
-            </router-link>
-          </h2>
-          <p class="text">{{item.content}}</p>
-          <div class="author">
-            <span class="mr20">来源：{{item.author}}</span>
-            <icon-svg icon-class="shijian" />
-            <span>{{item.createTime}}</span>
+	<div class="full-height pt100">
+    <div class="container">
+      <el-row :gutter="25" class="new_list">
+        <el-col :span="12" v-for="item in list" class="new_item" :key="item.title">
+          <div class="img pull-left" :style="'background-image:url('+ item.pic +')'"></div>
+          <div class="info">
+            <h2 class="title mb10">
+              <!-- <router-link to='/'> -->
+              {{item.title}}
+              <!-- </router-link> -->
+            </h2>
+            <p class="text">{{item.content}}</p>
+            <div class="author">
+              <span class="mr20">来源：{{item.author}}</span>
+              <icon-svg icon-class="shijian" />
+              <span>{{item.createTime}}</span>
+            </div>
           </div>
-        </div>
-      </el-col>
-    </el-row>
+        </el-col>
+        <el-col :span="24">
+          <div class="pull-right">
+            <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="listQuery.pageNo" :page-sizes="[30, 40, 50, 60, 70, 80]"
+              :page-size="listQuery.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
+            </el-pagination>
+          </div>
+        </el-col>
+      </el-row>
+    </div>
 	</div>
 </template>
 <script>
+  import { getListNew } from '@/api/home';
   export default {
-    props: {
-      list: {
-        type: Array
-      }
-    },
     data() {
       return {
-        
+        listQuery:{
+          pageNo: 1,
+          pageSize: 12,
+          title: '',
+        },
+        total: 0,
+        list: []
       };
     },
+    mounted() {
+      this.getListNew();
+    },
     methods: {
+      getListNew() {
+        getListNew(this.listQuery).then(res => {
+          this.list = res.list;
+          this.total = res.total
+        })
+      },
+      handleCurrentChange(val){
+        this.listQuery.pageNo = val;
+        this.getListNew();
+      },
+      handleSizeChange(val){
+        this.listQuery.pageSize = val;
+        this.getListNew();
+      },
     }
   };
 </script>

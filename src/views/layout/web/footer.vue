@@ -3,24 +3,15 @@
 		<div class="container">
 			<ul>
 				<li>
-					<router-link to="index">微众企业</router-link>
+					<a href="http://www.cnta.gov.cn/">微众教育</a>
+				</li>
+				<!-- <li>
+					<a href="http://www.cnta.gov.cn/">国家旅游局官网</a>
 				</li>
 				<li>
-					<router-link to="index">微众企业</router-link>
-				</li>
-				<li>
-					<router-link to="index">微众企业</router-link>
-				</li>
-				<li>
-					<router-link to="index">微众企业</router-link>
-				</li>
-				<li>
-					<router-link to="index">微众企业</router-link>
-				</li>
+					<a href="http://www.xmtravel.gov.cn/">厦门市旅游发展委员会</a>
+				</li> -->
 			</ul>
-			<p>
-				Copyright © 2017 Booom! Collect from xiaolongjun
-			</p>
 		</div>
 	</footer>
 </template>

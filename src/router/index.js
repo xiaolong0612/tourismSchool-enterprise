@@ -81,6 +81,7 @@ Vue.use(Router);
   **/
 export const constantRouterMap = [
   { path: '/login', component: Login, hidden: true },
+  { path: '/register', component: _import('login/register'), hidden: true },
   { path: '/404', component: Err404, hidden: true },
   {
     path: '/',
@@ -116,6 +117,15 @@ export const constantRouterMap = [
     name: 'Home',
     hidden: true,
     children: [{ path: 'form-new-resume', component: form_new_resume }]
+  },
+  {
+    path: '/new',
+    component: webLayout,
+    redirect: '/new/list',
+    name: '新闻',
+    noDropdown: true,
+    hidden: true,
+    children: [{ path: 'list', component: _import('web/new/list-new'), name: '新闻列表'}]
   },
 ]
 
@@ -197,7 +207,7 @@ export const asyncRouterMap = [
     icon: 'tubiaoleixingzhengchang',
     meta: { role: ['0'] },
     noDropdown: true,
-    children: [{ path: 'index', component: _import('admin/welcome/index'), name: 'welcome', meta: { role: ['0'] }}]
+    children: [{ path: 'index', component: _import('admin/welcome/index'), name: '系统近况', meta: { role: ['0'] }}]
   },
   {
     path: '/com',
@@ -233,11 +243,38 @@ export const asyncRouterMap = [
     path: '/report',
     component: adminLayout,
     redirect: '/report/list',
-    name: '报表',
+    name: '数据统计',
     icon: 'tubiaoleixingzhengchang',
-    meta: { role: ['0', '1'] },
+    meta: { role: ['0'] },
     noDropdown: true,
-    children: [{ path: 'list', component: admin_report_list, name: '报表', meta: { role: ['1'] }}]
+    children: [
+      { 
+        path: 'list', component: _import('admin/school/report'), name: '数据统计',
+      },
+      { path: 'list/details', component: _import('admin/school/report-details'), name: '报表详情' }
+    ]
+  },
+  {
+    path: '/report',
+    component: adminLayout,
+    redirect: '/report/list',
+    name: '数据统计',
+    icon: 'tubiaoleixingzhengchang',
+    meta: { role: ['1'] },
+    noDropdown: true,
+    children: [
+      { path: 'details', component: _import('admin/school/report-details'), name: '报表详情' }
+    ]
+  },
+  {
+    path: '/label',
+    component: adminLayout,
+    redirect: '/label/list',
+    name: '标签管理',
+    icon: 'tubiaoleixingzhengchang',
+    meta: { role: ['0'] },
+    noDropdown: true,
+    children: [{ path: 'list', component: _import('admin/label/job'), name: '标签管理' }]
   },
   // {
   //   path: '/example',

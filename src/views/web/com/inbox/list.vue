@@ -3,10 +3,10 @@
 		<div class="breadcrumb-wrap container pt95">
 			<el-breadcrumb separator="/">
 				  <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-				  <el-breadcrumb-item>收件箱</el-breadcrumb-item>
+				  <el-breadcrumb-item>谁来应聘</el-breadcrumb-item>
 				</el-breadcrumb>
 		</div>
-		<div class="container pt20 resume_type_list_wrap pb50">
+		<div class="container panel_white mt20 pt20 resume_type_list_wrap pb50">
 			<el-tabs v-model="active_list.resume_list">
 		    <el-tab-pane label="简历列表" name="resume">
 		    	
@@ -31,13 +31,13 @@
 	          				<span class="pull-right" style="font-size:14px;color:#555"> 
 	          					{{item.jobName}}
 	          				</span>
-	          				<router-link :to="{path: '/com/inbox/details', query: {id: item.resumeId,deliveryId: item.id,resumeState:item.resumeState, is_com_look: true}}">
+	          				<router-link :to="{path: '/search/student-details', query: {id: item.resumeId,deliveryId: item.id,resumeState:item.resumeState, is_com_look: true}}">
 											{{item.studentName}}
 	          				</router-link>
 	          			</div>
 	          		</div>
 	          		<div class="edit">
-	          			<router-link :to="{path: '/com/inbox/details', query: {id: item.resumeId,deliveryId: item.id,resumeState:item.resumeState, is_com_look: true}}">
+	          			<router-link :to="{path: '/search/student-details', query: {id: item.resumeId,deliveryId: item.id,resumeState:item.resumeState, is_com_look: true}}">
 		          			<el-button class="pull-right" size="mini" type="primary">查看</el-button>
 		          		</router-link>
 		          		
@@ -106,11 +106,11 @@
 		        },
         		{
         			value: '2',
-		          label: '录取'
+		          label: '面试成功'
 		        },
         		{
         			value: '3',
-		          label: '拒绝'
+		          label: '无结果'
 		        },
         	]
         },
@@ -160,7 +160,7 @@
 		.resume_type{
 			position: absolute;
 			top: 15px;
-			right: 15px;
+			right: 30px;
 		}
 	}
 	.resumet_list{

@@ -79,3 +79,11 @@ export function jobEvaluate(data) {
     data
   });
 }
+
+export function countBrowseRecord(data) {
+  return fetch({
+    url: '/admin/job-browse-record/count-browse-record',
+    method: 'post',
+    data
+  });
+}

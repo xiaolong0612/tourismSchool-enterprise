@@ -4,76 +4,87 @@
 			<div class="breadcrumb-wrap container">
 				<el-breadcrumb separator="/">
 				  <!-- <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item> -->
-				  <el-breadcrumb-item :to="{ path: '/com/inbox/list' }">收件列表</el-breadcrumb-item>
+				  <el-breadcrumb-item :to="{ path: '/com/inbox/list' }">谁来应聘</el-breadcrumb-item>
 				  <el-breadcrumb-item>简历详情</el-breadcrumb-item>
 				</el-breadcrumb>
 			</div>
 		</div>
 		<div class="section user-wrap small_container panel_white ">
 			<div class="about_intro">
-        <el-row>
-        		<el-col :span="10">
-        				<div class="user-img" :style="'background-image:url()'">
-        				</div>
-        				
+        <el-form :model="user_info" ref="user_info" label-width="100px">
+        	<el-row>
+	  				<el-col :span="24">
+		  				<el-form-item style="margin-left:-100px;">
+		    				<div class="user-img mb20" :style="'background-image:url('+user_info.pic+')'"></div>
+		    			</el-form-item>
+		    		</el-col>
+		    		<el-col :span="24">
+	    				<el-form-item style="margin-left:-100px;">
+	              <h4 class="t-center">
+	                  <span>{{user_info.linkName}}</span>
+	              </h4>
+	            </el-form-item>
+	          </el-col>
+						<!-- 基本信息 -->
+						<el-col :span="12">
+              <el-form-item label="联系方式:" >
+                	<span>{{user_info.linkPhone}}</span>
+              </el-form-item>
             </el-col>
-        		<el-col :span="14">
-                <h4>
-                    <span>{{user_info.linkName}}</span>
-                </h4>
-                <ul class="border_bottom_list">
-										<!-- 基本信息 -->
-                    <li class="clearfix">
-                    	<strong class="list_title">tel : </strong>
-                    	<span>{{user_info.linkPhone}}</span>
-                    </li>
-                    <li class="clearfix">
-                    	<strong class="list_title">年龄:</strong>
-                    	<span>{{age}}</span>
-                   	</li>
-                    <li class="clearfix">
-                    	<strong class="list_title">在职状态: </strong>
-                    	<span>{{user_info.working}}</span>
-                    </li>
-                </ul>
-								<el-form label-width="80px" label-position="left" class="mt25">
-
-							    <el-form-item label="个性标签" >
-							      <div class="small_container">
-											<el-tag 
-												v-for="tag in user_info.labelName"
-												:key="tag">{{tag}}</el-tag>
-										</div>
-							    </el-form-item>
-
-							    <el-form-item label="期望工作" class="mb0">
-							      <div class="expect_wrap">
-												<el-row>
-													<el-col :span="12">
-														<icon-svg icon-class="ffan_lingdai" />
-														<span>{{user_info.expectJob}}</span>
-													</el-col>
-													<el-col :span="12">
-														<icon-svg icon-class="dibiao" />
-														<span>{{user_info.expectAddress}}</span>
-													</el-col>
-													<el-col :span="12">
-														<icon-svg icon-class="bill-copy" />
-														<span>{{user_info.expectIncome}}</span>
-													</el-col>
-												</el-row>
-											</div>
-							    </el-form-item>
-
-							  </el-form>
-
-
+            <el-col :span="12">
+          		<el-form-item label="年龄:" >
+              	<span>{{age}}</span>
+          		</el-form-item>
+          	</el-col>
+          </el-row>
+          <el-row>
+					  <el-col :span="6">
+            	<el-form-item label="在职状态:" >
+              	<a href="#">{{user_info.working}}</a>
+            	</el-form-item>
             </el-col>
-        </el-row>
+						<el-col :span="18">
+					    <el-form-item label="期望工作:" class="mb0">
+					      <div class="expect_wrap">
+									<el-row>
+										<el-col :span="6">
+											<icon-svg icon-class="ffan_lingdai" />
+											<span>{{user_info.expectJob}}</span>
+										</el-col>
+										<el-col :span="8">
+											<icon-svg icon-class="dibiao" />
+											<span>{{user_info.expectAddress}}</span>
+										</el-col>
+										<el-col :span="8" :offset="2">
+											<icon-svg icon-class="bill-copy" />
+											<span>{{user_info.expectIncome}}</span>
+										</el-col>
+									</el-row>
+								</div>
+					    </el-form-item>
+					  </el-col>
+					</el-row>
+					<el-row>
+						<el-col :span="24">
+            	<el-form-item label="自我介绍:" label-width="100px">
+            		<span>{{user_info.selfIntro  }}</span>
+            	</el-form-item>
+            </el-col>
+					</el-row>
+					<el-row>
+					  <el-col :span="24">
+					    <el-form-item label="个性标签:" >
+								<el-tag 
+									v-for="tag in user_info.labelName"
+									:key="tag" class="mr5">{{tag}}</el-tag>
+					    </el-form-item>
+					  </el-col>
+        	</el-row>
+				</el-form>
       </div>
 		</div>
 
-		<div class="small_container section panel_white mb40">
+		<div class="small_container section panel_white mb40 t-center" v-if="user_info.workList.length !=0 ">
 			<div class="section_title">
 				<h4>我的经验</h4>
 				<div></div>
@@ -81,8 +92,7 @@
 			</div>
 			<div>
 				<el-table
-					v-show="user_info.work.length != 0"
-			    :data="user_info.work"
+			    :data="user_info.workList"
 			    :show-header="false"
 			    style="width: 100%">
 			    <el-table-column
@@ -106,15 +116,26 @@
 			</div>
 		</div>
 
-		<div class="small_container section panel_white mb40">
+		<div class="small_container section panel_white mb40 t-center" v-if="user_info.eduList.length != 0">
 			<div class="section_title">
 				<h4>我的教育</h4>
 				<div></div>
 				<p>教育的根源很苦，但果实甜美集</p>
 			</div>
+			<div>
+				<el-table
+			    :data="user_info.eduList"
+			    :show-header="false"
+			    style="width: 100%">
+			    <el-table-column property="schoolName"></el-table-column>
+			    <el-table-column property="major"></el-table-column>
+			    <el-table-column property="qualificate"></el-table-column>
+			    <el-table-column property="graduateYear"></el-table-column>
+			  </el-table>
+			</div>
 		</div>
 
-		<div class="section honor_wrap">
+		<div class="section honor_wrap" v-if="user_info.certificate.length != 0">
 			<div class="container">
 				<div class="section_title">
 					<h4>荣誉</h4>
@@ -122,13 +143,13 @@
 					<p>荣誉应该是结果，而不是行为的动机。</p>
 				</div>
 				<el-row>
-				  <el-col :span="8" v-for="(o, index) in 3" :key="o">
-				    <el-card style="background-image:url(/static/img/zhengshu.jpg)">
+				  <el-col :span="8" v-for="(o, index) in user_info.certificate" :key="index">
+				    <el-card class="mb40" :style="'background-image:url('+ o.url +')'">
 					      <div style="padding-top:100%;overflow:hidden;">
 					        <div class="bg-color" style="margin-top:-100%;">
 					        	<div class="honor_text">
-					        		<p>2017年6月12</p>
-					        		<p>厦门大学所奖</p>
+					        		<!-- <p>2017年6月12</p> -->
+					        		<p>{{o.name}}</p>
 					        	</div>
 					        </div>
 					    </div>
@@ -242,22 +263,24 @@
   				expectIncome: '',
   				expectJob: '',
   				work: [],
-  				edu: []
+  				edu: [],
+  				eduList: [],
+  				workList: []
   			},
   			agreeForm: {
   				id: '',
-  				interviewLinker: '1',
-  				interviewTel: '1',
-					interviewTime: '1',
-					interviewAddr: '1',
-					itemName: '1',
-					interviewRemark: '1'
+  				interviewLinker: '',
+  				interviewTel: '',
+					interviewTime: '',
+					interviewAddr: '',
+					itemName: '',
+					interviewRemark: ''
   			},
   			refuseForm: {
   				id: '',
   				type: 1,
   				resumeState: 3,
-					interviewConclusion: '1'
+					interviewConclusion: ''
   			},
   			resumeState: '',
   		}
@@ -311,7 +334,7 @@
 	.user-bg{
 		height: 445px;
 		width: 100%;
-		background: url(/static/img/background/长城.jpg) center top 98% no-repeat;
+		background: url(/static/banner/slider2-2377c67b76.jpg) center no-repeat;
 		background-size: cover;
 		.breadcrumb-wrap{
 			padding: 80px 0 0;
@@ -335,15 +358,17 @@
 	    text-align: left;
 	    margin: 0 auto;
 	    max-width: 100%;
+	    .el-form-item{margin-bottom: 0}
 	    .user-img{
-				width: 325px;
-				height: 345px;
-				line-height: 345px;
+				width: 80px;
+				height: 80px;
 				text-align: center;
 				overflow: hidden;
 				background: url(/static/img/default-img/user.jpg) center no-repeat;
 				background-size: cover;
-				border-radius: 8px;
+				margin: 0 auto;
+				border-radius: 100%;
+				box-shadow: 0 0 2px 4px #f7f7f7;
 				position: relative;
 				.avatar-uploader{
 					font-size: 50px;
@@ -351,6 +376,19 @@
 					border-radius: 8px;
 					height: 100%;
 					width: 100%;
+				}
+				.change_img-remind{
+					position: absolute;
+					top: 0;
+					left: 0;
+					width: 100%;
+					height: 100%;
+					line-height: 20px;
+					font-size: 14px;
+					color: #fff;
+					padding-top: 18px;
+					text-align: center;
+					background-color: rgba(0,0,0,.3);
 				}
 	    }
 	    h4{

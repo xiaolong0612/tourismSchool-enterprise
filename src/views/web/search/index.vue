@@ -4,8 +4,8 @@
 		<div class="container pt30" style="width: 958px" v-if="res.success">
 			<el-tabs v-model="active_list.search_result">
 		    <el-tab-pane label="搜索结果" name="result">
-					<search-list-two :list="list" :key="listKey" @jobid="getJobId"/>
-
+					<search-list-two v-if="type == '' || type == 2" :list="list" :key="listKey" @jobid="getJobId"/>
+          <search-list-student v-else :list="list" :key="listKey"></search-list-student>
           <div class="pb80">
             <el-pagination
               @current-change="handleCurrentChange"
@@ -28,16 +28,24 @@
 	</div>
 </template>
 <script>
+  import { mapGetters } from 'vuex';
 	import searchCriteria from '@/views/web/search/search-criteria';
-	import searchListTwo from '@/views/web/search/list-two';
+  import searchListTwo from '@/views/web/search/list-two';
+  import searchListStudent from '@/views/web/search/list-student';
   import resumeItemSelect from '@/views/web/user/resume/list-item-select';
 	export default {
 		name: '',
 		components: {
 			searchCriteria,
 			searchListTwo,
-      resumeItemSelect
+      resumeItemSelect,
+      searchListStudent
 		},
+    computed: {
+      ...mapGetters([
+        'type'
+      ])
+    },
 		data() {
 			return {
 				active_list: {

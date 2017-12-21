@@ -29,6 +29,7 @@
   </div>
 </template>
 <script>
+  import { mapGetters } from 'vuex';
   import { getColor } from '@/utils/index';
   import { searchResume } from '@/api/student/resume';
   import { resumeDelivery } from '@/api/student/delivery';
@@ -40,6 +41,12 @@
         default: '',
       }
     },
+    computed: {
+      ...mapGetters([
+        'id',
+        'name'
+      ])
+    },
     data() {
       return {
         list: [],
@@ -47,7 +54,7 @@
         deliveryQuery: {
           jobId: this.jobId,
           resumeId: '',
-          studentId:1,
+          studentId:'',
         }
       }
     },
@@ -58,6 +65,7 @@
       }
     },
     mounted() {
+      this.deliveryQuery.studentId = this.id;
       this.getlist();
     },
     methods: {
@@ -95,6 +103,7 @@
         let len=0;
         for(let index in this.list){
           if(this.list[index].is_active ==  true){
+            this.deliveryQuery.resumeId = this.list[index].id;
             len++;
           };
         }

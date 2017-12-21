@@ -31,3 +31,11 @@ export function getReport(data) {
     data
   });
 }
+// 报表
+export function getSchoolResumeDeliveryInvitate(data) {
+  return fetch({
+    url: '/admin/resume-delivery-invitate/getSchoolResumeDeliveryInvitate',
+    method: 'post',
+    data
+  });
+}

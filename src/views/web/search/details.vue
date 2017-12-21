@@ -5,7 +5,7 @@
 			<el-row :gutter="10">
 			  <el-col :span="16">
 			  	<div class="bg-white recruit_details">
-			  		<div class="top_wrap">
+			  		<div class="top_wrap clearfix">
 							<div class="pull-right" style="padding-top:8px;">
 								<el-button type="primary" @click="handlerDelivery">投个简历</el-button>
 							</div>
@@ -72,35 +72,42 @@
 			  <el-col :span="8">
 			  	<div class="bg-white com-info">
 			  		<div class="mb20">
-							<img class="logo mr5" :src="job.company.pic">
+							<img class="logo mr5" v-if="job.company.pic != ''" :src="job.company.pic">
 							<span class="name">{{job.company.companyName}}</span>
 						</div>
-						<div class="item">
+						<div class="item" v-if="job.company.industry != ''">
 							<span>
 								<icon-svg icon-class="caidan" />
 							</span>
 							<font>{{job.company.industry}}</font>
 						</div>
 
-						<div class="item">
+						<div class="item" v-if="job.company.introduce != ''">
 							<span>
 								<icon-svg icon-class="jianjie" />
 							</span>
 							<font>{{job.company.introduce}}</font>
 						</div>
 
-						<div class="item">
+						<div class="item" v-if="job.company.scale != ''">
 							<span>
 								<icon-svg icon-class="e60213" />
 							</span>
 							<font>{{job.company.scale}}</font>
 						</div>
 
-						<div class="item">
+						<div class="item" v-if="job.company.location != ''">
+							<span>
+								<icon-svg icon-class="dibiao" />
+							</span>
+							<font>{{job.company.location}}</font>
+						</div>
+
+						<div class="item" v-if="job.company.webUrl != ''">
 							<span>
 								<icon-svg icon-class="zhuye" />
 							</span>
-							<font><router-link to="www.baidu.com">{{job.company.webUrl}}</router-link></font>
+							<font><a target="_blank" :href="job.company.webUrl">{{job.company.webUrl}}</a></font>
 						</div>
 					</div>
 			  </el-col>
@@ -118,7 +125,7 @@
 <script>
 	import { mapGetters } from 'vuex';
   import listEvaluate from '@/views/web/search/list-evaluate';
-  import { detailJob } from '@/api/com/recruit';
+  import { detailJob, countBrowseRecord } from '@/api/com/recruit';
   import resumeItemSelect from '@/views/web/user/resume/list-item-select';
 	export default {
 		components: { 
@@ -128,6 +135,7 @@
 		computed: {
 	    ...mapGetters([
 	      'account',
+	      'id'
 	    ])
 	  },
 		data() {
@@ -177,6 +185,8 @@
 		},
 		mounted() {
 			this.getDetails();
+			if(this.id == '') countBrowseRecord(0);
+			else countBrowseRecord(this.id);
 		},
 		methods: {
 			getDetails(){
@@ -184,7 +194,8 @@
 					id: this.$route.query.id
 				}
 				detailJob(query).then(res => {
-					this.job = res.job
+					this.job = res.job;
+					this.countBrowseRecord();
 				})
 			},
 			handlerDelivery(){
@@ -197,6 +208,9 @@
       dialogResumeListClose(val){
         this.dialogResumeList = val
       },
+      countBrowseRecord(type){
+      	countBrowseRecord({userId:type,jobId:this.job.id})
+      }
 		}
 	}
 </script>

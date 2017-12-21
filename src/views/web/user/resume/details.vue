@@ -11,22 +11,7 @@
 		</div>
 		<div class="section user-wrap small_container panel_white ">
 			<div class="about_intro">
-        		<!-- <el-col :span="10">
-        				<div class="user-img" :style="'background-image:url('+user_info.pic+')'">
-        					<el-upload
-        						style="width:100%;height:100%;"
-        						v-if="is_edit"
-									  class="avatar-uploader"
-									  :action="gpath.user_hp"
-									  :show-file-list="false"
-									  :on-success="handleAvatarSuccess"
-									  :before-upload="beforeAvatarUpload">
-									  <img v-if="user_info.pic" :src="user_info.pic" class="avatar" style="width:100%;">
-									  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-									</el-upload>
-        				</div>
-        				
-            </el-col> -->
+
 	  		<el-form :model="user_info" ref="user_info" label-width="100px">
         	<el-row>
 	  				<el-col :span="24">
@@ -43,6 +28,7 @@
 									  <img v-if="user_info.pic" :src="user_info.pic" class="avatar" style="width:100%;">
 									  <div class="change_img-remind">点击<br>更换头像</div>
 									</el-upload>
+									<!-- <div class="change_img-remind" v-if="is_edit" @click="imagecropperShow = true">点击<br>更换头像</div> -->
 		    				</div>
 		    			</el-form-item>
 		    		</el-col>
@@ -102,12 +88,21 @@
 					  </el-col>
 					</el-row>
 					<el-row>
+						<el-col :span="24">
+            	<el-form-item label="自我介绍:" label-width="100px">
+            		<span v-if="!is_edit">{{user_info.selfIntro  }}</span>
+								<el-input v-if="is_edit" v-model="user_info.selfIntro" placeholder="请填写..."></el-input>
+            	</el-form-item>
+            </el-col>
+					</el-row>
+					<el-row>
 					  <el-col :span="24">
 					    <el-form-item label="个性标签:" >
 								<el-tag 
 									v-for="tag in user_info.labelName"
 									:closable="is_edit"
 									:key="tag"
+									class="mr5"
 									@close="handleTagClose(tag)">{{tag}}</el-tag>
 								<el-input
 									style="width:80px"
@@ -127,7 +122,7 @@
       </div>
 		</div>
 
-		<div class="small_container section panel_white mb40">
+		<div class="small_container section panel_white mb40 t-center">
 			<div class="section_title">
 				<h4>我的经验</h4>
 				<div></div>
@@ -161,7 +156,7 @@
 			    	<template slot-scope="scope">
 				    	<i 
 				    		class="el-icon-edit mr15 c-blue"
-				    		@click="editRow(scope.$index, user_info.workList, 'work')"></i>
+				    		@click="editRow(scope.$index, scope.row, 'work')"></i>
 				    	<i class="el-icon-delete c-danger"
 				    		@click="deleteRow(scope.$index, user_info.workList, 'work')"></i>
 				    </template>
@@ -173,7 +168,7 @@
 			</div>
 		</div>
 
-		<div class="small_container section panel_white mb40">
+		<div class="small_container section panel_white mb40 t-center">
 			<div class="section_title">
 				<h4>我的教育</h4>
 				<div></div>
@@ -200,9 +195,9 @@
 			    	<template slot-scope="scope">
 				    	<i 
 				    		class="el-icon-edit mr15 c-blue"
-				    		@click="editRow(scope.$index, user_info.workList, 'edu')"></i>
+				    		@click="editRow(scope.$index, scope.row, 'edu')"></i>
 				    	<i class="el-icon-delete c-danger"
-				    		@click="deleteRow(scope.$index, user_info.workList, 'edu')"></i>
+				    		@click="deleteRow(scope.$index, user_info.eduList, 'edu')"></i>
 				    </template>
 			    </el-table-column>
 			  </el-table>
@@ -212,7 +207,7 @@
 			</div>
 		</div>
 
-		<!-- <div class="section honor_wrap">
+		<div class="section honor_wrap">
 			<div class="container">
 				<div class="section_title">
 					<h4>荣誉</h4>
@@ -220,21 +215,24 @@
 					<p>荣誉应该是结果，而不是行为的动机。</p>
 				</div>
 				<el-row>
-				  <el-col :span="8" v-for="(o, index) in 3" :key="o">
-				    <el-card style="background-image:url(/static/img/zhengshu.jpg)">
+				  <el-col :span="8" v-for="(o, index) in user_info.certificate" :key="index">
+				    <el-card class="mb40" :style="'background-image:url('+ o.url +')'">
 					      <div style="padding-top:100%;overflow:hidden;">
 					        <div class="bg-color" style="margin-top:-100%;">
 					        	<div class="honor_text">
-					        		<p>2017年6月12</p>
-					        		<p>厦门大学所奖</p>
+					        		<!-- <p>2017年6月12</p> -->
+					        		<p>{{o.name}}</p>
 					        	</div>
 					        </div>
 					    </div>
 				    </el-card>
 				  </el-col>
 				</el-row>
+				<div class="t-center mt10">
+					<el-button icon='el-icon-plus' size="mini" type="primary" @click="dialogCertificate = true" class="addbtn" v-if="is_edit">添加</el-button>
+				</div>
 			</div>
-		</div> -->
+		</div>
 
 		<div class="fixed-edit">
 			<ul>
@@ -279,7 +277,8 @@
 		  </el-form>
 		  <div slot="footer" class="dialog-footer">
 		    <el-button @click="dialogAddWork = false">取 消</el-button>
-		    <el-button type="primary" @click="addExp('work')">确 定</el-button>
+		    <el-button v-show="!is_edit_exp" type="primary" @click="addExp('work')">确 定</el-button>
+		    <el-button v-show="is_edit_exp" type="primary" @click="seveEdit('work')">确 定</el-button>
 		  </div>
 		</el-dialog>
 
@@ -305,8 +304,19 @@
 		  </el-form>
 		  <div slot="footer" class="dialog-footer">
 		    <el-button @click="dialogAddEdu = false">取 消</el-button>
-		    <el-button type="primary" @click="addExp('edu')">确 定</el-button>
+		    <el-button v-show="!is_edit_exp" type="primary" @click="addExp('edu')">确 定</el-button>
+		    <el-button v-show="is_edit_exp" type="primary" @click="seveEdit('work')">确 定</el-button>
 		  </div>
+		</el-dialog>
+		<el-dialog title="添加荣誉" :visible.sync="dialogCertificate" width="510px">
+			<el-upload
+			  :action="gpath.user_hp"
+			  list-type="picture-card"
+			  :file-list="user_info.certificate"
+			  :on-success="updateCertificate"
+			  :on-remove="handleRemove">
+			  <i class="el-icon-plus"></i>
+			</el-upload>
 		</el-dialog>
 	</div>
 </template>
@@ -315,6 +325,7 @@
   import { mapGetters } from 'vuex';
   import { parseTime } from '@/utils/index';
   import { getResumeDetails, saveResume, updateResume } from '@/api/student/resume';
+	import ImageCropper from '@/components/ImageCropper';
   export default {
     computed: {
       ...mapGetters([
@@ -325,16 +336,20 @@
     },
   	data() {
   		return {
+  			imagecropperShow: false,
+  			imagecropperKey: 0,
   			is_edit: false,
   			is_edit_exp: false,
+  			edit_content: {},
   			inputVisible: false,
+  			certificateList: [],
   			labelValue: '',
   			user_info: {
   				studentId: '',
   				pic: "",
   				linkName: '',
   				linkPhone: '',
-  				certificate: '',
+  				certificate: [],
   				selfIntro: '',
   				skillDescript: '',
   				pic: '',
@@ -343,24 +358,26 @@
   				expectAddress: '',
   				expectIncome: '',
   				expectJob: '',
+  				selfIntro: '',
   				work: [],
   				edu: []
   			},
   			dialogAddWork: false,
   			dialogAddEdu: false,
+  			dialogCertificate: false,
   			list: {},
   			formData: {
   				work: {
-						workJob: '1',
-						companyName: '1',
+						workJob: '',
+						companyName: '',
 						time: '',
 						workContent: ''
 					},
 					edu: {
 						major: '',
-						schoolName: '1',
-						qualificate: '1',
-						graduateYear: '11'
+						schoolName: '',
+						qualificate: '',
+						graduateYear: ''
 					}
 				},
   			user_label: false
@@ -388,17 +405,21 @@
   						let workList;
   						workList = typeof data.workList == 'undefined' ? [] : data.workList
   						this.user_info['workList'] = JSON.parse(JSON.stringify(workList));
-  						this.user_info.wrok = JSON.parse(JSON.stringify(workList));
+  						this.user_info.work = JSON.parse(JSON.stringify(workList));
   					}else if(label == 'edu'){
   						let eduList;
   						eduList = typeof data.eduList == 'undefined' ? [] : data.eduList
   						this.user_info['eduList'] = JSON.parse(JSON.stringify(data.eduList));
   						this.user_info.edu = JSON.parse(JSON.stringify(eduList));
+  					}else if(label == 'certificate'){
+  						this.user_info.certificate = JSON.parse(data.certificate)
   					}else{
   						this.user_info[label] = data[label];
   					}
   				}
   				if(this.user_info.pic == '') this.user_info.pic = '/static/default_img.gif'
+
+  				this.certificateList = this.user_info.certificate;
   			})
   		},
   		saveResume(){
@@ -426,6 +447,7 @@
   			data.labelName = this.user_info.labelName.join(',');
   			data.work = JSON.stringify(this.user_info.workList);
   			data.edu = JSON.stringify(this.user_info.eduList);
+  			data.certificate = JSON.stringify(this.user_info.certificate);
   			delete data.workList;
   			delete data.eduList;
   			return data
@@ -450,12 +472,11 @@
   				this.user_info.workList = this.user_info.work
   				this.dialogAddWork = false;
   			}else{
-  				this.user_info.edu.push(this.formData.edu);
+  				this.user_info.edu.push(JSON.parse(JSON.stringify(this.formData.edu)));
   				this.user_info.eduList = this.user_info.edu;
   				this.dialogAddEdu = false;
   			}
       	this.is_edit_exp = false;
-  			console.log(this.user_info)
   		},
   		handleTagClose(tag){
   			this.user_info.labelName.splice(this.user_info.labelName.indexOf(tag), 1);
@@ -480,8 +501,6 @@
   		handleAvatarSuccess(res, file) {
   			this.is_edit = true;
         this.user_info.pic = res.url.split('@')[0];
-  			console.log(res.url);
-  			console.log(this.user_info)
       },
       beforeAvatarUpload(file) {
         const isJPG = file.type === 'image/jpeg';
@@ -501,31 +520,77 @@
       },
       editRow(index, rows, type){
       	this.is_edit_exp = true;
+      	this.edit_content = {
+      		index: index,
+      		rows: rows,
+      		type: type
+      	};
       	if(type == 'work'){
       		this.dialogAddWork = true;
-      		for(let label in this.formData[type]){
-      			if(label == 'time') this.formData[type][label] = [rows[index].beginDate, rows[index].endDate];
-      			else this.formData[type][label] = rows[index][label];
-	      	}
-	      	console.log(this.formData)
       	}
       	else{
       		this.dialogAddEdu = true;
-      		for(let label in this.formData[type]){
-	      		this.formData[type][label] = rows[index][label];
-	      	}
       	}
-      }
+      },
+      seveEdit(){
+      	let index = this.edit_content.index;
+      	let rows = this.edit_content.rows;
+      	let type = this.edit_content.type;
+      	if(type == 'work'){
+
+      		for(let label in this.formData.work){
+      			if(label == 'time'){
+							this.$set(this.user_info.workList[index], 'beginDate', parseTime(this.formData.work.time[0], '{y}-{m}-{d}'));
+							this.$set(this.user_info.workList[index], 'endDate', parseTime(this.formData.work.time[1], '{y}-{m}-{d}'));
+      			}else{
+      				this.$set(this.user_info.workList[index], label, this.formData.work[label]);
+      			}
+	      	}
+      		this.dialogAddWork = false;
+      	}
+      	else{
+      		for(let label in this.formData.edu){
+	      		this.$set(this.user_info.eduList[index], label, this.formData.edu[label]);
+	      	}
+      		this.dialogAddEdu = false;
+      	}
+      	this.is_edit_exp = false;
+      },
+      updateCertificate(res, file, fileList){
+      	let list = [];
+      	for(let i in fileList){
+      		console.log(fileList[i])
+      		list.push({
+      			name:file.name,
+      			url: fileList[i].url
+      		})
+      	}
+      	this.user_info.certificate = list;
+      },
+      handleRemove(file, fileList) {
+      	let list = [];
+      	for(let i in fileList){
+      		list.push({
+      			name:res.name,
+      			url: fileList[i].url.split(':')[1]
+      		})
+      	}
+      	this.user_info.certificate = list;
+      },
   	}
   }
 </script>
 
 <style rel="stylesheet/scss" lang="scss">
   @import "src/styles/mixin.scss";
+  .float_none{
+  	float: none!important;
+  	display: inline-block;
+  }
 	.user-bg{
 		height: 445px;
 		width: 100%;
-		background: url(/static/img/background/长城.jpg) center top 98% no-repeat;
+		background: url(/static/banner/slider2-2377c67b76.jpg) center no-repeat;
 		background-size: cover;
 		.breadcrumb-wrap{
 			padding: 80px 0 0;

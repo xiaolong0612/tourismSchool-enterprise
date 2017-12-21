@@ -82,5 +82,13 @@ export function getResumeDetails(data) {
   });
 }
 
+// 获取单个简历内容
+export function searchResumeList(data) {
+  return fetch({
+    url: '/admin/resume/get-resume-list',
+    method: 'post',
+    data
+  });
+}
 
 

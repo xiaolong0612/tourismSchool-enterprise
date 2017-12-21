@@ -10,18 +10,17 @@
 					  			{{item.jobName}} [{{item.workAddress}}]
 					  		</router-link>
 					  	</h2>
-					  	<span class="time">{{item.releaseTime}}</span>
 					  </div>
 					  <p class="postion_req">
-					  	<span class="mr15">{{item.income}}</span>
-					  	<font>{{item.workExperience}} / {{item.qualificate}}</font>
-					  	<el-tag class="ml10" size="mini" type="success" style="vertical-align:top">{{item.jobTypeStr}}</el-tag>
+					  	<span class="mr15 income">{{item.income}}</span>
+					  	<font>{{item.workExperience}} <d v-if="item.qualificate != ''">/</d> {{item.qualificate}}</font>
+					  	<el-tag class="ml10" size="small" type="warning">{{item.jobTypeStr}}</el-tag>
 					  </p>
 					</div>
 			  </el-col>
 			  <el-col :span="12">
 			  	<div class="con_info" style="padding: 14px 15px 0">
-				  	<img class="pull-right" :src="item.companyLogo" width="62">
+				  	<img class="pull-right" v-if="item.companyLogo == ''" :src="item.companyLogo == '' ? '/static/logo.png' : item.companyLogo" height="62px">
 				  	<div class="name">
 							<h2>
 					  		<router-link :to="{path:'/search/com-details', query:{id:item.companyId}}">
@@ -41,6 +40,7 @@
 				  		</div>
 			  		</el-col>
 			  		<el-col :span="12">
+					  	<span class="time pull-left">{{item.releaseTime}}</span>
 			  			<div class="btn_wrap">
 			  				<el-button size="small" type="primary" @click="dialogDelivery(item.id)">{{item.submit_btn_text}}</el-button>
 			  			</div>
@@ -98,6 +98,12 @@
 		.item{
 			border: 1px solid #ededed;
 			background-color: #fff;
+			.time{
+				font-size: 14px;
+				color: #999;
+				line-height: 40px;
+				text-indent: 16px;
+			}
 			.position_info, .con_info{
 				.name{
 					height: 34px;
@@ -107,10 +113,6 @@
 						display: inline-block;
 						vertical-align: middle;
 						margin: 0 5px 0 0;
-					}
-					.time{
-						font-size: 14px;
-						color: #999;
 					}
 				}
 			}
@@ -123,7 +125,7 @@
 				text-overflow: ellipsis;
 				white-space: nowrap;
 				word-wrap: normal;
-				span{
+				.income{
 					font-size: 16px;
 					color: #fd5f39;
 					display: inline-block;vertical-align: middle;
