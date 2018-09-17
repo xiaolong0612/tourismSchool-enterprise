@@ -320,3 +320,21 @@ export const gpath = {
   action_company: 'http://39.106.126.82:8080/admin/company/upload',
   user_hp: 'http://39.106.126.82:8080/ajaxfileupload'
 }
+
+// 修改url参数
+export function changeURLPar(destiny, par, par_value) { 
+  var pattern = par+'=([^&]*)'; 
+  var replaceText = par+'='+par_value; 
+  if (destiny.match(pattern)) { 
+    var tmp = '/\\'+par+'=[^&]*/'; 
+    tmp = destiny.replace(eval(tmp), replaceText); 
+    return (tmp); 
+  } else{ 
+    if (destiny.match('[\?]')) { 
+      return destiny+'&'+ replaceText; 
+    } else { 
+      return destiny+'?'+replaceText; 
+    } 
+  } 
+  return destiny+'\n'+par+'\n'+par_value; 
+}

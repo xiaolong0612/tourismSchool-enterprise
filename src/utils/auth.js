@@ -4,7 +4,9 @@ const Type = 'LYXQ-type';
 const Id = 'LYXQ-id';
 
 export function getType() {
-  return Cookies.get(Type)
+	let type = Cookies.get(Type);
+	if(type == '' || typeof type == 'undefined') type = 2;
+  return type
 }
 
 export function setType(type) {

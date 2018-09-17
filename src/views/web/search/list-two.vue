@@ -53,8 +53,15 @@
 	</div>
 </template>
 <script>
+  import { mapGetters } from 'vuex';
 	export default {
-		name: 'search-stype-tow',
+		computed: {
+	    ...mapGetters([
+	    	'id',
+	      'account',
+	    ])
+	  },
+		name: 'search-type-two',
 		props: {
       list: {
         type: Array
@@ -85,7 +92,14 @@
     		}
     	},
       dialogDelivery(id){
-      	this.$emit('jobid', id);
+      	if(this.account == ''){
+      		this.$message({
+          showClose: true,
+	          message: '请先登录',
+	          type: 'warning'
+	        })
+      	}
+      	else this.$emit('jobid', id);
       }
     }
 	}

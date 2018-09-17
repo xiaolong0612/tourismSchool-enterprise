@@ -9,36 +9,47 @@
 				  </el-form-item>
 
 				  <el-form-item label="待遇">
-				  	<el-row>
-							<el-col :span="11">
-						    <el-input v-model="startIncome" placeholder="请输入最低金额"></el-input>
-					    </el-col>
-					    <el-col class="t-center" :span="2">-</el-col>
-					    <el-col :span="11">
-						    <el-input v-model="endIncome" placeholder="请输入最高金额"></el-input>
-						  </el-col>
-						</el-row>
+
+                <el-select v-model="form.income" placeholder="请选择">
+                  <el-option label="面议" value="面议"></el-option>
+                  <el-option label="≤3000" value="≤3000"></el-option>
+                  <el-option label="3000-5000" value="3000-5000"></el-option>
+                  <el-option label="5000-8000" value="5000-8000"></el-option>
+                  <el-option label="≥8000" value="≥8000"></el-option>
+                </el-select>
 				  </el-form-item>
 
 				  <el-form-item label="工作经验">
-				    <el-input v-model="form.workExperience" placeholder="例如:1年"></el-input>
+            <el-select v-model="form.workExperience" placeholder="请选择">
+              <el-option label="≤1年" value="≤1年"></el-option>
+              <el-option label="1-3年" value="1-3年"></el-option>
+              <el-option label="3-5年" value="3-5年"></el-option>
+              <el-option label="≥5年" value="≥5年"></el-option>
+            </el-select>
 				  </el-form-item>
 
 				  <el-form-item label="岗位类型">
 
 				  	<el-select v-model="form.jobType" placeholder="请选择">
-				      <el-option label="兼职" value="0"></el-option>
-				      <el-option label="全职" value="1"></el-option>
-				      <el-option label="实习" value="2"></el-option>
+				      <el-option label="兼职" :value="0"></el-option>
+				      <el-option label="全职" :value="1"></el-option>
+				      <el-option label="实习" :value="2"></el-option>
 				    </el-select>
 				  </el-form-item>
 
 				  <el-form-item label="学历">
-				    <el-input v-model="form.qualificate" placeholder="例如:本科"></el-input>
+            <el-select v-model="form.qualificate" placeholder="请选择">
+              <el-option label="研究生" value="研究生"></el-option>
+              <el-option label="本科" value="本科"></el-option>
+              <el-option label="大专" value="大专"></el-option>
+              <el-option label="高中" value="高中"></el-option>
+              <el-option label="初中" value="初中"></el-option>
+              <el-option label="小学" value="小学"></el-option>
+            </el-select>
 				  </el-form-item>
 
 				  <el-form-item label="招聘人数">
-				    <el-input v-model="form.recruitNumber" placeholder="例如:1人"></el-input>
+				    <el-input v-model="form.recruitNumber" :min="1" placeholder="例如:1人" type="number"></el-input>
 				  </el-form-item>
 
 				  <el-form-item label="工作城市" prop="workCity">
@@ -63,12 +74,11 @@
 
 				  <el-form-item label="岗位标签">
 				    <el-select
-					    v-model="form.labels"
+					    v-model="selectJobLabels"
 					    multiple
 					    filterable
 					    allow-create
-					    placeholder="请选择标签"
-              @change="labelChange">
+					    placeholder="请选择标签">
 					    <el-option
 					      v-for="item in defaultJobLabels"
 					      :key="item.id"
@@ -109,26 +119,42 @@
 	      }
 	    }
       return {
+        type: '',
       	is_edit: false,
       	city_data,
-      	startIncome: '面议',
+      	startIncome: '',
       	endIncome: '',
-      	defaultJobLabels: [],
+        defaultJobLabels: [],
+        selectJobLabels: [],
       	form: {
-      		companyId: '',
-      		companyName: '',
-      		jobName: '会计',
-      		income: '面议',
-      		workCity: '厦门市',
-      		workExperience: '1年',
-      		jobType: '0',
-      		qualificate: '本科',
-      		recruitNumber: '1人',
-      		workAddress: '软件园',
-      		linkName: '赵经理',
-      		linkPhone: '18636787915',
-      		receiveEmail: '1057520381@qq.com',
-      		labels: [],
+          // companyId: '',
+          // companyName: '',
+          // jobName: '会计',
+          // income: '面议',
+          // workCity: '厦门市',
+          // workExperience: '1年',
+          // jobType: '0',
+          // qualificate: '本科',
+          // recruitNumber: '1人',
+          // workAddress: '软件园',
+          // linkName: '赵经理',
+          // linkPhone: '18636787915',
+          // receiveEmail: '1057520381@qq.com',
+          // labels: [],
+          companyId: '',
+          companyName: '',
+          jobName: '',
+          income: '',
+          workCity: '',
+          workExperience: '',
+          jobType: '',
+          qualificate: '',
+          recruitNumber: '',
+          workAddress: '',
+          linkName: '',
+          linkPhone: '',
+          receiveEmail: '',
+          labels: [],
       	},
       	rules: {
       		jobName: [
@@ -171,23 +197,34 @@
     		if(typeof this.$route.query.id != 'undefined') this.is_edit = true;
     		else return false;
     		detailJob({id: this.$route.query.id}).then( res => {
-    			this.form = res.job;
-    			this.form['labels'] = res.job.jobLabels;
-    			delete this.form.jobLabels;
+          // let label = res.job.labels;
+          // delete res.job.labels;
+          for(var i in this.form){
+            if(i != 'labels'){
+              this.form[i] = res.job[i] || '';
+            }else{
+              for(let i in res.job.labelList){
+                this.form['labels'][this.form['labels'].length] = res.job.labelList[i].name
+              }
+              this.selectJobLabels = this.form['labels'];
+            }
+          }
     		})    	
     	},
     	updateJob(){
     		delete this.form.company;
-    		delete this.form.releaseTime;
-    		if(this.endIncome == ''){
-      		this.form.income = this.startIncome
-      	}else{
-      		this.form.income = this.startIncome+'-'+this.endIncome;
-      	}
+        delete this.form.releaseTime;
+        delete this.form.evaluates;
+        this.form.id = this.$route.query.id;
     		this.form.workCity = getCity(this.form.workCity);
-    		this.form.labels = this.labels.length == 0 ? '' : this.form.labels.join(',');
+        // let labels = [];
+        // for(let i in this.selectJobLabels){
+        //   labels[labels.length] = this.selectJobLabels[i].name;
+        // }
+    		this.form.labels = this.selectJobLabels.length == 0 ? '' : this.selectJobLabels.join(',');
         this.$refs['form'].validate((valid) => {
           if (valid) {
+            if (this.form.workExperience == '') {this.form.workExperience = '不限'}
         		updateJob(this.form).then( res => {
         			if(res.success){
         				this.$message.success('编辑成功');
@@ -204,12 +241,8 @@
         })  
     	},
       submitForm() {
-      	if(this.endIncome == ''){
-      		this.form.income = this.startIncome
-      	}else{
-      		this.form.income = this.startIncome+'-'+this.endIncome;
-      	}
     		let query = JSON.parse(JSON.stringify(this.form));
+        if (query.workExperience == '') {query.workExperience = '不限'}
     		query.workCity = this.form.workCity == '' ? '' : getCity(this.form.workCity);
         query.labels = query.labels.length == 0 ? '' : query.labels.join(',');
         this.$refs['form'].validate((valid) => {
@@ -257,8 +290,13 @@
       		labels: [],
       	}
       },
-      labelChange(){
-        console.log(this.form.labels)
+      labelChange(val){
+        console.log(val)
+        // if(this.is_edit){
+        //   this.form.labels[this.form.labels.length] = val
+        // }
+        // this.form.labels[this.form.labels.length] = val;
+        // console.log(this.form.labels)
       }
     }
   }

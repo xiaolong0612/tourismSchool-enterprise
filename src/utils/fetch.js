@@ -42,7 +42,7 @@ service.interceptors.response.use(
         type: 'error',
         duration: 5 * 1000
       });
-      return response;
+      return response.data;
       // 登出
       // store.dispatch('FedLogOut').then(() => {
       //   router.push({ path: '/login' })

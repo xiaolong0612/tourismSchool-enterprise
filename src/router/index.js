@@ -38,6 +38,8 @@ const user_resume_list = _import('web/user/resume/list');
 const user_resume_details = _import('web/user/resume/details');
 /* 收藏夹 */
 const user_collect = _import('web/user/collect/index');
+/* 个人信息 */
+const user_info = _import('web/user/info/index');
 
 /***************
  *   企业信息   *
@@ -53,7 +55,8 @@ const com_inbox_list = _import('web/com/inbox/list');
 const com_inbox_details = _import('web/com/inbox/details');
 /* 企业信息 */
 const com_info = _import('web/com/info/index');
-
+// 收藏列表
+const com_collection = _import('web/com/collection/index');
 
 
 /* dashboard */
@@ -162,6 +165,11 @@ export const asyncRouterMap = [
         path: 'collect/list',
         component: user_collect,
         name: '收藏夹'
+      },
+      {
+        path: 'info',
+        component: user_info,
+        name: '个人信息'
       }
     ]
   },
@@ -196,6 +204,11 @@ export const asyncRouterMap = [
         path: 'info',
         component: com_info,
         name: '企业信息'
+      },
+      {
+        path: 'collection',
+        component: com_collection,
+        name: '搜藏列表'
       },
     ]
   },
@@ -299,5 +312,5 @@ export const asyncRouterMap = [
   //   noDropdown: true,
   //   children: [{ path: 'index', component: Table, name: 'Table', meta: { role: ['admin'] } }]
   // },
-  { path: '*', redirect: '/404', hidden: true }
+  { path: '*', redirect: '/', hidden: true }
 ];

@@ -47,7 +47,7 @@
 					        </el-col>
 					        <el-col :span="12">
 					          <el-form-item label="关注度" class="mb0">
-					            <span>1000</span>
+					            <span>{{job.reviewCount}}</span>
 					          </el-form-item>
 					        </el-col>
 					        <el-col :span="12">
@@ -125,7 +125,7 @@
 <script>
 	import { mapGetters } from 'vuex';
   import listEvaluate from '@/views/web/search/list-evaluate';
-  import { detailJob, countBrowseRecord } from '@/api/com/recruit';
+  import { detailJob, jobBrowseRecord } from '@/api/com/recruit';
   import resumeItemSelect from '@/views/web/user/resume/list-item-select';
 	export default {
 		components: { 
@@ -185,8 +185,6 @@
 		},
 		mounted() {
 			this.getDetails();
-			if(this.id == '') countBrowseRecord(0);
-			else countBrowseRecord(this.id);
 		},
 		methods: {
 			getDetails(){
@@ -195,7 +193,7 @@
 				}
 				detailJob(query).then(res => {
 					this.job = res.job;
-					this.countBrowseRecord();
+					this.jobBrowseRecord();
 				})
 			},
 			handlerDelivery(){
@@ -208,8 +206,10 @@
       dialogResumeListClose(val){
         this.dialogResumeList = val
       },
-      countBrowseRecord(type){
-      	countBrowseRecord({userId:type,jobId:this.job.id})
+      jobBrowseRecord(){
+      	if(this.account == '') return;
+      	jobBrowseRecord({jobId: this.$route.query.id, userId:this.id}).then( res => {
+      	})
       }
 		}
 	}

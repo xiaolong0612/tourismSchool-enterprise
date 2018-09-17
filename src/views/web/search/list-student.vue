@@ -7,7 +7,7 @@
 						<div class="left clearfix">
 							<img class="pull-left" :src="item.pic == '' ? '/static/default_img.gif': item.pic" height="60px" width="60px">
 							<div class="user-info mt5">
-								<router-link class="c-blue f17" :to="{path: '/search/student-details', query:{id:item.id}}">{{item.linkName}}</router-link>
+								<router-link class="c-blue f17" target="_blank" :to="{path: '/search/student-details', query:{id:item.id}}">{{item.linkName}}</router-link>
 								<div class="f14 c-gray mt5">
 									<p class="mr10" style="display: inline-block;line-height:24px">{{item.expectAddress}}<font v-if="item.working!=''"> / </font>{{item.working}}</p>
 									<el-tag size="small" v-for="label in item.labelName" :key="label" class="mr5">{{label}}</el-tag>
@@ -23,7 +23,7 @@
 					</el-col>
 					<el-col :span="4">
 						<div class="pt30">
-							<router-link class="c-blue f17" :to="{path: '/search/student-details', query:{id:item.id}}">
+							<router-link class="c-blue f17" target="_blank" :to="{path: '/search/student-details', query:{id:item.id}}">
 								<el-button type="primary" size="small">查看详情</el-button>
 							</router-link>
 						</div>
@@ -53,8 +53,8 @@
 		},
 		mounted() {
 			for(let i in this.list){
-				this.list[i].labelName = this.list[i].labelName == '' ? [] : this.list[i].labelName.split(',');
 				this.list[i].selfIntro = this.list[i].selfIntro== '' ? '这个人什么也没有留下' : this.list[i].selfIntro;
+				this.$set(this.list[i], 'labelName', this.list[i]['labelName'].split(','))
 			}
     },
 		methods: {

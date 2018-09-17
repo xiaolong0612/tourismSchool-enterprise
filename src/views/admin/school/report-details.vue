@@ -10,7 +10,7 @@
 				    </el-select>
 				  </el-form-item>
 				  <el-form-item label="成功比例" class="pull-right mb0">
-				    <span class="c-blue">{{proportion * 100 }}%</span>
+				    <span class="c-blue">{{proportion}}%</span>
 				  </el-form-item>
 				  <el-form-item label="成功个数" class="pull-right mb0">
 				    <span class="c-success">{{interviewSuccess}}</span>
@@ -86,7 +86,6 @@
       }
     },
     mounted() {
-    	console.log(this.$route);
     	if(this.type == 1){
     		this.listQuery.schoolId = this.id;
     	}
@@ -103,6 +102,8 @@
     			}
 	    		this.tableData = res.list;
 	    		this.total = res.total;
+	    		this.interviewSuccess = res.interviewSuccess;
+	    		this.proportion = (res.proportion * 100).toFixed(2);
 	    		this.listLoading = false;
 	    	})
     	},

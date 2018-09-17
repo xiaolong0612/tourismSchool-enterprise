@@ -4,7 +4,7 @@
 		<div class="container pt30" style="width: 958px" v-if="res.success">
 			<el-tabs v-model="active_list.search_result">
 		    <el-tab-pane label="搜索结果" name="result">
-					<search-list-two v-if="type == '' || type == 2" :list="list" :key="listKey" @jobid="getJobId"/>
+					<search-list-two v-if="type == '' || type == 2" :list="list" :key="listKey" @jobid="getJobId"></search-list-two>
           <search-list-student v-else :list="list" :key="listKey"></search-list-student>
           <div class="pb80">
             <el-pagination

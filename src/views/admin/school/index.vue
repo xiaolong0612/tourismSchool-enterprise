@@ -15,6 +15,9 @@
 					  <div slot="tip" class="el-upload__tip">只能上传excel文件，且不超过10M</div>
 					</el-upload>
 				</el-form-item>
+				<el-form-item class="mb0">
+					<a href="/static/file/学校导入.xlsx">下载上传模板</a>
+				</el-form-item>
 				<el-form-item class="mb0" label="学校名称">
 					<el-select v-model="listQuery.name" filterable placeholder="请选择" @change="getlist">
 				    <el-option

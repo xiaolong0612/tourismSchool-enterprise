@@ -16,14 +16,14 @@
             <transition name="el-zoom-in-top" v-for="item in list" :key="item.id">
   			      <el-col :span="6">
   			        <div class="item mb20" :style="{borderLeftColor: item.border_color}">
-  			          <i class="el-icon-circle-cross" @click="delResume(item.id)"></i>
+  			          <i class="el-icon-circle-cross" @click="showDialogDel(item)"></i>
   			          <div style="padding: 7px 7px 0" class="clearfix">
   			            <div class="img pull-left" :style="{backgroundImage: 'url('+item.pic+')'}"></div>
   			            <div class="info">
   			              <h2>
   			                <router-link :to="'/user/resume/list/details/'+item.id">
   			                {{item.expectJob}}
-  			                <span>({{item.expectIncome}})</span>
+  			                <span v-if="item.expectIncome != ''">({{item.expectIncome}})</span>
   			                </router-link>
   			              </h2>
   			              <font class="state">{{item.working}}</font>
@@ -38,8 +38,9 @@
   			              <el-button size="mini" type="primary">查看</el-button>
   			            </router-link>
   			            
-  			            <span class="pull-left">最后编辑于:</span><font class="pull-left">2017-09-10 12:00:00</font>
-  			            <!-- <font>{{item.last_edit_time}}</font> -->
+  			            <span class="pull-left">最后编辑于:</span>
+                    <!-- <font class="pull-left">2017-09-10 12:00:00</font> -->
+  			            <font>{{item.updatetime}}</font>
   			          </div>
   			        </div> 
   			      </el-col>
@@ -53,17 +54,27 @@
         <router-link to="/user/resume/list/details/0">
           <el-button type="primary" class="mr10" size="small">新建简历</el-button>
         </router-link>
-    		<el-select v-model="resume_type.select" placeholder="请选择">
+    		<!-- <el-select v-model="resume_type.select" placeholder="请选择">
 			    <el-option
 			      v-for="item in resume_type.list"
 			      :key="item.value"
 			      :label="item.label"
 			      :value="item.value">
 			    </el-option>
-			  </el-select>
+			  </el-select> -->
     	</div>
 
 		</div>
+    <el-dialog
+      title="删除提示"
+      :visible.sync="dialogDel"
+      width="30%">
+      <p>确定删除<span class="c-blue">{{delItem.expectJob}}</span>该专业的简历么？</p>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogDel = false">取 消</el-button>
+        <el-button type="primary" @click="delResume(delItem.id)">确 定</el-button>
+      </span>
+    </el-dialog>
 	</div>
 </template>
 
@@ -83,6 +94,8 @@
     },
 		data() {
 			return {
+        dialogDel: false,
+        delItem: '',
 				active_list: {
         	resume_list: 'resume',
         },
@@ -124,6 +137,10 @@
 	    		this.is_resume_item = true;
     		})
     	},
+      showDialogDel(item){
+        this.dialogDel = true;
+        this.delItem = item;
+      },
       delResume(id){
         let query = {
           studentId: this.id,
@@ -131,6 +148,7 @@
         }
         delResume(query).then(res => {
           if(typeof res == 'undefined') return;
+          this.dialogDel = false;
           this.$message({
             message: '删除成功',
             type: 'success'

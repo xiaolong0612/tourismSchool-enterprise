@@ -30,8 +30,8 @@
 							<el-row :gutter="100">
 							  <el-col :span="12">
 							  	<el-form-item label="企业规模" label-width="68px">
-							  		<span v-if="!is_edit">{{com_info.scale}}</span>
-								    <el-input v-if="is_edit" v-model="com_info.scale"></el-input>
+							  		<span v-if="!is_edit">{{com_info.scale}}人</span>
+								    <el-input v-if="is_edit" type="number" v-model="com_info.scale"></el-input>
 								  </el-form-item>
 							  </el-col>
 							  <el-col :span="12">
@@ -103,6 +103,39 @@
 								  </el-form-item>
 							  </el-col>
 							</el-row>
+					</div> 
+				</div>
+
+				<div class="section referpic">
+					<h2 class="title">
+						企业照片
+					</h2>
+					<div class="section-content" style="padding: 20px 0 0 0">
+						<el-row :gutter="20">
+						  <el-col :span="8" v-for="(o, index) in com_info.referPic" :key="index" style="margin-bottom: 20px">
+						    <el-card style="position:relative">
+						      <div class="img" :style="'background:url('+ o.pic +') center no-repeat;background-size:cover'"></div>
+						      <div style="padding: 14px 0 0;">
+						        <p v-if="!is_edit" class="eli-3" style="word-wrap:break-word">{{o.text}}</p>
+								    <el-input type="textarea" autosize v-if="is_edit" v-model="o.text"></el-input>
+						      </div>
+						      <i class="el-icon-error del" v-show="is_edit" @click="delRefer(index)"></i>
+						    </el-card>
+						  </el-col>
+						  <el-col :span="8" v-if="is_edit" >
+						    <el-card style="height:224px;text-align:center">
+						      <el-upload
+									  ref="upload"
+									  :show-file-list="false"
+									  :action="gpath.user_hp"
+									  :file-list="fileList"
+									  :on-success="handleSuccess"
+									  accept=".png, .jpg, .jpeg, .gif">
+									  <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+									</el-upload>
+						    </el-card>
+						  </el-col>
+						</el-row>
 					</div>
 				</div>
 			</el-form>
@@ -137,21 +170,26 @@
   	data() {
   		return {
   			is_edit: false,
+  			fileList: [],
   			com_info: {
   				companyName: '微众 教育',
   				pic: '',
-  				scale: '12',
+  				scale: '',
   				industry: '2312',
   				location: '2312',
-  				introduce: '厦门市七星通联科技有限公司，2014年3月正式成立，目前公司注册资本2364万元，在职员工200人，致力于专业为银行打造全景化金融服务场景平台。公司创始团队拥有20年以上的国内银行IT系统、社区银行系统、银行电商系统、移动支付产品的设计和开发经验。七星生活“七星生活”平台——全景化金融服务场景平台，将金融服务融入本地生活、消费支付、技能分享、商户营销、银行服务等各类生活场景中，使银行、客户、商户三方角色有机串连、互利共赢，从而提升平台各方用户体验。基于与农信社、农商行、城...',
+  				introduce: '',
   				webUrl: '21321',
   				linkName: '312312',
-  				linkPhone: '321312'
+  				linkPhone: '321312',
+  				referPic: [],
+  				state: ''
   			}
   		}
   	},
   	mounted(){
-  		this.com_info = this.user
+  		this.com_info = this.user;
+  		console.log(this.user)
+      this.com_info.referPic = this.com_info.referPic == '' ? [] : JSON.parse(this.com_info.referPic);
   	},
   	methods: {
   		handleAvatarSuccess(res, file) {
@@ -160,17 +198,37 @@
       },
       closeEdit(){
   			this.is_edit = false;
+  			this.com_info = JSON.parse(JSON.stringify(this.user));
   			//this.getInfo();
   		},
   		updateDetails(){
-  			updateDetails(this.com_info).then(res => {
-  				this.is_edit = false;
-  				this.$store.dispatch('GetInfo', {id: this.id, type:this.type}).then(res => {
-            this.com_info = res.userinfo;
-          }).catch(() => {
-            this.loading = false;
-          });
+  			let query = JSON.parse(JSON.stringify(this.com_info));
+  			query.referPic = JSON.stringify(this.com_info.referPic);
+  			delete query.state;
+  			updateDetails(query).then(res => {
+  				if(res.code != -1 ){
+	  				this.is_edit = false;
+	  				location.reload()
+	  				this.$store.dispatch('GetInfo', {id: this.id, type:this.type}).then(res => {
+	            this.com_info = res.userinfo;
+	      			this.com_info.referPic = this.com_info.referPic == '' ? [] : JSON.parse(this.com_info.referPic);
+	          }).catch(() => {
+	            this.loading = false;
+	          });
+	        }
   			})
+  		},
+  		handleSuccess(res, file, fileList){
+  			this.fileList = [];
+  			console.log(res, file, fileList);
+  			this.com_info.referPic.push({
+  				name: res.name,
+  				pic: res.url,
+  				text: ''
+  			})
+  		},
+  		delRefer(index){
+  			this.com_info.referPic.splice(index,1);
   		}
   	}
   }
@@ -236,6 +294,10 @@
 			}
 			
 		}
+	}
+	.referpic{
+		.img{width: 100%;height: 210px;}
+		.del{position: absolute;top:5px;right: 5px;color:red;font-size: 20px;cursor: pointer}
 	}
 	.fixed-edit{
 		position: fixed;

@@ -14,3 +14,12 @@ export function schoolList(data) {
     data
   });
 }
+// 获取短信验证码
+export function getCode(data) {
+  return fetch({
+    url: '/sendmsg',
+    method: 'get',
+    params: data
+  });
+}
+

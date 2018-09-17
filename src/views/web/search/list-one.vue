@@ -11,7 +11,7 @@
 										{{item.jobName}}
 									</router-link>
 								</h2>
-								<font class="time">[{{item.releaseTime}}]</font>
+								<font class="time">{{item.releaseTime.slice(0,16)}}</font>
 							</div>
 							<span class="pull-right salary">{{item.income}}</span>
 						</div>
@@ -26,7 +26,7 @@
 		  		</div>
 		  		<div class="con-info clearfix">
 		  			<router-link :to="{path:'/search/com-details', query:{id:item.companyId}}">
-		  				<img class="logo pull-left" :src="item.company.pic">
+		  				<img class="logo pull-left" :src="item.company.pic || '/static/logo.png'">
 		  			</router-link>
 		  			<div class="info-right">
 		  				<router-link :to="{path:'/search/com-details', query:{id:item.companyId}}">

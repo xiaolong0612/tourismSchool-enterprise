@@ -33,6 +33,7 @@ export function getDetails(data) {
     data
   });
 }
+
 export function searchDetails(data) {
   return fetch({
     url: '/admin/details/list-details',

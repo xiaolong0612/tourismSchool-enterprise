@@ -39,3 +39,21 @@ export function getComList(data) {
     data
   });
 }
+
+// 企业审核
+export function companyReview(data) {
+  return fetch({
+    url: '/admin/company/list-company-review',
+    method: 'post',
+    data
+  });
+}
+
+// 审批
+export function examination(data) {
+  return fetch({
+    url: '/admin/company/get-pass-or-refuse',
+    method: 'post',
+    data
+  });
+}

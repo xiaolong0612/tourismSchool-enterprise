@@ -15,22 +15,26 @@
 			    :name="tab.name">
 			    <div v-loading="loading">
 				  	<el-row :gutter="20">
-						  <el-col :span="12" v-for='item in list' :key="item.deliveryTime">
+						  <el-col :span="12" v-for='item in list' :key="item.id">
 						  	<div class="box mb15">
 						  		<div class="box_top">
 							  		<h2 class="position_name">
-							  			<router-link :to="{path: '/search/com-details', query:{id: item.jobId}}">
+							  			<router-link :to="{path: '/search/list/details', query:{id: item.jobId}}">
 							  				{{item.jobName}}
-							  				<span>15k-30k</span>
+							  				<span>{{item.income}}</span>
 							  			</router-link>
 							  		</h2>
 							  		<div class="com_info">
-							  			<router-link to="/">
+							  			<router-link :to="{path:'/search/com-details', query:{id:item.companyId}}">
 								  			{{item.companyName}}
 								  			<font>[厦门市]</font>
 							  			</router-link>
 							  		</div>
 							  		<div class="resume clearfix">
+
+
+									  	<el-button v-if="typeof item.interviewEvaluate == 'undefined' && (item.resumeState == 3 || item.resumeState == 4)" class="pull-right ml5" size="mini" type="primary" @click="getEvaluateEvent(item)">评价</el-button>
+
 							  			<el-popover
 											  placement="left-end"
 											  width="540"
@@ -45,7 +49,7 @@
 												    :closable="false">
 												  </el-alert>
 								          <el-form
-								          	v-if="item.resumeState == 1 && item.interviewLinker != ''"
+								          	v-if="item.resumeState == 2 && item.interviewLinker != ''"
 								          	label-position="left"
 								          	label-width="70px"
 								          	inline
@@ -54,11 +58,6 @@
 								          		<el-col :span="12">
 											          <el-form-item label="联系人">
 											            <span>{{item.interviewLinker}}</span>
-											          </el-form-item>
-											        </el-col>
-								          		<el-col :span="12">
-											          <el-form-item label="面试时间">
-											            <span>{{item.interviewTime}}</span>
 											          </el-form-item>
 											        </el-col>
 								          		<el-col :span="12">
@@ -76,7 +75,12 @@
 											            <span>{{item.itemName}}</span>
 											          </el-form-item>
 											        </el-col>
-								          		<el-col :span="12">
+								          		<el-col :span="24">
+											          <el-form-item label="面试时间">
+											            <span>{{item.interviewTime}}</span>
+											          </el-form-item>
+											        </el-col>
+								          		<el-col :span="24">
 											          <el-form-item label="备注">
 											            <span>{{item.interviewRemark}}</span>
 											          </el-form-item>
@@ -85,7 +89,7 @@
 									        </el-form>
 
 								          <el-form
-								          	v-if="(item.resumeState == 2 || item.resumeState == 3) && typeof item.interviewEvaluate != 'undefined'"
+								          	v-if="(item.resumeState == 4 || item.resumeState == 3) && typeof item.interviewEvaluate != 'undefined'"
 								          	label-position="left"
 								          	inline
 								          	class="demo-table-expand"
@@ -118,9 +122,11 @@
 									        </el-form>
 
 								        </div>
-									  		<el-button  slot="reference" v-if="item.resumeState != 0 && typeof item.interviewEvaluate != 'undefined'" class="pull-right ml5" size="mini" :type="item.stateStr.type">{{item.stateStr.text}}</el-button>
 
-									  		<el-button  slot="reference" v-if="typeof item.interviewEvaluate == 'undefined' && (item.resumeState == 2 || item.resumeState == 3)" class="pull-right ml5" size="mini" :type="item.stateStr.type" @click="getEvaluateEvent(item)">{{item.stateStr.text}}</el-button>
+									  		<el-button slot="reference" v-if="item.resumeState == 1 || item.resumeState == 2" class="pull-right ml5" size="mini" :type="item.stateStr.type">{{item.stateStr.text}}</el-button>
+
+									  		<el-button slot="reference" v-if="item.resumeState == 3 || item.resumeState == 4" class="pull-right ml5" size="mini" :type="item.stateStr.type">{{item.stateStr.text}}</el-button>
+
 									    </el-popover>
 											
 											<el-tooltip v-if="item.resumeState == 0" effect="dark" content="等待企业反馈" placement="top-start">
@@ -191,14 +197,14 @@
           title: '投递成功',
           name: '0',
         }, {
-          title: '待面试',
-          name: '1',
-        }, {
-          title: '面试成功',
+          title: '企业邀请',
           name: '2',
         }, {
-          title: '无结果',
+          title: '面试通过',
           name: '3',
+        }, {
+          title: '无结果',
+          name: '4',
         }],
 				listQuery: {
 					pageNo: 1,
@@ -221,14 +227,14 @@
 			}
 		},
 		mounted() {
-			this.form.studentId = this.id,
-			this.getList(this.active_list.tabs);
+			this.form.studentId = this.id;
+			this.getList('5');
 		},
 		methods: {
 			getList(val) {
 				this.loading = true;
 				val = val.name;
-				val = val > 3 ? '' : val;
+				val = val > 4 ? '' : val;
 				this.listQuery.resumeState = val;
 				this.listQuery.studentId = this.id;
 				deliveryList(this.listQuery).then(res => {
@@ -247,12 +253,12 @@
 			gerAlertType(type) {
 				switch (type) {
 					case 0:
-						return {
+					return {
 							type: 'text',
 							text: '等待通知'
 						}
 						break;
-					case 1:
+					case 2:
 						return {
 							type: 'primary',
 							text: '待参加面试',
@@ -260,20 +266,21 @@
 							alert_text: '提示:  你的简历已经通过初筛，企业可能会在近期与你沟通，请保持联系方式畅通'
 						}
 						break;
-					case 2:
+					case 3:
 						return {
 							type: 'success',
-							text: '通过',
+							text: '面试成功',
 							alert:'success',
 							alert_text: '即将开始工作，请做好工作前的准备'
 						}
 						break;
-					case 3:
+					case 4:
 						return {
 							type: 'danger',
 							text: '无结果',
 							alert: 'warning',
 							alert_text: '非常荣幸收到您的简历，经过我们评估，认为您与该职位不太合适，无法进入面试阶段'
+
 						}
 						break;
 				}
@@ -287,7 +294,11 @@
       	this.evaluateEvent = item;
       },
       submitEvaluate(){
-      	this.form.jobId = this.evaluateEvent.jobId,
+      	this.form.jobId = this.evaluateEvent.jobId;
+      	if(this.form.evaluateContent == ''){
+					this.$message.error('评价内容不能为空！！！');
+					return;
+      	}
       	editEvaluate(this.form).then(res => {
       		if(res.success) this.$message.success('评价成功');
       		else this.$message.error('评价失败，请刷新重试！！！');

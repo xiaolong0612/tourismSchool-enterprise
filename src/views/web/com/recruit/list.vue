@@ -14,12 +14,13 @@
 				    :data="tableData"
 				    stripe
 				    style="width: 100%"
-				    class="table_list">
+				    class="table_list"
+				    @selection-change="selectChange">
 
-				    <!-- <el-table-column
+				    <el-table-column
 				      type="selection"
 				      width="55">
-				    </el-table-column> -->
+				    </el-table-column>
 
 				    <el-table-column
 				      prop="jobName"
@@ -28,17 +29,29 @@
 
 				    <el-table-column
 				      prop="recruitNumber"
-				      label="人数">
+				      label="招聘人数"
+				      align="center">
 				    </el-table-column>
 
 				    <el-table-column
 				      prop="workExperience"
-				      label="经验">
+				      label="经验(年)">
 				    </el-table-column>
 
 				    <el-table-column
 				      prop="income"
 				      label="待遇">
+				    </el-table-column>
+
+						
+				      <!-- :filters="[{ text: '兼职', value: 0 }, { text: '全职', value: 1 }, { text: '实习', value: 2 }]"
+      				:filter-method="filterJobType" -->
+				    <el-table-column
+				      prop="jobType"
+				      label="工作类型">
+				      <template slot-scope="scope">
+				      	{{jobType[scope.row.jobType]}}
+				      </template>
 				    </el-table-column>
 
 				    <el-table-column
@@ -52,20 +65,31 @@
 				    </el-table-column>
 
 				    <el-table-column
-				      prop="address"
+				      prop="workAddress"
 				      label="地址">
+				      <template slot-scope="scope">
+								{{scope.row.workCity}}/{{scope.row.workAddress}}
+				      </template>
+				    </el-table-column>
+
+				    <el-table-column
+				      prop="reviewCount"
+				      label="浏览次数"
+				      align="center">
 				    </el-table-column>
 
 				    <el-table-column
 				      label="操作"
-				      align="center">
+				      align="center"
+				      width="230px">
 				      <template slot-scope="scope">
 				      	<div class="edit_wrap">
 									<router-link :to="{path: '/com/recruit/release', query:{id:scope.row.id}}">
 				      			<el-button class="mr10" type="primary" size="small">编辑</el-button>
 									</router-link>
-					      	<!-- <el-button class="mr10" v-if="scope.row.use" type="success" size="small" @click="handlerUse(scope)">启用</el-button>
-					      	<el-button class="mr10" v-if="!scope.row.use" type="warning" size="small" @click="handlerDisable(scope)">停用</el-button> -->
+					      	<el-button class="mr10" v-if="scope.row.isUse == '0'" type="success" size="small" @click="handlerUse(scope.row, 1)" :loading="scope.row.loading_btn">启用</el-button>
+					      	<el-button class="mr10" v-if="scope.row.isUse 
+					      	!= '0'" type="warning" size="small" @click="handlerUse(scope.row, 0)" :loading="scope.row.loading_btn">停用</el-button>
 									<el-popover trigger="click" placement="top">
 
 					          <p>确定删除该条招聘信息么</p>
@@ -92,10 +116,10 @@
 				</el-tab-pane>
 			</el-tabs>
 			<div class="all_edit">
-				<!-- <el-button type="danger" size="small">删除</el-button>
+				<!-- <el-button type="danger" size="small">删除</el-button> -->
 
-				<el-button type="success" size="small" @click="handlerUse()">启用</el-button>
-				<el-button type="warning" size="small" @click="handlerDisable()">停用</el-button> -->
+				<el-button type="success" size="small" @click="handlerSomeUse(1)">启用</el-button>
+				<el-button type="warning" size="small" @click="handlerSomeUse(0)">停用</el-button>
 
     		<!-- <el-select class="ml10" v-model="recruit_type.select" placeholder="请选择">
 			    <el-option
@@ -112,7 +136,7 @@
 
 <script>
 	import { mapGetters } from 'vuex';
-  import { searchJob, delJob } from '@/api/com/recruit';
+  import { searchJob, delJob, isUse } from '@/api/com/recruit';
   export default {
   	computed: {
 	    ...mapGetters([
@@ -125,6 +149,7 @@
       	active_list: {
         	resume_list: 'recruit',
         },
+        jobType: ['兼职', '全职', '实习'],
         total: 0,
         tableLoading: true,
         recruit_type: {
@@ -140,56 +165,21 @@
 		        },
         	]
         },
-        tableData: [{
-          jobName: '导游',
-          recruitNumber: 2,
-          workExperience: '1年',
-          income: '2000-5000',
-          linkName: '王小虎',
-          linkPhone: '18636787878',
-          address: '上海市普陀区金沙江路 1518 弄',
-          use: true
-        }, {
-          jobName: '导游',
-          recruitNumber: 12,
-          workExperience: '1年',
-          income: '2000-5000',
-          linkPhone: '18636787878',
-          linkName: '王小虎',
-          address: '上海市普陀区金沙江路 1517 弄',
-          use: false
-        }, {
-          jobName: '导游',
-          recruitNumber: 1,
-          workExperience: '1年',
-          income: '2000-5000',
-          linkPhone: '18636787878',
-          linkName: '王小虎',
-          address: '上海市普陀区金沙江路 1519 弄',
-          use: false
-        }, {
-          jobName: '导游',
-          recruitNumber: 2,
-          workExperience: '1年',
-          income: '2000-5000',
-          linkPhone: '18636787878',
-          linkName: '王小虎',
-          address: '上海市普陀区金沙江路 1516 弄',
-          use: true
-        }],
-
+        tableData: [],
+        selectList: [],
         listQuery: {
         	pageNo: 1,
         	pageSize: 30,
         	companyId: '',
         	workCity: '',
-        	jobType: 1,
+        	jobType: '',
         	jobName: ''
         }
       }
     },
     // 调用方法的函数，，方法必须以this.方法名的方式调用
     mounted(){
+    	this.setDefault();
 			this.getList();
     },
     // 写方法的地方
@@ -201,29 +191,36 @@
     		this.tableLoading = true;
     		// 调用接口,参数必须以 this.参数名 才能调用
     		searchJob(this.listQuery).then(res => {
-    			console.log(res)
+    			for(let i=0; i<res.list.length; i++){
+	    			this.$set(res.list[i], 'loading_btn', false);
+	    		}	
+
     			this.tableData = res.list;
 
     			this.total = res.total;
     			this.tableLoading = false;
+    			this.selectList = [];
     		})
     	},
     	delRecryit(id){
     		
     	},
-    	handlerUse(scope){
-    		scope.row.use = false;
-    		this.$message({
-          message: '启用成功',
-          type: 'success'
-        });
-    	},
-    	handlerDisable(scope){
-    		scope.row.use = true;
-    		this.$message({
-          message: '关闭使用',
-          type: 'warning'
-        });
+    	handlerUse(row, state){
+    		row.loading_btn = true;
+    		isUse({ids: row.id, isUse: state}).then(rs => {
+    			if (rs.code != -1) {
+    				switch(state){
+    					case 0:
+    						this.$message.success('该岗位已关闭');
+    						break;
+    					case 1:
+    						this.$message.success('该岗位启用成功');
+    						break;
+    				};
+    				row.loading_btn = false;
+    				this.getList();
+    			}
+    		})
     	},
     	handlerDel(id){
     		delJob({ id: id }).then(res => {
@@ -240,7 +237,34 @@
     	handleCurrentChange(val){
     		this.listQuery.pageNo = val;
     		this.getList();
-    	}
+    	},
+    	filterJobType(value, row) {
+        return row.tag === value;
+      },
+      selectChange(selection){
+      	for(let i in selection){
+      		this.selectList[i] = selection[i].id;
+      	}
+      },
+      handlerSomeUse(state){
+      	if(this.selectList.length == 0){
+      		this.$message.error('最少选择一个岗位');
+      		return false;
+      	}
+      	isUse({ids: this.selectList.join(','), isUse: state}).then(rs => {
+    			if (rs.code != -1) {
+    				switch(state){
+    					case 0:
+    						this.$message.success('选中岗位已关闭');
+    						break;
+    					case 1:
+    						this.$message.success('选中岗位启用成功');
+    						break;
+    				};
+    				this.getList();
+    			}
+    		})
+      }
     }
   }
 </script>

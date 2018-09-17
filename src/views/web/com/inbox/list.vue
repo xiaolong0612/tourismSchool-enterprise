@@ -61,7 +61,7 @@
 		  </el-tabs>
 
 			<div class="resume_type">
-    		<el-select v-model="listQuery.resumeState" placeholder="请选择" @change="getList()">
+    		<el-select v-model="resumeState" placeholder="请选择" @change="getList()">
 			    <el-option
 			      v-for="item in resume_type.list"
 			      :key="item.value"
@@ -90,6 +90,7 @@
 				active_list: {
         	resume_list: 'resume',
         },
+        resumeState: '',
         resume_type: {
         	list: [
         		{
@@ -101,16 +102,20 @@
 		          label: '未处理'
 		        },
         		{
-        			value: '1',
-		          label: '已处理'
-		        },
-        		{
         			value: '2',
-		          label: '面试成功'
+		          label: '被邀面试'
 		        },
         		{
         			value: '3',
+		          label: '面试成功'
+		        },
+        		{
+        			value: '4',
 		          label: '无结果'
+		        },
+        		{
+        			value: '5',
+		          label: '平台推荐'
 		        },
         	]
         },
@@ -133,7 +138,17 @@
 			setDefault(){
 				this.listQuery.companyId = this.id;
 			},
-    	getList() {
+    	getList(type) {
+    		this.listQuery.resumeState = this.resumeState;
+    		if(type != 'page'){
+					this.listQuery.pageNo = 1;
+				}
+    		if(this.listQuery.resumeState == 5){
+    			this.listQuery.resumeState = '';
+    			this.listQuery.state= 2
+    		}else{
+    			this.listQuery.state= ''
+    		}
     		getInbox(this.listQuery).then(res => {
     			this.list = res.list;
     			this.total = res.total;
@@ -145,7 +160,7 @@
     	},
     	handleCurrentChange(val){
     		this.listQuery.pageNo = val;
-    		this.getList();
+    		this.getList('page');
     	}
     }
 	}

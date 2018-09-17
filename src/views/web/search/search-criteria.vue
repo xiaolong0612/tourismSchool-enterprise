@@ -30,7 +30,8 @@
 				</el-row>
 				<el-row>
 					<el-col :span="12" :offset="2">
-					    <span class="c-white">热门搜索：</span><font class="c-blue mr15" style="cursor:pointer" v-for="item in hot_search" @click="hotSearch(item)" :key="item">{{item}}</font>
+					    <!-- <span class="c-white">热门搜索：</span> -->
+					    <font class="c-blue mr15" style="cursor:pointer" v-for="item in hot_search" @click="hotSearch(item)" :key="item">{{item}}</font>
 					</el-col>
 				</el-row>
 			</el-form>
@@ -114,15 +115,13 @@
 				}else{
 					this.getStudentList();
 				}
-				
 			}
 		},
 		mounted() {
 			this.formSearch.workCity = this.$route.query.workCity;
 			if(typeof this.$route.query.jobName != 'undefined') this.formSearch.jobName = this.$route.query.jobName;
 			if(typeof this.$route.query.workCity != 'undefined') this.formSearch.workCity = this.$route.query.workCity;
-			console.log(this.id)
-			if(this.id == undefined|| this.id == ''){
+			if(this.type == '' || this.type == 2){
 				this.getList();
 			}else{
 				this.getStudentList();
@@ -130,6 +129,7 @@
 		},
 		methods: {
 			getList(){
+				console.log('搜索岗位')
 				this.loading = true;
 				this.formSearch.workCity = getCity(this.formSearch.workCity);
 				searchJob(this.formSearch).then(res => {
@@ -142,6 +142,7 @@
 				this.studentSearch.id = this.id;
 				this.studentSearch.expectJob = this.formSearch.jobName;
 				this.studentSearch.expectAddress = getCity(this.formSearch.workCity);
+				console.log('搜索简历')
 				searchResumeList(this.studentSearch).then(res => {
 					this.$emit('search', res);
           this.loading = false;

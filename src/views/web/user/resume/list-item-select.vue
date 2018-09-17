@@ -9,7 +9,7 @@
               <div class="info">
                 <h2>
                   {{item.expectJob}}
-                  <span>({{item.expectIncome}})</span>
+                  <span v-if="item.expectIncome != ''">({{item.expectIncome}})</span>
                 </h2>
                 <font class="state">{{item.working}}</font>
                 <p>
@@ -71,7 +71,7 @@
     methods: {
       getlist(){
         let query={
-          studentId: 1
+          studentId: this.id
         }
         searchResume(query).then(res => {
           this.list = res.list;

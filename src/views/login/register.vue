@@ -52,7 +52,7 @@
 					          
 											<el-col :span="12">
 												<el-form-item>
-													<MDinput name="name" v-model="com.webUrl" required :maxlength="20">官网</MDinput>
+													<MDinput name="name" v-model="com.webUrl" required :maxlength="20" placeholder="例如：http://www.xxx.com">官网</MDinput>
 						        		</el-form-item>
 						          </el-col>
 						        
@@ -64,15 +64,28 @@
 											</el-col>
 					        	
 					          
-											<el-col :span="12">
+											<el-col :span="24">
 												<el-form-item prop="linkPhone">
-													<MDinput name="linkPhone" v-model="com.linkPhone" required :maxlength="20">联系方式</MDinput>
+													<el-row>
+													  <el-col :span="16">
+													  	<MDinput name="linkPhone" v-model="com.linkPhone" required :maxlength="20">手机号码</MDinput>
+													  </el-col>
+													  <el-col :span="8">
+													  	<el-button @click.prevent="getCode" style="margin-top:30px" class="pull-right" :disabled="codeTimeBtn" size="small">{{codeText}}</el-button>
+													  </el-col>
+													</el-row>
 												</el-form-item>
 											</el-col>
 
-											<el-col :span="24">
+											<el-col :span="12">
+												<el-form-item prop="code">
+													<MDinput name="code" v-model="com.code" required :maxlength="20">验证码</MDinput>
+												</el-form-item>
+											</el-col>
+
+											<el-col :span="12">
 												<el-form-item>
-													<el-button class="pull-right" type="primary" size="small" @click="comSbumit">&nbsp;&nbsp;提交&nbsp;&nbsp;</el-button>
+													<el-button class="pull-right" type="primary" size="small" @click="comSbumit" style="margin-top:30px">&nbsp;&nbsp;提交&nbsp;&nbsp;</el-button>
 												</el-form-item>
 											</el-col>
 			            	</el-row>
@@ -132,7 +145,19 @@
 										</el-col>
 										<el-col :span="24">
 											<el-form-item prop="linkPhone">
-												<MDinput name="linkPhone" v-model="user.linkPhone" required :maxlength="20">联系方式</MDinput>
+												<el-row>
+												  <el-col :span="18">
+												  	<MDinput name="linkPhone" v-model="user.linkPhone" required :maxlength="20">手机号码</MDinput>
+												  </el-col>
+												  <el-col :span="6">
+												  	<el-button @click.prevent="getCode" style="margin-top:28px" class="pull-right" :disabled="codeTimeBtn" size="small">{{codeText}}</el-button>
+												  </el-col>
+												</el-row>
+											</el-form-item>
+										</el-col>
+										<el-col :span="24">
+											<el-form-item prop="code">
+												 <MDinput name="code" v-model="user.code" required :maxlength="20" >验证码</MDinput>
 											</el-form-item>
 										</el-col>
 										<el-col :span="24">
@@ -148,7 +173,7 @@
 							<div class="login-type-box t-center">
 								<div v-for="item in register" :class="{active: item.active}" @click="changeRegisterType(item)"><span>{{item.name}}</span></div>
 
-								<div style="line-height:50px"><router-link class="c-blue" to="/">已有账号</router-link></div>
+								<div style="line-height:50px"><router-link style="color:#fff" to="/?login=true">已有账号</router-link></div>
 							</div>
 						</el-col>
 					</el-row>
@@ -163,11 +188,38 @@
 <script>
 	import ImageCropper from '@/components/ImageCropper';
 	import MDinput from '@/components/MDinput';
+  import { getCode } from '@/api/form';
 	import { registerCom, registerStudent } from '@/api/login';
+	import { isAccount,validatPhone } from '@/utils/validate';
+	import { setType } from '@/utils/auth';
 	export default {
 		components: { MDinput, ImageCropper },
 		data() {
+			var checkAccount = (rule, value, callback) => {
+				if (!value) {
+          return callback(new Error('账号不能为空'));
+        }
+				if (!isAccount(value)) {
+          callback(new Error('账号只能由字母和数字，下划线组成，且开头的只能是下划线和字母'));
+        } else {
+          callback();
+        }
+      };
+      var checkPhone = (rule, value, callback) => {
+				if (!value) {
+          return callback(new Error('手机号不能为空'));
+        }
+				if (!validatPhone(value)) {
+          callback(new Error('请输入正确的手机号码'));
+        } else {
+          callback();
+        }
+      };
   		return {
+  			codeText: '获取短信验证码',
+  			countdown: 60,
+  			codeTimeBtn: false,
+  			code_time: null,
   			register: [
   				{name: '我要招聘', active: true},
   				{name: '我要应聘', active: false}
@@ -179,6 +231,11 @@
   				second: false,
   				third: false
   			},
+  			codeQuery: {
+  				phone: '',
+  				type: 0
+  			},
+  			select_user: '',
   			com: {
   				account: '',
   				password: '',
@@ -190,17 +247,19 @@
   				linkName: '',
   				linkPhone: '',
   				introduce: '',
-  				pic:''
+  				pic:'',
+  				code: ''
   			},
   			user: {
   				account: '',
   				password: '',
   				name: '',
-  				linkPhone: ''
+  				linkPhone: '',
+  				code: ''
   			},
   			comRules: {
   				account: [
-  					{ required: true, message: '请填写账号', trigger: 'blur' }
+  					{ required: true, trigger: 'blur', validator: checkAccount }
   				],
   				password: [
   					{ required: true, message: '请填写密码', trigger: 'blur' }
@@ -209,12 +268,12 @@
   					{ required: true, message: '请填写联系人', trigger: 'blur' }
   				],
   				linkPhone: [
-  					{ required: true, message: '请填写联系方式', trigger: 'blur' }
+  					{ required: true, trigger: 'blur', validator: checkPhone }
   				]
   			},
   			userRules: {
   				account: [
-  					{ required: true, message: '请填写账号', trigger: 'blur' }
+  					{ required: true, trigger: 'blur', validator: checkAccount }
   				],
   				password: [
   					{ required: true, message: '请填写密码', trigger: 'blur' }
@@ -223,7 +282,7 @@
   					{ required: true, message: '请填写姓名', trigger: 'blur' }
   				],
   				linkPhone: [
-  					{ required: true, message: '请填写联系方式', trigger: 'blur' }
+  					{ required: true, trigger: 'blur', validator: checkPhone }
   				]
   			}
   		}
@@ -232,9 +291,22 @@
   	},
   	methods: {
   		changeRegisterType(item){
+  			this.codeText = '获取短信验证码';
+  			this.countdown = 60;
+  			this.codeTimeBtn = false;
+  			clearInterval(this.code_time);
   			for(let i in this.register){
-  				if(this.register[i].name == item.name) this.register[i].active = true;
-  				else this.register[i].active = false;
+  				if(this.register[i].name == item.name){
+  					this.register[i].active = true;
+  					if(i == 0){
+  						this.select_user = 3
+  					}else{
+  						this.select_user = 2
+  					}
+  				}else{
+  					this.register[i].active = false;
+  				}
+
   			}
   		},
   		comStep(step){
@@ -242,19 +314,17 @@
   				if(index == step) this.step[index] = true;
   				else this.step[index] = false;
   			}
-  			console.log(this.step)
   		},
   		comSbumit(){
 		  	this.$refs.com.validate(valid => {
           if (valid) {
             this.loading = true;
-            setType(this.radio);
-            this.loginForm.type = this.radio;
             registerCom(this.com).then(res => {
 		  				if(typeof res != 'undefined') {
 		  					this.$message.success('注册成功, 即将前往首页');
+		  					const _this = _this = this;
 		  					setTimeout(function(){
-		  						this.$router.push({ path: '/' });
+		  						_this.$router.push({ path: '/' });
 		  					},2000)
 		  				}
 		  			})
@@ -268,13 +338,12 @@
   			this.$refs.user.validate(valid => {
           if (valid) {
             this.loading = true;
-            setType(this.radio);
-            this.loginForm.type = this.radio;
             registerStudent(this.user).then(res => {
-		  				if(typeof res != 'undefined') {
+		  				if(typeof res != 'undefined' && res.code != -1) {
 		  					this.$message.success('注册成功, 即将前往首页');
+		  					const _this = _this = this;
 		  					setTimeout(function(){
-		  						this.$router.push({ path: '/' });
+		  						_this.$router.push({ path: '/' });
 		  					},2000)
 		  				}
 		  			})
@@ -291,7 +360,37 @@
 	    },
 	    close() {
 	      this.imagecropperShow = false
-	    }
+	    },
+	    getCode(){
+    		if(this.select_user == 2){
+    			this.codeQuery.phone = this.user.linkPhone
+    		}else{
+    			this.codeQuery.phone = this.com.linkPhone
+    		}
+    		if(this.codeQuery.phone == ''){
+    			this.$message.error('手机号码不能为空哦！');
+    		}else{
+	    		getCode(this.codeQuery).then( rs => {
+	    			if(rs.code != -1){
+      				this.codeTimeBtn = true;
+    					this.downGetCodeTime();
+	    			}
+	    		})
+	    	}
+	    },
+	    downGetCodeTime(){
+	    	let _this = this;
+	    	this.code_time = setInterval(function(){
+	    		_this.codeText = _this.countdown +'s后重新获取';
+	    		_this.countdown--;
+	    		if(_this.countdown <= 0){
+	    			_this.codeTimeBtn = false;
+	    			_this.countdown = 60;
+	    			_this.codeText = '获取验证码';
+	    			clearInterval(_this.code_time);
+	    		}
+	    	},1000)
+	    },
   	}
   }
 </script>
@@ -321,10 +420,10 @@
 			padding-top: 50px;
 			box-sizing: border-box;
 			background: url(/static/banner/slider2-2377c67b76.jpg) center no-repeat / cover; 
-			>div{line-height: 50px;background-color: rgba(255,255,255,.4);margin-top: 30px}
+			>div{line-height: 50px;margin-top: 30px;background-color: transparent;}
 			span{cursor: pointer}
 			.active{
-				background-color: transparent;
+				background-color: rgba(255,255,255,.4);
 				span{color: #fff;}
 			}
 		}

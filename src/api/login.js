@@ -37,3 +37,11 @@ export function registerStudent(data){
     data
   });
 }
+
+export function modPassword(data){
+  return fetch({
+    url: '/admin/company/mod-password',
+    method: 'post',
+    data
+  });
+}

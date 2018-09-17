@@ -79,11 +79,22 @@ export function jobEvaluate(data) {
     data
   });
 }
-
-export function countBrowseRecord(data) {
+// 是否启用
+export function isUse(data) {
   return fetch({
-    url: '/admin/job-browse-record/count-browse-record',
+    url: '/admin/job/mod-job-is-use',
     method: 'post',
     data
   });
 }
+
+// 增加浏览岗位浏览数
+export function jobBrowseRecord(data) {
+  return fetch({
+    url: '/admin/job-browse-record/new-jobBrowseRecord',
+    method: 'post',
+    data
+  });
+}
+
+

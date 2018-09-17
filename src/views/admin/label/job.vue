@@ -121,7 +121,12 @@
     		})
     	},
     	onAdd(formName){
-
+        for(var i in this.tags){
+          if(this.tags[i].name == this.form.name){
+            this.$message.error('不允许重复添加哦！');
+            return false;
+          }
+        }
     		this.$refs[formName].validate((valid) => {
           if (valid) {
             newLabel(this.form).then(res => {

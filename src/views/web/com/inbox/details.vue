@@ -73,7 +73,7 @@
 					</el-row>
 					<el-row>
 					  <el-col :span="24">
-					    <el-form-item label="个性标签:" >
+					    <el-form-item label="应聘标签:" >
 								<el-tag 
 									v-for="tag in user_info.labelName"
 									:key="tag" class="mr5">{{tag}}</el-tag>
@@ -144,7 +144,7 @@
 				</div>
 				<el-row>
 				  <el-col :span="8" v-for="(o, index) in user_info.certificate" :key="index">
-				    <el-card class="mb40" :style="'background-image:url('+ o.url +')'">
+				    <el-card class="mb40" :style="'background-image:url('+ o.src +')'">
 					      <div style="padding-top:100%;overflow:hidden;">
 					        <div class="bg-color" style="margin-top:-100%;">
 					        	<div class="honor_text">
@@ -161,16 +161,20 @@
 
 		<div class="fixed-edit" v-if="is_com_look">
 			<ul>
-				<transition name="el-zoom-in-center" v-if="resumeState == 2 || resumeState == 1">
+				<!-- <transition name="el-zoom-in-center" v-if="resumeState == 2 || resumeState == 1">
 					<li style="background:#67c23a">已<br>邀<br>请</li>
+				</transition> -->
+				<transition name="el-zoom-in-center" v-if="resumeState == 0">
+					<li style="background:#67c23a" @click="is_agree_dialog = true">同意<br>入职</li>
 				</transition>
-				<transition name="el-zoom-in-center" v-if="resumeState == 3">
+				
+				<transition name="el-zoom-in-center" v-if="resumeState == 4">
 					<li class="bg-danger">已<br>拒<br>绝</li>
 				</transition>
-				<transition name="el-zoom-in-center" v-if="resumeState == 0">
-					<li style="background:#67c23a" @click="is_agree_dialog = true">同<br>意</li>
+				<transition name="el-zoom-in-center" v-if="resumeState == 2">
+					<li style="background:#67c23a" @click="is_agree_dialog = true">同<br>意<br>入职</li>
 				</transition>
-				<transition name="el-zoom-in-center" v-if="resumeState == 0">
+				<transition name="el-zoom-in-center" v-if="resumeState == 0 || resumeState == 2">
 					<li class="bg-danger" @click="is_refuse_dialog = true">拒<br>绝</li>
 				</transition>
 			</ul>
@@ -213,7 +217,7 @@
 		</el-dialog>
 
 		<el-dialog
-		  title="邀请信息"
+		  title="拒绝原因"
 		  :visible.sync="is_refuse_dialog"
 		  width="30%">
 		  <el-form :model="refuseForm" label-width="100">
@@ -269,6 +273,7 @@
   			},
   			agreeForm: {
   				id: '',
+  				resumeState: '2',
   				interviewLinker: '',
   				interviewTel: '',
 					interviewTime: '',
@@ -312,6 +317,7 @@
   		},
   		updateInbox(){
   			this.is_agree_dialog = false;
+  			this.refuseForm.resumeState = 2;
   			updateInbox(this.agreeForm).then(res => {
   				console.log(res)
   				this.resumeState = 2;
@@ -320,9 +326,7 @@
   		refuseInbox(){
   			this.is_refuse_dialog = false;
   			refuseInbox(this.refuseForm).then(res => {
-  				console.log(res)
   				this.resumeState = 3;
-  				console.log(this.$route.query.resumeState)
   			})
   		}
   	}

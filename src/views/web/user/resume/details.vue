@@ -3,8 +3,8 @@
 		<div class="user-bg">
 			<div class="breadcrumb-wrap container">
 				<el-breadcrumb separator="/">
-				  <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-				  <el-breadcrumb-item :to="{ path: '/user/resume/list' }">简历列表</el-breadcrumb-item>
+				  <el-breadcrumb-item :to="{ path: '/' }"><span style="color: #409EFF">首页</span></el-breadcrumb-item>
+				  <el-breadcrumb-item :to="{ path: '/user/resume/list' }"><span style="color: #409EFF">简历列表</span></el-breadcrumb-item>
 				  <el-breadcrumb-item>简历详情</el-breadcrumb-item>
 				</el-breadcrumb>
 			</div>
@@ -22,6 +22,7 @@
 		    						v-if="is_edit"
 									  class="avatar-uploader"
 									  :action="gpath.user_hp"
+							  		accept=".jpg,.png, .gif"
 									  :show-file-list="false"
 									  :on-success="handleAvatarSuccess"
 									  :before-upload="beforeAvatarUpload">
@@ -41,22 +42,32 @@
 	            </el-form-item>
 	          </el-col>
 						<!-- 基本信息 -->
-						<el-col :span="12">
+						<el-col :span="8">
               <el-form-item label="联系方式:" >
                 	<span v-if="!is_edit">{{user_info.linkPhone}}</span>
                 	<el-input v-if="is_edit" v-model="user_info.linkPhone"></el-input>
               </el-form-item>
             </el-col>
-            <el-col :span="12">
+            <el-col :span="8">
           		<el-form-item label="年龄:" >
-              	<span>{{age}}</span>
+            		<span v-if="!is_edit">{{user_info.age}}</span>
+              	<el-input v-if="is_edit" v-model="user_info.age"></el-input>
+          		</el-form-item>
+          	</el-col>
+            <el-col :span="8">
+          		<el-form-item label="性别:" >
+            		<span v-if="!is_edit">{{user_info.sexStr}}</span>
+              	<el-select v-if="is_edit" v-model="user_info.sex" placeholder="请选择">
+							    <el-option label="男" :value="0"></el-option>
+							    <el-option label="女" :value="1"></el-option>
+							  </el-select>
           		</el-form-item>
           	</el-col>
           </el-row>
           <el-row>
 					  <el-col :span="6">
             	<el-form-item label="在职状态:" >
-              	<a v-if="!is_edit" href="#">{{user_info.working}}</a>
+              	<span v-if="!is_edit">{{user_info.working}}</span>
               	<el-select v-if="is_edit" v-model="user_info.working" placeholder="请选择">
 						      <el-option label="待业" value="待业"></el-option>
 						      <el-option label="在职" value="在职"></el-option>
@@ -67,12 +78,12 @@
 					    <el-form-item label="期望工作:" class="mb0">
 					      <div class="expect_wrap">
 									<el-row>
-										<el-col :span="6">
+										<el-col :span="7">
 											<icon-svg icon-class="ffan_lingdai" />
 											<span v-if="!is_edit">{{user_info.expectJob}}</span>
 		                  <el-input v-if="is_edit" v-model="user_info.expectJob" placeholder="期望岗位"></el-input>
 										</el-col>
-										<el-col :span="8">
+										<el-col :span="7">
 											<icon-svg icon-class="dibiao" />
 											<span v-if="!is_edit">{{user_info.expectAddress}}</span>
 		                  <el-input v-if="is_edit" v-model="user_info.expectAddress" placeholder="期望地点"></el-input>
@@ -81,6 +92,7 @@
 											<icon-svg icon-class="bill-copy" />
 											<span v-if="!is_edit">{{user_info.expectIncome}}</span>
 											<el-input v-if="is_edit" v-model="user_info.expectIncome" placeholder="期望薪资"></el-input>
+
 										</el-col>
 									</el-row>
 								</div>
@@ -97,7 +109,7 @@
 					</el-row>
 					<el-row>
 					  <el-col :span="24">
-					    <el-form-item label="个性标签:" >
+					    <el-form-item label="应聘标签:" >
 								<el-tag 
 									v-for="tag in user_info.labelName"
 									:closable="is_edit"
@@ -147,7 +159,7 @@
 			    <el-table-column
 			      property="endDate">
 			      <template slot-scope="scope">
-			      	<span>{{scope.row.endDate}}</span>
+			      	<span>{{scope.row.beginDate}}至{{scope.row.endDate}}</span>
 			      </template>
 			    </el-table-column>
 			    <el-table-column
@@ -164,7 +176,7 @@
 			  </el-table>
 			</div>
 			<div class="t-center mt10">
-				<el-button icon='el-icon-plus' size="mini" type="primary" @click="dialogAddWork = true" class="addbtn" v-if="is_edit">添加</el-button>
+				<el-button icon='el-icon-plus' size="mini" type="primary" @click="addDialog('dialogAddWork')" class="addbtn" v-if="is_edit">添加</el-button>
 			</div>
 		</div>
 
@@ -203,7 +215,7 @@
 			  </el-table>
 			</div>
 			<div class="t-center mt10">
-				<el-button icon='el-icon-plus' size="mini" type="primary" @click="dialogAddEdu = true" class="addbtn" v-if="is_edit">添加</el-button>
+				<el-button icon='el-icon-plus' size="mini" type="primary" @click="addDialog('dialogAddEdu')" class="addbtn" v-if="is_edit">添加</el-button>
 			</div>
 		</div>
 
@@ -216,14 +228,16 @@
 				</div>
 				<el-row>
 				  <el-col :span="8" v-for="(o, index) in user_info.certificate" :key="index">
-				    <el-card class="mb40" :style="'background-image:url('+ o.url +')'">
+				    <el-card class="mb40" :style="'background-image:url('+ o.src +')'">
 					      <div style="padding-top:100%;overflow:hidden;">
 					        <div class="bg-color" style="margin-top:-100%;">
 					        	<div class="honor_text">
 					        		<!-- <p>2017年6月12</p> -->
-					        		<p>{{o.name}}</p>
+					        		<p>{{o.text}}</p>
 					        	</div>
 					        </div>
+
+				    			<i class="el-icon-circle-close" v-if="is_edit" @click="delCertificate(index)"></i>
 					    </div>
 				    </el-card>
 				  </el-col>
@@ -248,7 +262,7 @@
 			</ul>
 		</div>
 
-		<el-dialog title="添加工作经历" :visible.sync="dialogAddWork" width="500px">
+		<el-dialog title="编辑工作经历" :visible.sync="dialogAddWork" width="500px">
 		  <el-form label-width="80px">
 
 		    <el-form-item label="职位">
@@ -282,7 +296,7 @@
 		  </div>
 		</el-dialog>
 
-		<el-dialog title="添加教育经历" :visible.sync="dialogAddEdu" width="500px">
+		<el-dialog title="编辑教育经历" :visible.sync="dialogAddEdu" width="500px">
 		  <el-form label-width="80px">
 
 		    <el-form-item label="专业" >
@@ -294,11 +308,24 @@
 		    </el-form-item>
 
 		    <el-form-item label="学历" >
-		      <el-input v-model="formData.edu.qualificate" auto-complete="off"></el-input>
+
+		      <el-select v-model="formData.edu.qualificate" placeholder="请选择">
+				    <el-option label="研究生" value="研究生"></el-option>
+              <el-option label="本科" value="本科"></el-option>
+              <el-option label="大专" value="大专"></el-option>
+              <el-option label="高中" value="高中"></el-option>
+              <el-option label="初中" value="初中"></el-option>
+              <el-option label="小学" value="小学"></el-option>
+				  </el-select>
 		    </el-form-item>
 
 		    <el-form-item label="毕业时间" >
-		      <el-input v-model="formData.edu.graduateYear" auto-complete="off"></el-input>
+		    	<el-date-picker
+			      v-model="formData.edu.graduateYear"
+			      type="month"
+			      placeholder="选择月"
+			      style="width:100%">
+			    </el-date-picker>
 		    </el-form-item>
 
 		  </el-form>
@@ -308,15 +335,22 @@
 		    <el-button v-show="is_edit_exp" type="primary" @click="seveEdit('work')">确 定</el-button>
 		  </div>
 		</el-dialog>
-		<el-dialog title="添加荣誉" :visible.sync="dialogCertificate" width="510px">
+		<el-dialog title="编辑荣誉（证书）" :visible.sync="dialogCertificate" width="510px">
 			<el-upload
+			  class="avatar-uploader t-center"
 			  :action="gpath.user_hp"
-			  list-type="picture-card"
-			  :file-list="user_info.certificate"
+			  :show-file-list="false"
 			  :on-success="updateCertificate"
-			  :on-remove="handleRemove">
-			  <i class="el-icon-plus"></i>
+			  accept=".jpg,.png, .gif"
+			  :before-upload="beforeAvatarUpload">
+			  <img v-if="certificateList.src" :src="certificateList.src" class="avatar">
+			  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
 			</el-upload>
+			<el-input v-model="certificateList.text" placeholder='简单介绍该荣誉'></el-input>
+			<div slot="footer" class="dialog-footer">
+		    <el-button @click="dialogCertificate = false">取 消</el-button>
+		    <el-button type="primary" @click="addCertificate()">确 定</el-button>
+		  </div>
 		</el-dialog>
 	</div>
 </template>
@@ -324,25 +358,33 @@
 <script>
   import { mapGetters } from 'vuex';
   import { parseTime } from '@/utils/index';
-  import { getResumeDetails, saveResume, updateResume } from '@/api/student/resume';
-	import ImageCropper from '@/components/ImageCropper';
+  import { updateResume, getResumeDetails, saveResume } from '@/api/student/resume';
   export default {
     computed: {
       ...mapGetters([
-        'name',
         'id',
-        'age'
+	      'name',
+	      'pic',
+				'age',
+				'sex',
+				'schoolName',
+				'major',
+				'email',
+				'major',
+				'linkPhone'
       ])
     },
   	data() {
   		return {
-  			imagecropperShow: false,
-  			imagecropperKey: 0,
   			is_edit: false,
   			is_edit_exp: false,
   			edit_content: {},
   			inputVisible: false,
-  			certificateList: [],
+  			certificateList: {
+  				name: '',
+  				src: '',
+  				text: ''
+  			},
   			labelValue: '',
   			user_info: {
   				studentId: '',
@@ -353,6 +395,8 @@
   				selfIntro: '',
   				skillDescript: '',
   				pic: '',
+  				sex: '',
+  				sexStr: '',
   				labelName: [],
   				working: '',
   				expectAddress: '',
@@ -385,6 +429,11 @@
   	},
   	mounted(){
   		this.is_add();
+  		this.user_info.linkName = this.name;
+  		this.user_info.age = this.age;
+  		this.user_info.sex = this.sex;
+  		this.user_info.linkPhone = this.linkPhone;
+  		this.user_info.pic = this.pic;
   	},
   	methods: {
   		is_add(){
@@ -438,8 +487,13 @@
   		updata(){
   			this.user_info['id'] = this.$route.params.id;
   			updateResume(this.formToString()).then(res => {
-  				this.$message.success('编辑成功');
-	        this.$router.back(-1);
+  				if(res.code == 1){
+  					this.$message.success('编辑成功');
+  					this.$router.go(0);
+	        	// this.$router.back(-1);
+  				}else{
+  					this.$message.error('编辑失败');
+  				}
   			})
   		},
   		formToString(){
@@ -460,6 +514,27 @@
   				this.$router.back(-1);
   			}
   		},
+  		addDialog(type){
+  			this.formData = {
+  				work: {
+						workJob: '',
+						companyName: '',
+						time: '',
+						workContent: ''
+					},
+					edu: {
+						major: '',
+						schoolName: '',
+						qualificate: '',
+						graduateYear: ''
+					}
+				}
+  			if(type == 'dialogAddEdu'){
+  				this.dialogAddEdu = true
+  			}else{
+  				this.dialogAddWork = true
+  			}
+  		},
   		addExp(position){
   			if(position == 'work'){
   				this.user_info.work.push({
@@ -472,11 +547,26 @@
   				this.user_info.workList = this.user_info.work
   				this.dialogAddWork = false;
   			}else{
+  				this.formData.edu.graduateYear = parseTime(this.formData.edu.graduateYear,'{y}-{m}');
+  				this.formData.edu.qualificate = this.formData.edu.qualificate;
   				this.user_info.edu.push(JSON.parse(JSON.stringify(this.formData.edu)));
   				this.user_info.eduList = this.user_info.edu;
   				this.dialogAddEdu = false;
   			}
       	this.is_edit_exp = false;
+  		},
+  		addCertificate(){
+  			this.user_info.certificate[this.user_info.certificate.length] = this.certificateList;
+  			this.certificateList= {
+  				name: '',
+  				src: '',
+  				text: ''
+  			};
+  			this.dialogCertificate = false;
+  		},
+  		delCertificate(index){
+  			console.log(index)
+  			delete this.user_info.certificate.splice(index, 1);
   		},
   		handleTagClose(tag){
   			this.user_info.labelName.splice(this.user_info.labelName.indexOf(tag), 1);
@@ -486,14 +576,14 @@
   				this.$message.warning('sorry，不可以太贪心哦！最多只可以添加5条。');
   				return;
   			}
-  			let inputValue = this.labelValue;
+  			let inputValue = this.labelValue.replace(/\s|\xA0/g,"");
 
   			if(inputValue.length >= 5){
   				this.$message.warning('sorry，字符太多了哦，快删除几个字符')
   				return;
   			}
 
-        if (inputValue) {
+        if (inputValue && inputValue.length != 0) {
           this.user_info.labelName.push(inputValue);
         }
         this.labelValue = '';
@@ -503,19 +593,14 @@
         this.user_info.pic = res.url.split('@')[0];
       },
       beforeAvatarUpload(file) {
-        const isJPG = file.type === 'image/jpeg';
         const isLt2M = file.size / 1024 / 1024 < 2;
-
-        // if (!isJPG) {
-        //   this.$message.error('上传头像图片只能是 JPG 格式!');
-        // }
         if (!isLt2M) {
           this.$message.error('上传头像图片大小不能超过 2MB!');
         }
-        return isJPG && isLt2M;
+        return isLt2M;
       },
       deleteRow(index, rows) {
-      	console.log(rows)
+      	// console.log(rows)
         rows.splice(index, 1);
       },
       editRow(index, rows, type){
@@ -526,9 +611,11 @@
       		type: type
       	};
       	if(type == 'work'){
+      		this.formData.work = rows;
       		this.dialogAddWork = true;
       	}
       	else{
+      		this.formData.edu = rows;
       		this.dialogAddEdu = true;
       	}
       },
@@ -546,6 +633,7 @@
       				this.$set(this.user_info.workList[index], label, this.formData.work[label]);
       			}
 	      	}
+
       		this.dialogAddWork = false;
       	}
       	else{
@@ -557,26 +645,21 @@
       	this.is_edit_exp = false;
       },
       updateCertificate(res, file, fileList){
-      	let list = [];
-      	for(let i in fileList){
-      		console.log(fileList[i])
-      		list.push({
-      			name:file.name,
-      			url: fileList[i].url
-      		})
-      	}
-      	this.user_info.certificate = list;
+    		this.certificateList = {
+    			name: res.name,
+    			src: res.url
+    		}
+    		console.log(this.certificateList)
       },
       handleRemove(file, fileList) {
-      	let list = [];
-      	for(let i in fileList){
-      		list.push({
-      			name:res.name,
-      			url: fileList[i].url.split(':')[1]
-      		})
+      	// console.log(file, fileList)
+      	for(let i in this.user_info.certificate){
+      		if(this.user_info.certificate[i].uid == file.uid){
+	      		this.user_info.certificate.splice(i, 1);
+	      	}
       	}
-      	this.user_info.certificate = list;
-      },
+      	console.log(this.user_info.certificate)
+      }
   	}
   }
 </script>
@@ -711,20 +794,30 @@
 				}
 				.honor_text{
 					bottom: 10px;
-					opacity: 1;
+					color: #fff
+				}
+				.el-icon-circle-close{
+					display: block;
 				}
 			}
 			.el-card__body{
 				@include transition;
 			}
+			.el-icon-circle-close{
+				position: relative;
+				font-size: 32px;
+				color: #fff;
+				display: none;
+				cursor: pointer;
+			}
 			.honor_text{
 				position: absolute;
 				bottom: 0;
 				left: 20px;
+				right: 0;
 				width: 100%;
 				line-height: 25px;
-				color: #fff;
-				opacity: 0;
+				color: #333;
 				@include transition;
 			}
 		}
@@ -767,4 +860,29 @@
     }
   }
 }
+
+.el-dialog .avatar-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  .el-upload:hover {
+	  border-color: #409EFF;
+	}
+	.avatar-uploader-icon {
+	  font-size: 28px;
+	  color: #8c939d;
+	  width: 178px;
+	  height: 178px;
+	  line-height: 178px;
+	  text-align: center;
+	}
+	.avatar {
+	  width: 178px;
+	  height: 178px;
+	  display: block;
+	}
+}
+
 </style>

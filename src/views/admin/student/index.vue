@@ -8,6 +8,20 @@
 
 				<el-form-item class="mb0" label="学校名称" v-if="type == 0">
 					<!-- <el-input v-model="listQuery.schoolName" placeholder="请输入" @change="search"></el-input> -->
+					<el-select v-model="listQuery.registerType" filterable placeholder="请选择" @change="search">
+				    <el-option
+				      label="平台导入"
+				      :value="0">
+				    </el-option>
+				    <el-option
+				      label="自主注册"
+				      :value="1">
+				    </el-option>
+				  </el-select>
+				</el-form-item>
+
+				<el-form-item class="mb0" label="学校名称" v-if="type == 0">
+					<!-- <el-input v-model="listQuery.schoolName" placeholder="请输入" @change="search"></el-input> -->
 					<el-select v-model="listQuery.schoolId" filterable placeholder="请选择" @change="search">
 				    <el-option
 				      v-for="item in schoolList"
@@ -32,6 +46,9 @@
 					  <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>
 					  <!-- <div slot="tip" class="el-upload__tip">只能上传excel文件，且不超过500kb</div> -->
 					</el-upload>
+				</el-form-item>
+				<el-form-item class="mb0">
+					<a href="/static/file/学生导入.xlsx">下载上传模板</a>
 				</el-form-item>
 				<el-form-item class="mb0">
 					<el-button size="small" type="primary" class="ml20" @click="handleDownload">导出excel</el-button>
@@ -151,7 +168,8 @@
 	      	pageNo: 1,
 	      	pageSize: 30,
 	      	schoolId: '',
-	      	studentName: ''
+	      	studentName: '',
+	      	registerType: 0
 	      },
 	      schoolQuery: {
 	      	pageNo: 1,

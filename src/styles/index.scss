@@ -2,6 +2,7 @@
 @import './mixin.scss';
 @import './response.scss';
 body {
+  min-width: 1200px;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -79,6 +80,9 @@ p {font-size: 14px;}
 .full-height{min-height: calc(100vh - 94px)}
 .pull-left{float: left;}
 .pull-right{float: right;}
+.rel{position: relative;}
+.abs{position: absolute;}
+
 
 .t-center{text-align: center;}
 .t-left{text-align: left;}
@@ -139,6 +143,10 @@ p {font-size: 14px;}
   fill: currentColor;
   overflow: hidden;
 }
+.fixed-edit{
+  li{cursor: pointer}
+}
+.point{cursor: pointer;}
 // 面板
 .panel_white {
   background-color: #ffffff;
