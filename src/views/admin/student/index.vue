@@ -6,7 +6,7 @@
 			    <span class="c-success">{{total}}</span>人
 			  </el-form-item>
 
-				<el-form-item class="mb0" label="学校名称" v-if="type == 0">
+				<el-form-item class="mb0" label="学生类型" v-if="type == 0">
 					<!-- <el-input v-model="listQuery.schoolName" placeholder="请输入" @change="search"></el-input> -->
 					<el-select v-model="listQuery.registerType" filterable placeholder="请选择" @change="search">
 				    <el-option

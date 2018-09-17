@@ -31,13 +31,13 @@
 	          				<span class="pull-right" style="font-size:14px;color:#555"> 
 	          					{{item.jobName}}
 	          				</span>
-	          				<router-link :to="{path: '/search/student-details', query: {id: item.resumeId,deliveryId: item.id,resumeState:item.resumeState, is_com_look: true}}">
+	          				<router-link :to="{path: '/com/inbox/details', query: {id: item.resumeId,deliveryId: item.id,resumeState:item.resumeState, is_com_look: true}}">
 											{{item.studentName}}
 	          				</router-link>
 	          			</div>
 	          		</div>
 	          		<div class="edit">
-	          			<router-link :to="{path: '/search/student-details', query: {id: item.resumeId,deliveryId: item.id,resumeState:item.resumeState, is_com_look: true}}">
+	          			<router-link :to="{path: '/com/inbox/details', query: {id: item.resumeId,deliveryId: item.id,resumeState:item.resumeState, is_com_look: true}}">
 		          			<el-button class="pull-right" size="mini" type="primary">查看</el-button>
 		          		</router-link>
 		          		

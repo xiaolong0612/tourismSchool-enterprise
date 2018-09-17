@@ -15,7 +15,7 @@
         	<el-row>
 	  				<el-col :span="24">
 		  				<el-form-item style="margin-left:-100px;">
-		    				<div class="user-img mb20" :style="'background-image:url('+user_info.pic =='' ? '/static/logo.png' : user_info.pic+')'"></div>
+		    				<div class="user-img mb20" :style="'background-image:url('+user_info.pic || ''+')'"></div>
 		    			</el-form-item>
 		    		</el-col>
 		    		<el-col :span="24">
@@ -197,7 +197,7 @@
 		  title="邀请信息"
 		  :visible.sync="is_agree_dialog"
 		  width="30%">
-		  <el-form :model="agreeForm" label-width="100px">
+		  <el-form :model="agreeForm" ref="agreeForm" :rules="agreebForm_rules" label-width="100px">
 
 		    <el-form-item label="联系人">
 		      <el-input v-model="agreeForm.interviewLinker" auto-complete="off"></el-input>
@@ -207,7 +207,7 @@
 		      <el-input v-model="agreeForm.interviewTel" auto-complete="off"></el-input>
 		    </el-form-item>
 		    
-		    <el-form-item label="面试时间">
+		    <el-form-item label="面试时间" prop="interviewTime">
 		      <el-date-picker
 		      	style="width: 100%"
 			      v-model="agreeForm.interviewTime"
@@ -219,7 +219,7 @@
 			    </el-date-picker>
 		    </el-form-item>
 		    
-		    <el-form-item label="面试地点">
+		    <el-form-item label="面试地点" prop="interviewAddr">
 		      <el-input v-model="agreeForm.interviewAddr" auto-complete="off"></el-input>
 		    </el-form-item>
 		    
@@ -234,7 +234,7 @@
 		  </el-form>
 		  <span slot="footer" class="dialog-footer">
 		    <el-button @click="is_agree_dialog = false">取 消</el-button>
-		    <el-button type="primary" @click="updateInbox">确 定</el-button>
+		    <el-button type="primary" @click="newInbox">确 定</el-button>
 		  </span>
 		</el-dialog>
 
@@ -272,7 +272,7 @@
   import { mapGetters } from 'vuex';
   import { getResumeDetails } from '@/api/student/resume';
   import { resumeCollect,resumeIsCollect,delResumeCollect } from '@/api/com/collect';
-  import { updateInbox, refuseInbox } from '@/api/com/inbox';
+  import { newInbox, refuseInbox } from '@/api/com/inbox';
   import { changeURLPar } from '@/utils/index';
   export default {
     computed: {
@@ -316,7 +316,8 @@
   				workList: []
   			},
   			agreeForm: {
-  				id: '',
+  				resumeId: '',
+  				companyId: '',
   				// type: '0',
   				resumeState: '1',
   				interviewLinker: '',
@@ -325,6 +326,14 @@
 					interviewAddr: '',
 					itemName: '',
 					interviewRemark: ''
+  			},
+  			agreebForm_rules:{
+  				interviewTime:[
+  					{ required: true, message: '请选择面试时间', trigger: 'blur' }
+  				],
+  				interviewAddr: [
+  					{ required: true, message: '请填写面试地点', trigger: 'blur' }
+  				]
   			},
   			refuseForm: {
   				id: '',
@@ -342,8 +351,9 @@
   	},
   	methods: {
   		setDefault(){
-  			this.agreeForm.id = typeof this.$route.query.deliveryId == 'undeined' ? '' : this.$route.query.deliveryId;
-  			this.refuseForm.id = this.agreeForm.id;
+  			this.agreeForm.resumeId = typeof this.$route.query.id == 'undeined' ? '' : this.$route.query.id;
+  			this.agreeForm.companyId = this.id;
+  			this.refuseForm.id = this.agreeForm.resumeId;
   			this.resumeState = typeof this.$route.query.resumeState == 'undefined' ? 0 : this.$route.query.resumeState;
 
   			this.agreeForm.interviewLinker = this.linkName;
@@ -365,6 +375,7 @@
   						this.user_info[index] = data[index];
   					}
   				}
+  				console.log(this.user_info)
   			})
   		},
   		// 同意入职
@@ -372,19 +383,19 @@
   			let query = this.$route.query;
   			this.is_entry_dialog = false;
   			this.agreeForm.resumeState = 3
-  			updateInbox(this.agreeForm).then(res => {
+  			newInbox(this.agreeForm).then(res => {
   				this.resumeState = 3;
 
   				this.$router.push({path: '/search/student-details',query:{id: query.id,deliveryId: query.deliveryId,resumeState:3, is_com_look: query.is_com_look}});
   			})
   		},
   		// 邀请面试
-  		updateInbox(){
+  		newInbox(){
   			let query = this.$route.query;
   			this.is_agree_dialog = false;
   			// this.agreeForm.type = 0;
   			this.agreeForm.resumeState = 2;
-  			updateInbox(this.agreeForm).then(res => {
+  			newInbox(this.agreeForm).then(res => {
   				this.resumeState = 2;
 
   				this.$router.push({path: '/search/student-details',query:{id: query.id,deliveryId: query.deliveryId,resumeState:2, is_com_look: query.is_com_look}});

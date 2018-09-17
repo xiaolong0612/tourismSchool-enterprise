@@ -15,7 +15,7 @@
         	<el-row>
 	  				<el-col :span="24">
 		  				<el-form-item style="margin-left:-100px;">
-		    				<div class="user-img mb20" :style="'background-image:url('+user_info.pic+')'"></div>
+		    				<div class="user-img mb20" :style="'background-image:url('+user_info.pic || ''+')'"></div>
 		    			</el-form-item>
 		    		</el-col>
 		    		<el-col :span="24">
@@ -28,12 +28,21 @@
 						<!-- 基本信息 -->
 						<el-col :span="12">
               <el-form-item label="联系方式:" >
-                	<span>{{user_info.linkPhone}}</span>
+                	<span v-if="resumeState != 0 && resumeState != 1 && resumeState != 4 ">{{user_info.linkPhone}}</span>
+	                  <span v-else>
+	                  	<font v-if="resumeState != 4">邀请面试后可查看</font>
+	                  	<font v-else>因拒绝无法查看</font>
+	                  </span>
               </el-form-item>
             </el-col>
-            <el-col :span="12">
+            <el-col :span="6">
           		<el-form-item label="年龄:" >
-              	<span>{{age}}</span>
+              	<span>{{user_info.age}}</span>
+          		</el-form-item>
+          	</el-col>
+            <el-col :span="6">
+          		<el-form-item label="性别:" >
+              	<span>{{user_info.sexStr}}</span>
           		</el-form-item>
           	</el-col>
           </el-row>
@@ -149,7 +158,7 @@
 					        <div class="bg-color" style="margin-top:-100%;">
 					        	<div class="honor_text">
 					        		<!-- <p>2017年6月12</p> -->
-					        		<p>{{o.name}}</p>
+					        		<p>{{o.text}}</p>
 					        	</div>
 					        </div>
 					    </div>
@@ -159,22 +168,27 @@
 			</div>
 		</div>
 
-		<div class="fixed-edit" v-if="is_com_look">
+		<div class="fixed-edit" v-if="type == 3">
 			<ul>
-				<!-- <transition name="el-zoom-in-center" v-if="resumeState == 2 || resumeState == 1">
-					<li style="background:#67c23a">已<br>邀<br>请</li>
-				</transition> -->
-				<transition name="el-zoom-in-center" v-if="resumeState == 0">
-					<li style="background:#67c23a" @click="is_agree_dialog = true">同意<br>入职</li>
+				<transition name="el-zoom-in-center" v-if="!resume_is_collect">
+					<li class="bg-info" @click="resumeCollect">收<br>藏</li>
 				</transition>
-				
+				<transition name="el-zoom-in-center" v-if="resume_is_collect">
+					<li class="bg-info" @click="delResumeCollect">取消<br>收藏</li>
+				</transition>
+				<transition name="el-zoom-in-center" v-if="resumeState == 2 ">
+					<li style="background:#67c23a" @click="is_entry_dialog = true">同意<br>入职</li>
+				</transition>
+				<transition name="el-zoom-in-center" v-if="resumeState == 3">
+					<li style="background:#67c23a">成功<br>入职</li>
+				</transition>
 				<transition name="el-zoom-in-center" v-if="resumeState == 4">
 					<li class="bg-danger">已<br>拒<br>绝</li>
 				</transition>
-				<transition name="el-zoom-in-center" v-if="resumeState == 2">
-					<li style="background:#67c23a" @click="is_agree_dialog = true">同<br>意<br>入职</li>
+				<transition name="el-zoom-in-center" v-if="resumeState == 0 || resumeState == 1">
+					<li style="background:#67c23a" @click="is_agree_dialog = true">邀请<br>面试</li>
 				</transition>
-				<transition name="el-zoom-in-center" v-if="resumeState == 0 || resumeState == 2">
+				<transition name="el-zoom-in-center" v-if="resumeState != 3 && resumeState != 4">
 					<li class="bg-danger" @click="is_refuse_dialog = true">拒<br>绝</li>
 				</transition>
 			</ul>
@@ -183,7 +197,7 @@
 		  title="邀请信息"
 		  :visible.sync="is_agree_dialog"
 		  width="30%">
-		  <el-form :model="agreeForm" label-width="100px">
+		  <el-form :model="agreeForm" ref="agreeForm" :rules="agreebForm_rules" label-width="100px">
 
 		    <el-form-item label="联系人">
 		      <el-input v-model="agreeForm.interviewLinker" auto-complete="off"></el-input>
@@ -193,11 +207,19 @@
 		      <el-input v-model="agreeForm.interviewTel" auto-complete="off"></el-input>
 		    </el-form-item>
 		    
-		    <el-form-item label="面试时间">
-		      <el-input v-model="agreeForm.interviewTime" auto-complete="off"></el-input>
+		    <el-form-item label="面试时间" prop="interviewTime">
+		      <el-date-picker
+		      	style="width: 100%"
+			      v-model="agreeForm.interviewTime"
+			      :picker-options="pickerOptions"
+			      value-format="yyyy 年 MM 月 dd 日 HH 点 m 分"
+			      type="datetime"
+			      format="yyyy 年 MM 月 dd 日 HH 点 m 分"
+			      placeholder="选择面试时间">
+			    </el-date-picker>
 		    </el-form-item>
 		    
-		    <el-form-item label="面试地点">
+		    <el-form-item label="面试地点" prop="interviewAddr">
 		      <el-input v-model="agreeForm.interviewAddr" auto-complete="off"></el-input>
 		    </el-form-item>
 		    
@@ -213,6 +235,17 @@
 		  <span slot="footer" class="dialog-footer">
 		    <el-button @click="is_agree_dialog = false">取 消</el-button>
 		    <el-button type="primary" @click="updateInbox">确 定</el-button>
+		  </span>
+		</el-dialog>
+
+		<el-dialog
+		  title="邀请入职"
+		  :visible.sync="is_entry_dialog"
+		  width="30%">
+		  <span>确定同意<font class="c-blue">{{user_info.linkName}}</font>入职申请么?</span>
+		  <span slot="footer" class="dialog-footer">
+		    <el-button @click="is_entry_dialog = false">取 消</el-button>
+		    <el-button type="primary" @click="handleEntry">确 定</el-button>
 		  </span>
 		</el-dialog>
 
@@ -238,20 +271,31 @@
 <script>
   import { mapGetters } from 'vuex';
   import { getResumeDetails } from '@/api/student/resume';
+  import { resumeCollect,resumeIsCollect,delResumeCollect } from '@/api/com/collect';
   import { updateInbox, refuseInbox } from '@/api/com/inbox';
+  import { changeURLPar } from '@/utils/index';
   export default {
     computed: {
       ...mapGetters([
         'name',
         'id',
-        'age'
+        'age',
+        'type',
+        'linkPhone',
+        'linkName'
       ])
     },
   	data() {
   		return {
   			is_agree_dialog: false,
   			is_refuse_dialog: false,
-  			is_com_look: false,
+  			is_entry_dialog: false,
+  			resume_is_collect: false,
+  			pickerOptions: {
+          disabledDate(time) {
+            return time.getTime() <= Date.now();
+          }
+        },
   			user_info: {
   				studentId: '',
   				pic: "",
@@ -260,7 +304,7 @@
   				certificate: '',
   				selfIntro: '',
   				skillDescript: '',
-  				pic: '',
+  				sexStr: '',
   				labelName: [],
   				working: '',
   				expectAddress: '',
@@ -273,7 +317,8 @@
   			},
   			agreeForm: {
   				id: '',
-  				resumeState: '2',
+  				// type: '0',
+  				resumeState: '1',
   				interviewLinker: '',
   				interviewTel: '',
 					interviewTime: '',
@@ -281,10 +326,18 @@
 					itemName: '',
 					interviewRemark: ''
   			},
+  			agreebForm_rules:{
+  				interviewTime:[
+  					{ required: true, message: '请选择面试时间', trigger: 'blur' }
+  				],
+  				interviewAddr: [
+  					{ required: true, message: '请填写面试地点', trigger: 'blur' }
+  				]
+  			},
   			refuseForm: {
   				id: '',
   				type: 1,
-  				resumeState: 3,
+  				resumeState: '',
 					interviewConclusion: ''
   			},
   			resumeState: '',
@@ -293,40 +346,91 @@
   	mounted(){
   		this.setDefault();
   		this.getInfo();
+  		this.resumeIsCollect();
   	},
   	methods: {
   		setDefault(){
-  			this.is_com_look = typeof this.$route.query.is_com_look == 'undeined' ? false : true;
-  			this.agreeForm.id = typeof this.$route.query.deliveryId == 'undeined' ? '' : this.$route.query.deliveryId;
+  			this.agreeForm.id = typeof this.$route.query.id == 'undeined' ? '' : this.$route.query.id;
   			this.refuseForm.id = this.agreeForm.id;
-  			this.resumeState = this.$route.query.resumeState;
+  			this.resumeState = typeof this.$route.query.resumeState == 'undefined' ? 0 : this.$route.query.resumeState;
+
+  			this.agreeForm.interviewLinker = this.linkName;
+  			this.agreeForm.interviewTel = this.linkPhone;
   		},
   		getInfo(){
   			let id = this.$route.query.id;
   			getResumeDetails({id}).then(res => {
   				if(typeof res == 'undefined') return;
   				let data = res.resume;
+  				var arr_to_json = ['certificate']
   				for(let index in data){
   					if(index == 'labelName'){
   						this.user_info[index] = data[index] == '' ? [] : data[index].split(',');
+  					}else if(arr_to_json.indexOf(index) != -1){
+  							console.log(index)
+  							this.user_info[index] = JSON.parse(data[index]) || [];
   					}else{
   						this.user_info[index] = data[index];
   					}
   				}
+  				console.log(this.user_info)
   			})
   		},
-  		updateInbox(){
-  			this.is_agree_dialog = false;
-  			this.refuseForm.resumeState = 2;
+  		// 同意入职
+  		handleEntry(){
+  			let query = this.$route.query;
+  			this.is_entry_dialog = false;
+  			this.agreeForm.resumeState = 3
   			updateInbox(this.agreeForm).then(res => {
-  				console.log(res)
-  				this.resumeState = 2;
+  				this.resumeState = 3;
+
+  				this.$router.push({path: '/com/inbox/details',query:{id: query.id,deliveryId: query.deliveryId,resumeState:3, is_com_look: query.is_com_look}});
   			})
   		},
+  		// 邀请面试
+  		updateInbox(){
+  			let query = this.$route.query;
+  			this.is_agree_dialog = false;
+  			// this.agreeForm.type = 0;
+  			this.agreeForm.resumeState = 2;
+  			updateInbox(this.agreeForm).then(res => {
+  				this.resumeState = 2;
+
+  				this.$router.push({path: '/com/inbox/details',query:{id: query.id,deliveryId: query.deliveryId,resumeState:2, is_com_look: query.is_com_look}});
+  			})
+  		},
+  		// 拒绝
   		refuseInbox(){
+  			let query = this.$route.query;
   			this.is_refuse_dialog = false;
+  			this.refuseForm.resumeState = 4;
   			refuseInbox(this.refuseForm).then(res => {
-  				this.resumeState = 3;
+  				this.resumeState = 4;
+
+  				this.$router.push({path: '/com/inbox/details',query:{id: query.id,deliveryId: query.deliveryId,resumeState:4, is_com_look: query.is_com_look}});
+  			})
+  		},
+  		// 搜藏
+  		resumeCollect(){
+  			resumeCollect({companyId: this.id, resumeId: this.$route.query.id}).then( res => {
+  				if(res.success){
+  					this.resume_is_collect = true;
+  					this.$message.success('收藏成功');
+  				}
+  			})
+  		},
+  		resumeIsCollect(){
+  			resumeIsCollect({companyId: this.id, resumeId: this.$route.query.id}).then(res => {
+  					if(res.state == 0) this.resume_is_collect = true;
+  					else this.resume_is_collect = false;
+  			})
+  		},
+  		delResumeCollect(){
+  			delResumeCollect({companyId: this.id, resumeId: this.$route.query.id}).then(res => {
+  					if(res.success){
+  					this.resume_is_collect = false;
+  					this.$message.success('已取消收藏');
+  				}
   			})
   		}
   	}
@@ -368,7 +472,7 @@
 				height: 80px;
 				text-align: center;
 				overflow: hidden;
-				background: url(/static/img/default-img/user.jpg) center no-repeat;
+				background: url(/static/logo.png) center no-repeat;
 				background-size: cover;
 				margin: 0 auto;
 				border-radius: 100%;
@@ -459,7 +563,7 @@
 				}
 				.honor_text{
 					bottom: 10px;
-					opacity: 1;
+					color: #fff
 				}
 			}
 			.el-card__body{
@@ -471,8 +575,7 @@
 				left: 20px;
 				width: 100%;
 				line-height: 25px;
-				color: #fff;
-				opacity: 0;
+				color: #333;
 				@include transition;
 			}
 		}

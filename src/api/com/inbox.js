@@ -2,10 +2,18 @@ import fetch from '@/utils/fetch';
 
 // 收件箱
 
-// 同意面试
+// 邀请面试
 export function updateInbox(data) {
   return fetch({
     url: '/admin/company-resume/mod-student-resume-delivery',
+    method: 'post',
+    data
+  });
+}
+// 企业直接邀请面试
+export function newInbox(data) {
+  return fetch({
+    url: '/admin/company-resume/new-resume-delivery',
     method: 'post',
     data
   });
