@@ -350,8 +350,7 @@
   	},
   	methods: {
   		setDefault(){
-  			this.agreeForm.id = typeof this.$route.query.id == 'undeined' ? '' : this.$route.query.id;
-  			this.refuseForm.id = this.agreeForm.id;
+  			this.refuseForm.id = this.$route.query.deliveryId;
   			this.resumeState = typeof this.$route.query.resumeState == 'undefined' ? 0 : this.$route.query.resumeState;
 
   			this.agreeForm.interviewLinker = this.linkName;
@@ -373,14 +372,13 @@
   						this.user_info[index] = data[index];
   					}
   				}
-  				console.log(this.user_info)
   			})
   		},
   		// 同意入职
   		handleEntry(){
   			let query = this.$route.query;
   			this.is_entry_dialog = false;
-  			this.agreeForm.resumeState = 3
+  			this.agreeForm.resumeState = 3;
   			updateInbox(this.agreeForm).then(res => {
   				this.resumeState = 3;
 
@@ -393,6 +391,7 @@
   			this.is_agree_dialog = false;
   			// this.agreeForm.type = 0;
   			this.agreeForm.resumeState = 2;
+  			this.agreeForm.studentId = query.studentId;
   			updateInbox(this.agreeForm).then(res => {
   				this.resumeState = 2;
 

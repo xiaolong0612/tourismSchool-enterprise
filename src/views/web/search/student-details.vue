@@ -392,14 +392,24 @@
   		// 邀请面试
   		newInbox(){
   			let query = this.$route.query;
-  			this.is_agree_dialog = false;
   			// this.agreeForm.type = 0;
+  			
   			this.agreeForm.resumeState = 2;
-  			newInbox(this.agreeForm).then(res => {
-  				this.resumeState = 2;
+  			this.agreeForm.studentId = query.id;
+  			this.$refs['agreeForm'].validate((valid) => {
+          if (valid) {
 
-  				this.$router.push({path: '/search/student-details',query:{id: query.id,deliveryId: query.deliveryId,resumeState:2, is_com_look: query.is_com_look}});
-  			})
+  					this.is_agree_dialog = false;
+		  			newInbox(this.agreeForm).then(res => {
+		  				this.resumeState = 2;
+
+		  				this.$router.push({path: '/search/student-details',query:{id: query.id,deliveryId: query.deliveryId,resumeState:2, is_com_look: query.is_com_look}});
+		  			})
+		  		}else {
+            console.log('error submit!!');
+            return false;
+          }
+        })
   		},
   		// 拒绝
   		refuseInbox(){

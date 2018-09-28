@@ -6,9 +6,9 @@
           
           <el-row :gutter="15" class="resumet_list">
 
-            <transition name="el-zoom-in-top" v-for="item in list" :key="item.resume.id">
+            <transition name="el-zoom-in-top" v-for="item in list" :key="item.resumeId">
               <el-col :span="6">
-                <div class="item mb20" :style="{borderLeftColor: item.resume.border_color}">
+                <div class="item mb20" :style="{borderLeftColor: item.border_color}">
                   <i class="el-icon-circle-cross" @click="delResumeCollect(item.resume)"></i>
                   <div style="padding: 7px 7px 0" class="clearfix">
                     <div class="img pull-left" :style="{backgroundImage: 'url('+item.resume.pic+')'}"></div>
@@ -31,7 +31,6 @@
                     </router-link>
 
                     <span class="pull-left">收藏于:</span>
-                    <!-- <font class="pull-left">2017-09-10 12:00:00</font> -->
                     <font>{{item.collectTime}}</font>
                   </div>
                 </div> 
@@ -73,7 +72,7 @@
         },
         list: [],
         query: {
-          jobId: this.jobId,
+          jobId: 0,
           resumeId: '',
           companyId:'',
           studentName: '',
@@ -85,6 +84,7 @@
     },
     mounted() {
       this.query.companyId = this.id;
+      this.query.jobId = this.jobId;
       this.getlist();
     },
     methods: {
