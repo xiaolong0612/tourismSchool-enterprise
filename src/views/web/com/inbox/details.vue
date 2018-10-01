@@ -351,6 +351,7 @@
   	methods: {
   		setDefault(){
   			this.refuseForm.id = this.$route.query.deliveryId;
+  			this.agreeForm.id = this.$route.query.deliveryId;
   			this.resumeState = typeof this.$route.query.resumeState == 'undefined' ? 0 : this.$route.query.resumeState;
 
   			this.agreeForm.interviewLinker = this.linkName;
@@ -366,7 +367,6 @@
   					if(index == 'labelName'){
   						this.user_info[index] = data[index] == '' ? [] : data[index].split(',');
   					}else if(arr_to_json.indexOf(index) != -1){
-  							console.log(index)
   							this.user_info[index] = JSON.parse(data[index]) || [];
   					}else{
   						this.user_info[index] = data[index];
